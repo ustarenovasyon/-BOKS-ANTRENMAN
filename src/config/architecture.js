@@ -467,6 +467,7 @@ export const CURRENT_GENERATION_POLICY_VERSION = GENERATION_POLICY_VERSIONS.V1;
 
 export const WORKOUT_BLOCK_TYPES = Object.freeze({
   WARMUP: 'warmup',
+  FOOTWORK_TECHNIQUE: 'boxing_footwork_technique',
   BOXING_ATTACK_WORK: 'boxing_attack_work',
   BOXING_DEFENSE_WORK: 'boxing_defense_work',
   BOXING_REST: 'boxing_rest',

@@ -6,6 +6,8 @@
  * --------------------------------------------------------------
  */
 import { LOCAL_DB, WEEKLY_SESSION_ROLES, WORKOUT_BLOCK_TYPES, PROGRAM_GENERATION_REASON_CODES } from '@/config/architecture';
+import { resolveGenerationPolicyVersion } from './generationPolicyResolver';
+import { validateFootworkTechniqueDay } from './footworkTechniqueBlock';
 import { BOXING_MOVE_IDS } from '@/features/boxing/library/boxingMoves';
 import { BOXING_COMBINATIONS } from '@/features/boxing/combinations/boxingCombinations';
 import { DEFENSE_COUNTER_RULES } from '@/features/boxing/defense/defenseCounterRules';
@@ -28,6 +30,8 @@ export function validateFullProgramBlueprint(blueprint) {
   }
   const { program, programVersion, programDays, workoutBlocks } = blueprint;
   const settings = programVersion.settingsSnapshot;
+  const policy = resolveGenerationPolicyVersion(programVersion);
+  if (!policy.resolved) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
 
   // Program-level
   if (![1, 3, 6].includes(settings.durationMonths)) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
@@ -73,6 +77,15 @@ export function validateFullProgramBlueprint(blueprint) {
     for (let i = 0; i < orders.length; i++) {
       if (orders[i] !== i) { reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED); break; }
     }
+    const footworkValidation = validateFootworkTechniqueDay({
+      day,
+      dayBlocks,
+      programDays,
+      settings,
+      generationPolicyVersion: policy.version,
+    });
+    if (!footworkValidation.valid) reasons.push(RC.PROGRAM_BOXING_VALIDATION_FAILED);
+
     // forbidden kg keys
     for (const b of dayBlocks) {
       for (const k of FORBIDDEN_KG_KEYS) {

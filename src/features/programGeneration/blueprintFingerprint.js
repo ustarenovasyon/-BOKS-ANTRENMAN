@@ -39,7 +39,7 @@ export function getBlueprintFingerprintSignature(blueprint, seed) {
     .map((d) => `${d.trainingOrdinal}|${d.plannedDate}|${d.sessionRole}|${d.phaseId}|${d.progressionFocus}|${d.defenseEligible ? 1 : 0}`)
     .join(';');
   const blockSig = blocks
-    .map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}:${b.plannedSeconds}:${b.combinationId || b.defenseRuleId || b.exerciseId || b.templateId || ''}`)
+    .map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}:${b.plannedSeconds}:${b.combinationId || b.defenseRuleId || b.exerciseId || b.templateId || b.footworkMoveId || ''}`)
     .join(';');
   const sig = [seed, programVersion.programStartDate, programVersion.endDateExclusive, programVersion.totalPlannedTrainingSessions, daySig, blockSig].join('||');
   return { sig, seed, startDate: programVersion.programStartDate, endDate: programVersion.endDateExclusive, total: programVersion.totalPlannedTrainingSessions, daySig, blockSig, daysOrder: days.map((d) => d.trainingOrdinal), blocksOrder: blocks.map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}`) };

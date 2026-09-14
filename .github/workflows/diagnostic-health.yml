@@ -26,5 +26,7 @@ jobs:
       - name: Typecheck diagnostic
         continue-on-error: true
         run: npm run typecheck
+      - name: Strength fitter root-cause probe
+        run: node tests/diagnostic-strength-root.mjs
       - name: Full health matrix
         run: node tests/diagnostic-health.mjs

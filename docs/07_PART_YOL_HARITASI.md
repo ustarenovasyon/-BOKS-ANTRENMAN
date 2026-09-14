@@ -15,13 +15,40 @@ Durable finalizasyon tamamlandı:
 
 1M / 3M / 6M78 historical exact fingerprint çiftleri korunur. Original complete input object'leri mevcut repository/karar kayıtlarında bulunmadığından seed/requestId/date tahmin edilerek sahte exact fixture oluşturulmadı. Güvenilir original input evidence bulunursa ayrı durable fixture olarak eklenebilir; historical çiftler overwrite edilmez.
 
-## PART 33 — Footwork isolated-learning domain/block preflight
+## PART 33 — LOCKED: Footwork isolated-learning domain/block preflight
 
-Amaç: kullanıcı Step In/Out'u combo olmadan nasıl öğrenecek? Yeni `FOOTWORK_TECHNIQUE` block contract'ı, süre bütçesi, preview ve persistence etkisi. Önce preflight, sonra implementation.
+Preflight kararları:
+
+- Future block key `FOOTWORK_TECHNIQUE`
+- Canonical type string `boxing_footwork_technique`
+- Tek canonical `footworkMoveId`
+- Attack `moveIds` / `moveCount` ile tamamen ayrı
+- Defense rule alanlarıyla ayrı
+- `footworkPrescription` değildir
+- Warmup sonrası, boxing interval öncesi
+- Boxing budget içinden pay alır; session total artırmaz
+- V1 session budget davranışı değişmez
+- Curriculum eligibility merkezi helper'lardan derive edilir
+- Current intermediate/experienced curriculum timeline için fake fallback yok
+- DB schema bump gerekmez
+- Fingerprint'te future `footworkMoveId` identity zorunlu
+- V1 audit `checkSummary` shape/count değiştirilemez
+- Production generated footwork block count bu PART sonunda hâlâ 0
+
+Ayrıntılı contract: `docs/18_PART_33_FOOTWORK_ISOLATED_PREFLIGHT.md`.
 
 ## PART 34 — Footwork isolated drill implementation
 
-Stage1 Step In/Out ve Stage2 lateral step drill'leri; V1 isolation.
+Dormant V2 contract/support implementation:
+
+- block type constant
+- isolated block builder/helper
+- validator support
+- fingerprint identity
+- audit/preview fail-closed support
+- regression tests
+
+PART 36 scheduling/frequency policy gelmeden generated workout scheduling production'a açılmaz. V1 output kesinlikle değişmez.
 
 ## PART 35 — Footwork integration prescription
 
@@ -29,7 +56,7 @@ Structured `before_combo / after_combo` prescription; attack `moveCount` değiş
 
 ## PART 36 — Footwork scheduling/frequency policy
 
-Exposure frequency, support/main/challenge ile karışmayan ayrı pedagojik katman.
+Exposure frequency, budget allocation seconds ve hangi session'larda isolated drill bulunacağı kilitlenir. Support/main/challenge ile karışmayan ayrı pedagojik katman.
 
 ## PART 37 — Technique cue / guard / balance instruction layer
 

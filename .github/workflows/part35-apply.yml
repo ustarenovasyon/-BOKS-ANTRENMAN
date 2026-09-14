@@ -1,0 +1,53 @@
+name: PART35 Apply Patch
+
+on:
+  push:
+    branches:
+      - part35-footwork-integration-prescription
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: part35-footwork-integration-prescription
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply PART 35 patch
+        run: python scripts/part35_apply.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify independence
+        run: npm run verify:independent
+
+      - name: Regression suite
+        run: npm run test:regression
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit final PART 35 branch
+        run: |
+          rm -f scripts/part35_apply.py .github/workflows/part35-apply.yml
+          git config user.name "ustarenovasyon"
+          git config user.email "ustarenovasyon@gmail.com"
+          git add -A
+          git commit -m "PART 35: add dormant footwork integration prescription"
+          git push origin HEAD:part35-footwork-integration-prescription

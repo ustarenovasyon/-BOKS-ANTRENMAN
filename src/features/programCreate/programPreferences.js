@@ -8,6 +8,7 @@ import {
   EXPERIENCE_LEVELS, BOXING_STANCES, SESSION_DURATION_OPTIONS,
   SESSION_DURATION_LIMITS, STRENGTH_EQUIPMENT, TRAINING_PROFILE,
 } from '@/config/architecture';
+import { minimumSessionMinutesForMode } from '@/features/sessionBudget/sessionDurationPolicy';
 import { nowIso } from '@/lib/localData/time';
 
 export const PROGRAM_MODE_VALUES = Object.values(PROGRAM_MODES);
@@ -110,6 +111,8 @@ export function validateProgramPreferences(form) {
   const mins = resolveMinutes(form);
   if (!Number.isInteger(mins) || mins < SESSION_DURATION_LIMITS.MIN || mins > SESSION_DURATION_LIMITS.MAX) {
     errors.push(`Günlük süre ${SESSION_DURATION_LIMITS.MIN}–${SESSION_DURATION_LIMITS.MAX} dakika arasında tam sayı olmalı.`);
+  } else if (PROGRAM_MODE_VALUES.includes(mode) && mins < minimumSessionMinutesForMode(mode)) {
+    errors.push(`${LABELS.programMode[mode]} için günlük süre en az ${minimumSessionMinutesForMode(mode)} dakika olmalı.`);
   }
 
   if (!EXPERIENCE_VALUES.includes(form.experienceLevel)) errors.push('Deneyim seviyesi seç.');

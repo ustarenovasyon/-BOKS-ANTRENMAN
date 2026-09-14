@@ -1,0 +1,30 @@
+name: Diagnostic Health Matrix
+
+on:
+  push:
+    branches:
+      - diagnostic-full-health
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run verify:independent
+      - run: npm run test:regression
+      - run: npm run lint
+      - run: npm run build
+      - name: Typecheck diagnostic
+        continue-on-error: true
+        run: npm run typecheck
+      - name: Full health matrix
+        run: node tests/diagnostic-health.mjs

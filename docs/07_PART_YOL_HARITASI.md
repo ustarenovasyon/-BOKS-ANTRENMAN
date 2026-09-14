@@ -1,13 +1,19 @@
 # PART Yol Haritası — GitHub Devam Planı
 
-Bu dosya kesin PART numaralarını koddan daha önemli saymaz; kapsamlar küçük tutulmalıdır. PART 32 implementation repository'dedir ancak durable 6M/104 regression fixture işi tamamlanmadan kesin lock verilmemelidir.
+Bu dosya kesin PART numaralarını koddan daha önemli saymaz; kapsamlar küçük tutulmalıdır.
 
-## PART 32 Finalizasyon
+## PART 32 — LOCKED
 
-- Historical 6M/104 fingerprint'i historical/unreproducible olarak belgelemek
-- Kalıcı, self-contained 6M/104 V1 fixture eklemek
-- İki run FP/AFP determinism doğrulamak
-- 1M/3M/6M78 historical fixture'ları repository'ye kalıcılaştırmak
+Durable finalizasyon tamamlandı:
+
+- Historical 6M/104 `FP_9698c40e / AFP_628181959` historical/unreproducible olarak korundu
+- Kalıcı, self-contained canonical 6M/104 V1 fixture eklendi
+- Canonical 104-session gate: `FP_9b61698b / AFP_3194287436`
+- İki bağımsız run deep-equal doğrulandı
+- V1 Catch/Footwork leak kontrolleri regression runner'a bağlandı
+- Persistent GitHub Actions CI gate eklendi
+
+1M / 3M / 6M78 historical exact fingerprint çiftleri korunur. Original complete input object'leri mevcut repository/karar kayıtlarında bulunmadığından seed/requestId/date tahmin edilerek sahte exact fixture oluşturulmadı. Güvenilir original input evidence bulunursa ayrı durable fixture olarak eklenebilir; historical çiftler overwrite edilmez.
 
 ## PART 33 — Footwork isolated-learning domain/block preflight
 

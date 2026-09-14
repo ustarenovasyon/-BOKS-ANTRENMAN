@@ -21,9 +21,9 @@ Stance Reset ertelenmiştir; fake lead/rear semantics kullanılmaz. Pivot ertele
 Mevcut ve tamamlanmış foundation. Technique curriculum'a bağlıdır.
 
 ### 2. Isolated learning
-PART 33 preflight ile contract kilitlendi; production implementation henüz yok.
+PART 33 preflight ile contract kilitlendi; PART 34 ile dormant V2 block/support implementation tamamlandı.
 
-Future first-class block:
+First-class block:
 
 - enum key: `FOOTWORK_TECHNIQUE`
 - canonical string: `boxing_footwork_technique`
@@ -34,20 +34,18 @@ Future first-class block:
 
 Pedagojik sıra: warmup sonrası, attack/defense interval bloklarından önce.
 
-Isolated block ekstra session süresi yaratmaz; mevcut boxing budget içinden pay alır. Exact duration ve hangi günlerde uygulanacağı scheduling/frequency policy PART 36'ya aittir.
-
-PART 34 contract/support implementasyonu yapılabilir ancak PART 36 gelmeden generated workout scheduling production'a açılmaz.
+Isolated block ekstra session süresi yaratmaz; mevcut boxing budget içinden pay alır. PART 36 policy candidate scheduled exposure için 60 saniye ayırır ve en az 180 saniye boxing interval bırakır.
 
 ### 3. Integrated application
-Henüz yok. PART 35'te structured `before_combo / after_combo` footwork prescription olarak ele alınacaktır.
+PART 35 ile structured `before_combo / after_combo` `footworkPrescription` dormant support implementation tamamlandı ve LOCKED.
 
-Integration layer isolated `FOOTWORK_TECHNIQUE` block ile aynı kavram değildir.
+Integration layer isolated `FOOTWORK_TECHNIQUE` block ile aynı kavram değildir. Prescription attack `moveIds` içine girmez, `moveCount` artırmaz ve süre eklemez.
 
 ## Curriculum
 
 Eligibility merkezi `boxingTechniqueCurriculum` source-of-truth'undan derive edilir; duplicate footwork stage listesi source code'a eklenmez.
 
-Beklenen unlock:
+Unlock:
 
 - Stage1: Step In, Step Out
 - Stage2: Lead-side Step, Rear-side Step de açılır
@@ -56,7 +54,7 @@ Stage progression global training ordinal değil boxing exposure ordinal kullan�
 
 ## Budget ve domain sınırı
 
-Future invariant:
+Invariant:
 
 `footworkTechniqueSeconds + boxingIntervalSeconds = boxingSeconds`
 
@@ -67,11 +65,37 @@ Footwork block boxing interval work round değildir:
 - defense round sayısını artırmaz
 - combo selector pool'una girmez
 
+PART 36 candidate allocation:
+
+- isolated technique = 60 sn
+- kalan boxing interval minimum = 180 sn
+- yetersiz budget overtime veya gizli süreyle düzeltilmez; fail-closed
+
+## PART 36 scheduling/frequency candidate
+
+Scheduling attack round role policy'sinden bağımsız, stage-local boxing exposure cadence'i kullanır:
+
+1. Her curriculum stage'in ilk boxing exposure'ı isolated technique içerir.
+2. Stage yeni footwork movement açıyorsa introduction window her yeni movement'a bir isolated exposure verir.
+3. Introduction sonrası her 3. stage-local exposure controlled repetition içerir.
+
+Current library sonucu:
+
+- Stage 1 local 1: Step In
+- Stage 1 local 2: Step Out
+- Stage 2 local 1: Lead-side Step
+- Stage 2 local 2: Rear-side Step
+- Stage 3/4: yeni footwork unlock yok; ilk exposure refresh, sonra her 3. local exposure tekrar
+
+Movement selection listesi policy içinde duplicate edilmez; canonical registry + curriculum helper'lardan derive edilir.
+
+Policy explicit V2 ister. V1 call fail-closed kalır ve current production V1 generator bu helper'a bağlı değildir. Bu nedenle production generated isolated footwork block count ve prescription count 0 kalır.
+
 ## Determinism / fingerprint
 
-Future isolated block fingerprint identity'sinde `footworkMoveId` bulunmalıdır. Mevcut V1 block signature'ları değişmeden kalmalıdır.
+Isolated block fingerprint identity'sinde `footworkMoveId` bulunur. Structured prescription varsa phase + movement identity fingerprint'e girer. Prescription veya isolated block olmayan mevcut V1 signature'ları değişmez.
 
-Audit `checkSummary` şeması V1 için koşulsuz değiştirilmemelidir; audit fingerprint checkSummary'yi hash'lediği için boş bir yeni sayaç bile V1 AFP'yi değiştirebilir.
+Audit `checkSummary` şeması V1 için koşulsuz değiştirilmez; canonical `AFP_3194287436` korunur.
 
 ## Zorluk eksenleri
 
@@ -92,12 +116,12 @@ Uzun vadede yalnız combo length değil:
 
 Bu nedenle 2 punch combo 18–24 aylık advanced session'da da kullanılabilir; advanced yapan şey bağlamdır.
 
-## PART 33 durumu
+## Durum
 
-Isolated-learning preflight contract: LOCKED.
+- PART 33 isolated-learning preflight: LOCKED
+- PART 34 isolated block/support: LOCKED
+- PART 35 structured integration prescription: LOCKED
+- PART 36 scheduling/frequency policy: implementation candidate; final LOCK CI/PR/main gates sonrası
 
-Production generated footwork block count: hâlâ 0.
-
-## PART 35 implementation note
-
-Structured `footworkPrescription` support is implemented as dormant V2 attack metadata. It does not enter attack `moveIds`, does not increase `moveCount`, and does not add session time. Canonical phases are `before_combo` and `after_combo`; curriculum eligibility comes from the existing central curriculum helpers. Production prescription scheduling/frequency remains disabled until PART 36.
+Production V1 generated footwork block count: 0.
+Production V1 generated `footworkPrescription` count: 0.

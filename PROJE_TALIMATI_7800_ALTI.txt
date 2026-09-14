@@ -1,0 +1,120 @@
+BOX ANTRENMAN — ANA PROJE TALİMATI
+
+AMAÇ
+Bu repository tek kullanıcılı, offline-first boks + kuvvet antrenman uygulamasıdır. React + Vite kullanır. Kalıcı veri IndexedDB'dedir ve yalnız repository katmanı üzerinden erişilir. Harici backend, hesap/login, platform builder veya bulut AI zorunluluğu ekleme.
+
+MEVCUT DURUM
+- Production generation policy: V1.
+- V2 tanımlı fakat production'da inactive; audit/preview fail-closed.
+- Desteklenen program süreleri şu an 1, 3, 6 ay.
+- Hedef süreler: 1, 3, 6, 9, 12, 15, 18, 24 ay.
+- Boks movement toplamı 18: 10 strike, 4 defense, 4 footwork.
+- Canonical attack combo: 52.
+- V2 foundational supplemental attack: 2; combined 54.
+- V1 defense: 2 Slip-counter.
+- V2 supplemental defense: 2 Catch-counter; combined 4.
+- Footwork: Step In, Step Out, Lead-side Step, Rear-side Step.
+- Footwork registry/curriculum'da var fakat generated workout'a henüz bağlanmadı.
+- Workout, History ve Settings ekranları büyük ölçüde tamamlanmamış/placeholder.
+- PART 32 footwork foundation kodu mevcut; final durable 6M/104 regression fixture işi tamamlanmalı.
+
+DEĞİŞMEZ MİMARİ KURALLAR
+1. Tek kullanıcı. Login/kayıt/rol sistemi ekleme.
+2. Offline-first. Ana iş mantığı internetsiz çalışmalı.
+3. UI doğrudan IndexedDB kullanmaz; src/lib/localData repository katmanını kullanır.
+4. Program generation deterministic olmalı. Math.random veya gizli Date.now seçimleri kullanma.
+5. Bilinmeyen generation/library version fail-closed olmalı.
+6. V2 geliştirmesi V1 davranışını değiştirmemeli.
+7. V2 production activation yapılırken generator + audit + preview birlikte açılmalı.
+8. Footwork attack moveIds içine GİRMEZ ve punch moveCount'u artırmaz.
+9. Catch/Slip defense movement'ları attack catalog'a sızmaz.
+10. Kamera/sensör yoksa gard, denge, pivot doğruluğu gibi fiziksel ölçüm yaptığını iddia etme.
+11. Combo uzunluğu tek zorluk ölçütü değildir. Teknik, savunma, footwork, mesafe, açı, ritim, counter, fatigue ve controlled repetition ayrı eksenlerdir.
+12. Source-of-truth duplicate etme. Curriculum stage, version ve catalog bilgileri merkezi helper/constant'tan gelsin.
+13. Her PART küçük kapsamlı olsun; kesin lock olmadan sonraki production PART'a karıştırma.
+
+FOOTWORK KİLİDİ
+OPTION D+ korunacak:
+- Technique layer: first-class footwork registry + curriculum.
+- Isolated learning layer: ileride ayrı V2-only footwork drill/block.
+- Integration layer: ileride structured footworkPrescription.
+Örnek: Step In -> Jab -> Cross -> Step Out gösterilebilir; attack combo yine Jab -> Cross ve moveCount=2 kalır.
+Stance Reset ve Pivot şu an DEFER. Pivot için angle/rotation modeli gerekir.
+
+CURRICULUM
+Stage1: Jab, Cross, Step In, Step Out.
+Stage2: hooks/body straights, Catch Lead/Rear, Lead-side/Rear-side Step.
+Stage3: Slip Lead/Rear, body hooks.
+Stage4: uppercuts.
+Stage5: Rhythm Advanced.
+Stage6: Performance.
+Stage5/6 uzun süre policy tamamlanana kadar yeni movement açmıyor.
+
+REGRESSION / DETERMINISM
+Bilinen exact historical baselines:
+- 1M: FP_d703233d / AFP_1456231044
+- 3M: FP_cf99b187 / AFP_1436708599
+- 6M/78: FP_eab5e5c1 / AFP_1046783139
+Historical fakat exact fixture kayıp:
+- 6M/104: FP_9698c40e / AFP_628181959
+Bu son çifti silme veya yeni değeri eskiymiş gibi overwrite etme. Historical/unreproducible olarak sakla. Repository içinde explicit generationSeed, generationRequestId ve tüm generation input'larını içeren yeni canonical 6M/104 fixture oluştur; iki bağımsız run aynı FP/AFP ve deep-equal blueprint üretmeli.
+Fixture'lar başka fixture'dan seed/requestId miras almamalı; self-contained olmalı.
+
+V1/V2
+GENERATION_POLICY_VERSIONS: V1=1, V2=2. CURRENT=V1.
+Missing legacy generationPolicyVersion -> V1.
+Explicit V1 -> active.
+Explicit V2 -> inactive/fail-closed.
+Null/unknown -> fail-closed.
+Movement library current=3; legacy 1,2,3 audit tarafından desteklenmeli; unknown/null fail.
+
+UZUN SÜRE YOLU
+9/12/15/18/24 ay eklerken yalnız duration enum/UI değiştirme. Aynı PART zincirinde curriculum boundary, progression, combo length policy, round roles, defense eligibility, weekly balance, audit, preview ve deterministic fixtures güncellenmeli. Uzun süre daha uzun combo demek değildir. Kısa kombinasyon ileri footwork/defense/angle bağlamıyla advanced kalabilir.
+
+ÖNERİLEN DEVAM SIRASI
+1. PART32 durable regression fixture finalizasyonu.
+2. Footwork isolated-learning block preflight ve implementation.
+3. Structured footworkPrescription entegrasyonu (before_combo/after_combo).
+4. Footwork scheduling/frequency.
+5. Technique cue/guard/balance instruction layer.
+6. 9/12/15/18/24 ay timeline architecture ve implementasyon.
+7. Pivot/angle architecture.
+8. Gerçek Workout player: timer, work/rest, pause/resume, completion confirmation.
+9. History, Settings, data export/import/backup.
+10. V2 full activation + generator/audit/preview regression gate.
+
+WORKOUT STATUS
+Süre dolması otomatik completed değildir. State'ler: upcoming, in_progress, paused, partial, skipped, awaiting_completion_confirmation, completed. Kullanıcı completion onayı vermelidir.
+
+GELİŞTİRME AKIŞI
+Her değişiklikte:
+1. İlgili docs dosyalarını oku.
+2. Current invariant/baseline çıkar.
+3. Minimum kapsamlı kod değişikliği yap.
+4. Library/curriculum değiştiyse coverage/validator çalıştır.
+5. npm run verify:independent çalıştır.
+6. npm run lint ve npm run build çalıştır.
+7. Regression fixture/testleri çalıştır.
+8. V1 farkı varsa root-cause bulmadan expected baseline değiştirme.
+9. Sonuçları ve exact changed files listesini raporla.
+10. PASS/LOCK ancak tüm blocker'lar kapalıysa ver.
+
+GITHUB
+Repository tek source-of-truth olmalıdır. Her PART ayrı commit. main yalnız stabil/locked durum. Temp test scriptleri veya yalnız sohbet içinde yaşayan fixture bırakma. Test input/expected sonuçları repository'ye persist et. İlk fırsatta GitHub Actions ile npm ci + independence scan + lint + build + regression suite zorunlu hale getir.
+
+BAĞIMSIZLIK
+Bu paket platform runtime bağlantılarından temizlenmiştir. @base44/sdk, @base44/vite-plugin, auth client/context, app bootstrap params ve builder config geri eklenmemelidir. Bağımsızlık kontrolü: npm run verify:independent.
+
+ÖNEMLİ DOSYALAR
+- src/config/architecture.js
+- src/features/programGeneration/programGenerationEngine.js
+- src/features/programGeneration/boxingContentSelector.js
+- src/features/programGeneration/defenseContentSelector.js
+- src/features/programGeneration/blueprintFingerprint.js
+- src/features/boxing/curriculum/boxingTechniqueCurriculum.js
+- src/features/boxing/curriculum/boxingCurriculumStageResolver.js
+- src/features/programAudit/programAuditEngine.js
+- src/lib/localData/
+- docs/
+
+Bu talimat source code ve docs ile çelişirse önce mevcut kodu ve en son kilitli karar kaydını incele; tahmin ederek production davranışını değiştirme.

@@ -1,0 +1,10 @@
+{
+  "name": "BOX ANTRENMAN",
+  "short_name": "BOX",
+  "description": "Offline-first kişisel boks ve kuvvet antrenman uygulaması",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "lang": "tr"
+}

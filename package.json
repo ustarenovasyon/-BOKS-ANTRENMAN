@@ -9,7 +9,7 @@
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
-    "test:regression": "node tests/run-regression.mjs && node tests/strength-generation-regression.mjs && node tests/part34-footwork-isolated-regression.mjs && node tests/part35-footwork-prescription-regression.mjs && node tests/part36-footwork-scheduling-regression.mjs",
+    "test:regression": "node tests/run-regression.mjs && node tests/strength-generation-regression.mjs && node tests/part34-footwork-isolated-regression.mjs && node tests/part35-footwork-prescription-regression.mjs && node tests/part36-footwork-scheduling-regression.mjs && node tests/part37-technique-instruction-regression.mjs",
     "preview": "vite preview",
     "verify:independent": "node scripts/verify-independent.mjs"
   },

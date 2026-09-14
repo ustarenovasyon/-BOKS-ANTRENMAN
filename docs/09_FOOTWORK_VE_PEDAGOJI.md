@@ -34,7 +34,7 @@ First-class block:
 
 Pedagojik sıra: warmup sonrası, attack/defense interval bloklarından önce.
 
-Isolated block ekstra session süresi yaratmaz; mevcut boxing budget içinden pay alır. PART 36 policy candidate scheduled exposure için 60 saniye ayırır ve en az 180 saniye boxing interval bırakır.
+Isolated block ekstra session süresi yaratmaz; mevcut boxing budget içinden pay alır. PART 36 scheduled exposure için 60 saniye ayırır ve en az 180 saniye boxing interval bırakır.
 
 ### 3. Integrated application
 PART 35 ile structured `before_combo / after_combo` `footworkPrescription` dormant support implementation tamamlandı ve LOCKED.
@@ -65,13 +65,13 @@ Footwork block boxing interval work round değildir:
 - defense round sayısını artırmaz
 - combo selector pool'una girmez
 
-PART 36 candidate allocation:
+PART 36 locked allocation:
 
 - isolated technique = 60 sn
 - kalan boxing interval minimum = 180 sn
 - yetersiz budget overtime veya gizli süreyle düzeltilmez; fail-closed
 
-## PART 36 scheduling/frequency candidate
+## PART 36 scheduling/frequency — LOCKED
 
 Scheduling attack round role policy'sinden bağımsız, stage-local boxing exposure cadence'i kullanır:
 
@@ -91,9 +91,36 @@ Movement selection listesi policy içinde duplicate edilmez; canonical registry 
 
 Policy explicit V2 ister. V1 call fail-closed kalır ve current production V1 generator bu helper'a bağlı değildir. Bu nedenle production generated isolated footwork block count ve prescription count 0 kalır.
 
+## PART 37 technique instruction layer
+
+PART 37 hareketleri fiziksel olarak ölçmez; yalnız neye odaklanılacağını anlatan static instruction üretir.
+
+Her canonical movement için derive edilen alanlar:
+
+- `techniqueCue`
+- `guardReminder`
+- `balanceReminder`
+- `repetitionObjective`
+- `mode = instruction_only`
+
+Kamera/sensör yokken `accuracy`, `score`, `confidence`, `detected`, `measured` veya “guard/balance doğru” sonucu üretilmez.
+
+Instruction identity movement registry'den derive edilir. Lead/Rear semantics korunur; stance'tan bağımsız absolute sol/sağ cue yazılmaz.
+
+Read-only block sequence helper şu bağlamları destekler:
+
+- isolated footwork
+- attack combo
+- optional `before_combo` / `after_combo` footworkPrescription
+- defense + counter
+
+Örnek instruction sırası `Step In → Jab → Cross → Step Out` olabilir; attack yine `Jab → Cross`, `moveCount=2` kalır ve block süresi değişmez.
+
+Instruction layer generated blueprint'e persist edilmez ve fingerprint'e girmez.
+
 ## Determinism / fingerprint
 
-Isolated block fingerprint identity'sinde `footworkMoveId` bulunur. Structured prescription varsa phase + movement identity fingerprint'e girer. Prescription veya isolated block olmayan mevcut V1 signature'ları değişmez.
+Isolated block fingerprint identity'sinde `footworkMoveId` bulunur. Structured prescription varsa phase + movement identity fingerprint'e girer. Instruction text ise derived/read-time katmandır; persisted blueprint identity'si değildir.
 
 Audit `checkSummary` şeması V1 için koşulsuz değiştirilmez; canonical `AFP_3194287436` korunur.
 
@@ -121,7 +148,8 @@ Bu nedenle 2 punch combo 18–24 aylık advanced session'da da kullanılabilir; 
 - PART 33 isolated-learning preflight: LOCKED
 - PART 34 isolated block/support: LOCKED
 - PART 35 structured integration prescription: LOCKED
-- PART 36 scheduling/frequency policy: implementation candidate; final LOCK CI/PR/main gates sonrası
+- PART 36 scheduling/frequency policy: LOCKED
+- PART 37 instruction-only technique layer: implementation candidate; final LOCK final CI/PR/main gates sonrası
 
 Production V1 generated footwork block count: 0.
 Production V1 generated `footworkPrescription` count: 0.

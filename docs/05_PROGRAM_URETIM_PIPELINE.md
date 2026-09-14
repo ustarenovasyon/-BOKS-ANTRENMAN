@@ -4,7 +4,7 @@
 
 `generateProgramBlueprint(input)` pure ve deterministic olmalıdır. Persistence, `Date.now()` veya random seçim generation içine karışmaz.
 
-## Ana sıra
+## Ana sıra — current V1
 
 1. Input validation
 2. Settings snapshot
@@ -24,6 +24,42 @@
 16. Full blueprint validation
 17. Blueprint fingerprint
 18. Persistence
+
+Current V1 pipeline PART 33'te değişmez.
+
+## Future V2 isolated-footwork insertion point
+
+PART 33 preflight ile isolated-learning katmanının gelecekteki pipeline konumu kilitlendi.
+
+Base session budget üretildikten ve curriculum stage / boxing exposure context çözüldükten sonra, boxing budget V2-only bir allocation layer'da iki parçaya ayrılacaktır:
+
+`footworkTechniqueSeconds + boxingIntervalSeconds = boxingSeconds`
+
+Sonra:
+
+1. optional isolated footwork technique planı
+2. kalan `boxingIntervalSeconds` üzerinden boxing interval budget
+3. attack/defense selection
+4. workout block build
+
+çalışacaktır.
+
+Bu split `sessionTimeBudgetEngine` V1 davranışını değiştirmez. Footwork aynı `boxingSeconds` bütçesini ikinci kez kullanamaz ve session total artırılamaz.
+
+Exact seconds ve scheduling frequency PART 36'da tanımlanacaktır.
+
+## Future isolated block order
+
+Boxing-capable bir günde future sıra:
+
+1. Warmup
+2. optional `FOOTWORK_TECHNIQUE`
+3. attack / defense / rest boxing interval blocks
+4. combined ise mode transition
+5. strength blocks
+6. cooldown
+
+`FOOTWORK_TECHNIQUE` interval round değildir; `roundIndex`, attack `moveIds` veya punch `moveCount` üretmez.
 
 ## Determinism
 
@@ -46,6 +82,21 @@ Bu nedenle regression fixture'da aşağıdaki alanlar explicit olmalıdır:
 - generationRequestId
 
 Base fixture inheritance ile seed/requestId sızıntısı yapılmamalıdır.
+
+Future footwork selector da `Math.random` veya gizli `Date.now` kullanamaz. Selection merkezi curriculum eligibility + deterministic seed/context üzerinden yapılmalıdır.
+
+## Fingerprint safety
+
+Future isolated block `footworkMoveId` fingerprint content identity'ye dahil edilmelidir.
+
+Existing V1 blocks için fingerprint signature string'i byte-for-byte değişmemelidir; canonical V1 baseline:
+
+- `FP_9b61698b`
+- `AFP_3194287436`
+
+korunur.
+
+Audit fingerprint `checkSummary` JSON'unu da içerdiğinden V1 path'te unconditional summary schema/count değişikliği yapılmaz.
 
 ## Current duration gate
 

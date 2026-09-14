@@ -17,8 +17,6 @@ Durable finalizasyon tamamlandı:
 
 ## PART 33 — LOCKED: Footwork isolated-learning domain/block preflight
 
-Preflight kararları:
-
 - Future block key `FOOTWORK_TECHNIQUE`
 - Canonical type string `boxing_footwork_technique`
 - Tek canonical `footworkMoveId`
@@ -30,55 +28,24 @@ Preflight kararları:
 - V1 session budget davranışı değişmez
 - Curriculum eligibility merkezi helper'lardan derive edilir
 - Current intermediate/experienced curriculum timeline için fake fallback yok
-- DB schema bump gerekmez
-- Fingerprint'te future `footworkMoveId` identity zorunlu
-- V1 audit `checkSummary` shape/count değiştirilemez
-- Production generated footwork block count bu PART sonunda hâlâ 0
 
 Ayrıntılı contract: `docs/18_PART_33_FOOTWORK_ISOLATED_PREFLIGHT.md`.
 
 ## PART 34 — LOCKED: Footwork isolated drill implementation
 
-Dormant V2 contract/support implementation tamamlandı:
-
-- `FOOTWORK_TECHNIQUE = boxing_footwork_technique` block type
-- merkezi isolated footwork descriptor/validator helper
-- Stage 1 yalnız Step In / Step Out
-- Stage 2+ dört canonical footwork movement
-- strength-only day fail-closed
-- max 1 isolated footwork block / boxing-capable day
-- warmup → footwork → boxing interval order contract
-- boxing budget içinden exact süre composition
-- attack/defense/integration field isolation guard'ları
-- fingerprint identity `footworkMoveId` içerir
-- validator/audit/preview fail-closed support
-- preview dedicated render/label support
-- kalıcı PART 34 regression testi
+Dormant V2 isolated block/support tamamlandı. Validator, fingerprint, audit, preview ve kalıcı regression coverage mevcut. V1 generated footwork block count = 0.
 
 Regression lock:
 
-- V1 canonical `FP_9b61698b / AFP_3194287436` değişmedi
-- 104-session canonical fixture PASS
-- strength regression PASS
+- V1 canonical `FP_9b61698b / AFP_3194287436`
 - synthetic Step In `FP_c45ecc5d`
 - alternate Step Out `FP_790ff55e`
-
-Production scheduling **açılmadı**. V1 generated footwork block count = 0. V2 generation/audit/preview active değildir.
 
 Ayrıntılı implementation: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
 
 ## PART 35 — LOCKED: Footwork integration prescription
 
-Structured `before_combo / after_combo` prescription support tamamlandı:
-
-- attack `moveIds` değişmez
-- punch `moveCount` değişmez
-- prescription süre eklemez
-- canonical active footwork + curriculum stage validation
-- phase/movement fingerprint identity
-- V1 prescription metadata için fail-closed audit
-- preview integrity + dormant future render support
-- production generator prescription schedule etmez
+Structured `before_combo / after_combo` prescription support tamamlandı. Attack `moveIds`, punch `moveCount` ve session süresi değişmez. Production generator prescription schedule etmez.
 
 Regression lock:
 
@@ -86,33 +53,46 @@ Regression lock:
 - synthetic prescription `FP_8cda526a`
 - alternate prescription `FP_52d704eb`
 
-PR #4 squash merge edildi; main CI ve GitHub Pages deploy PASS.
-
 Ayrıntılı implementation: `docs/20_PART_35_FOOTWORK_INTEGRATION_PRESCRIPTION.md`.
 
-## PART 36 — Footwork scheduling/frequency policy
+## PART 36 — LOCKED: Footwork scheduling/frequency policy
 
-Dormant V2-only policy candidate:
+Dormant V2-only deterministic policy tamamlandı:
 
 - isolated technique allocation = 60 sn
 - kalan boxing interval minimum = 180 sn
-- boxing budget exact composition korunur
 - stage-local ilk boxing exposure teaching exposure
-- stage yeni footwork açıyorsa introduction window her yeni movement'a bir exposure verir
+- new movement introduction window
 - introduction sonrası her 3. stage-local exposure controlled repetition
-- selection canonical registry/curriculum source-of-truth'undan derive edilir
-- attack `FOUNDATIONAL / SUPPORT / MAIN / CHALLENGE` role planından bağımsızdır
-- explicit V2 gerekir; V1 fail-closed
-- current intermediate/experienced timeline tanımsız olduğu için fail-closed
-- production V1 generator'a bağlanmaz; generated footwork/prescription count = 0 kalır
+- canonical registry/curriculum-derived selection
+- attack role planından bağımsız cadence
+- explicit V2; V1 fail-closed
+- production V1 generator'a bağlı değil; footwork/prescription count = 0
 
-Final LOCK için branch + PR + main regression/CI/Pages gate'leri gereklidir.
+PR #5 squash merge edildi; main CI ve GitHub Pages deploy PASS.
 
 Ayrıntılı policy: `docs/21_PART_36_FOOTWORK_SCHEDULING_POLICY.md`.
 
 ## PART 37 — Technique cue / guard / balance instruction layer
 
-Observed scoring yok. Instructional cue, repetition objective, stance reminder.
+Instruction-only layer implementation candidate:
+
+- 18/18 canonical movement coverage
+- `techniqueCue`
+- `guardReminder`
+- `balanceReminder`
+- `repetitionObjective`
+- observed score/accuracy/confidence/detection yok
+- kamera/sensör olmadan fiziksel doğruluk iddiası yok
+- Lead/Rear stance-relative semantics korunur
+- attack / defense / isolated footwork block instruction sequence helper
+- `before_combo → combo → after_combo` ordering support
+- source block mutate edilmez
+- generator/persisted blueprint/fingerprint değişmez
+
+Final LOCK için final branch + PR + main regression/CI/Pages gate'leri gereklidir.
+
+Ayrıntılı karar: `docs/22_PART_37_TECHNIQUE_INSTRUCTION_LAYER.md`.
 
 ## PART 38 — Uzun süre timeline architecture
 

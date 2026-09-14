@@ -26,6 +26,7 @@ Base44 runtime/auth/backend bağımlılıkları kaldırılmıştır. Uygulama Re
 - PART 34 footwork isolated regression: `tests/part34-footwork-isolated-regression.mjs`
 - PART 35 footwork prescription regression: `tests/part35-footwork-prescription-regression.mjs`
 - PART 36 footwork scheduling regression: `tests/part36-footwork-scheduling-regression.mjs`
+- PART 37 technique instruction regression: `tests/part37-technique-instruction-regression.mjs`
 - GitHub CI: `.github/workflows/ci.yml`
 - GitHub Pages deploy: `.github/workflows/deploy-pages.yml`
 
@@ -44,7 +45,7 @@ Base44 runtime/auth/backend bağımlılıkları kaldırılmıştır. Uygulama Re
 - Curriculum coverage: 18/18
 - Footwork: Step In, Step Out, Lead-side Step, Rear-side Step
 
-Footwork registry + curriculum foundation tamamlandı. PART 34 dormant isolated block support, PART 35 structured integration prescription support olarak LOCKED durumdadır. PART 36 deterministic scheduling/frequency policy desteğini dormant V2 helper olarak hazırlar; production V1 generator'a bağlanmaz.
+Footwork registry + curriculum foundation tamamlandı. PART 34 isolated block support, PART 35 structured integration prescription ve PART 36 deterministic scheduling/frequency policy LOCKED durumdadır. Production V1 generator bu V2 footwork support katmanlarını schedule etmez.
 
 ## PART 32 durumu
 
@@ -67,11 +68,9 @@ Historical 6M/104 `FP_9698c40e / AFP_628181959` historical/unreproducible olarak
 
 Footwork isolated-learning domain/block preflight LOCKED.
 
-Future contract:
-
 - `FOOTWORK_TECHNIQUE`
 - type: `boxing_footwork_technique`
-- tek `footworkMoveId`
+- tek canonical `footworkMoveId`
 - attack combo / defense rule / integration prescription alanlarından ayrı
 - warmup sonrası, boxing interval öncesi
 - mevcut boxing budget içinden süre kullanır
@@ -83,26 +82,13 @@ Ayrıntılı karar: `docs/18_PART_33_FOOTWORK_ISOLATED_PREFLIGHT.md`.
 
 Dormant V2 footwork isolated drill contract/support implementation LOCKED.
 
-Eklenen destek:
-
-- `WORKOUT_BLOCK_TYPES.FOOTWORK_TECHNIQUE = 'boxing_footwork_technique'`
-- merkezi isolated footwork descriptor/validator helper
-- Stage 1 eligibility: Step In + Step Out
-- Stage 2+ eligibility: dört canonical footwork movement
-- max 1 isolated footwork block / boxing-capable day
-- warmup sonrası / boxing interval öncesi order contract
-- `footworkTechniqueSeconds + boxingIntervalSeconds = boxingSeconds` exact budget composition
-- forbidden attack/defense/integration alan guard'ları
-- fingerprint identity içinde `footworkMoveId`
-- preview label/render/integrity support
-- audit fail-closed support
-- DB schema bump yok
-
 Regression lock:
 
 - canonical V1: `FP_9b61698b / AFP_3194287436`
 - synthetic Step In: `FP_c45ecc5d`
 - alternate Step Out: `FP_790ff55e`
+
+Production scheduling açılmadı.
 
 Ayrıntılı implementation: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
 
@@ -115,42 +101,55 @@ Structured `footworkPrescription` integration support LOCKED.
 - punch `moveCount` değişmez
 - prescription session süresi eklemez
 - canonical active footwork + curriculum eligibility zorunlu
-- fingerprint phase + movement identity içerir yalnız prescription mevcutsa
 - V1 prescription metadata görürse fail-closed
-- V2 production audit/preview hâlâ inactive/fail-closed
 - production generator prescription schedule etmez
 
 Regression lock:
 
 - canonical V1: `FP_9b61698b / AFP_3194287436`
-- PART 35 synthetic prescription: `FP_8cda526a`
+- synthetic prescription: `FP_8cda526a`
 - alternate prescription: `FP_52d704eb`
-
-Main commit: `7d83b30d610a0f83ab19d51614635a3e12570331`. Main CI ve GitHub Pages deploy PASS.
 
 Ayrıntılı implementation: `docs/20_PART_35_FOOTWORK_INTEGRATION_PRESCRIPTION.md`.
 
 ## PART 36 durumu
 
-Deterministic footwork scheduling/frequency policy branch implementasyonu hazırlanıyor. Scope dormant V2-only support'tur; production generator'a bağlanmaz.
+Deterministic footwork scheduling/frequency policy LOCKED.
 
-Policy candidate:
-
-- scheduled isolated footwork = 60 sn
-- süre mevcut boxing budget'tan düşer
-- kalan boxing interval en az 180 sn olmalı
-- stage'in ilk boxing exposure'ında isolated footwork
+- isolated technique allocation = 60 sn
+- kalan boxing interval minimum = 180 sn
+- stage-local ilk boxing exposure teaching exposure
 - stage yeni footwork açıyorsa introduction window her yeni movement'a bir exposure verir
 - introduction sonrası her 3. stage-local exposure controlled repetition
 - movement seçimi canonical registry + curriculum helper'larından derive edilir
-- V1 explicit fail-closed
+- attack round role planından bağımsızdır
+- explicit V2 gerekir; V1 fail-closed
 - Intermediate/experienced current timeline tanımsız olduğu için fail-closed
 - production V1 isolated block count = 0
 - production V1 prescription count = 0
 
-Final LOCK ancak branch + PR + main CI/Pages gate'leri geçerse verilir.
+PR #5 squash merge edildi. Main commit: `cb6821c703dec371701bf95574b3f3d2c70d0c7e`. Main CI ve GitHub Pages deploy PASS.
 
 Ayrıntılı policy: `docs/21_PART_36_FOOTWORK_SCHEDULING_POLICY.md`.
+
+## PART 37 durumu
+
+Technique cue / guard / balance instruction-only layer branch implementasyonu hazırlandı.
+
+- mevcut 18 canonical movement için 18/18 instruction coverage
+- `techniqueCue`, `guardReminder`, `balanceReminder`, `repetitionObjective`
+- `mode = instruction_only`
+- kamera/sensör sonucu, accuracy/score/confidence veya fiziksel doğruluk iddiası yok
+- Lead/Rear stance-relative semantics korunur; absolute sol/sağ talimatı üretilmez
+- attack/defense/isolated-footwork block'larından read-only instruction sequence üretilebilir
+- `before_combo → combo → after_combo` sırası desteklenir
+- source workout block mutate edilmez
+- instruction layer persisted blueprint alanı değildir; fingerprint değiştirmez
+- production V1 block shape değişmez
+
+Initial branch regression: coverage `18/18`, instruction-only, V1 lock PASS. Final LOCK ancak final branch + PR + main CI/Pages gate'leri geçerse verilir.
+
+Ayrıntılı karar: `docs/22_PART_37_TECHNIQUE_INSTRUCTION_LAYER.md`.
 
 ## Süre desteği
 
@@ -171,4 +170,4 @@ Kaynak kod şu anda yalnız `1, 3, 6` ayı kabul eder. Hedef süre ailesi:
 
 ## Bir sonraki teknik hedef
 
-PART 36 tamamlanıp LOCKED olduktan sonra PART 37: technique cue / guard / balance instruction layer. Sensörsüz observed scoring veya fiziksel doğruluk ölçümü yapılmaz.
+PART 37 LOCKED olduktan sonra PART 38: 9 / 12 / 15 / 18 / 24 ay için uzun süre timeline architecture. Yalnız duration enum genişletilmeyecek; curriculum boundaries ve ilgili generation/audit/preview politikaları birlikte ele alınacak.

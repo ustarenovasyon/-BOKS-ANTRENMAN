@@ -19,5 +19,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Compact combined audit summary
-        run: node tests/diagnostic-audit-summary.mjs
+      - name: Final compact health summary
+        run: node tests/diagnostic-summary.mjs

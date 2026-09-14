@@ -20,6 +20,7 @@ import { planMixedDefenseSlots } from '@/features/programGeneration/defenseConte
 import { boxingCandidatePool } from '@/features/programGeneration/boxingContentSelector';
 import { resolveGenerationPolicyVersion } from '@/features/programGeneration/generationPolicyResolver';
 import { validateFootworkTechniqueDay } from '@/features/programGeneration/footworkTechniqueBlock';
+import { validateFootworkPrescriptionDay } from '@/features/programGeneration/footworkPrescription';
 import { WEEKDAY_INDEX, ROLE_BUDGET_MODE } from '@/features/weeklyBalance/weeklyBalanceConstants';
 import { BOXING_COMBINATIONS } from '@/features/boxing/combinations/boxingCombinations';
 import { BOXING_MOVE_IDS, BOXING_MOVES } from '@/features/boxing/library/boxingMoves';
@@ -123,6 +124,28 @@ export function auditProgramSnapshot(snapshot) {
         'Footwork technique block contract geçersiz.',
         { trainingOrdinal: day.trainingOrdinal, plannedDate: day.plannedDate },
         { reasons: footworkValidation.reasons },
+      );
+    }
+  }
+
+  // PART 35: V1 must never carry structured footwork integration metadata.
+  // No prescription = no extra checkSummary bump, preserving canonical V1 AFP.
+  for (const day of days) {
+    const prescriptionValidation = validateFootworkPrescriptionDay({
+      day,
+      dayBlocks: blocksByDay.get(day.id) || [],
+      programDays: days,
+      settings,
+      generationPolicyVersion: policy.version,
+    });
+    if (!prescriptionValidation.valid) {
+      add(
+        RC.AUDIT_FOOTWORK_PRESCRIPTION_INVALID,
+        SEV.CRITICAL,
+        CAT.BOXING,
+        'Footwork integration prescription contract geçersiz.',
+        { trainingOrdinal: day.trainingOrdinal, plannedDate: day.plannedDate },
+        { reasons: prescriptionValidation.reasons },
       );
     }
   }

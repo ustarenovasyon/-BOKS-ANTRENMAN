@@ -97,3 +97,7 @@ Bu nedenle 2 punch combo 18–24 aylık advanced session'da da kullanılabilir; 
 Isolated-learning preflight contract: LOCKED.
 
 Production generated footwork block count: hâlâ 0.
+
+## PART 35 implementation note
+
+Structured `footworkPrescription` support is implemented as dormant V2 attack metadata. It does not enter attack `moveIds`, does not increase `moveCount`, and does not add session time. Canonical phases are `before_combo` and `after_combo`; curriculum eligibility comes from the existing central curriculum helpers. Production prescription scheduling/frequency remains disabled until PART 36.

@@ -10,7 +10,7 @@ import React from 'react';
 import { BOXING_MOVES } from '@/features/boxing/library/boxingMoves';
 import { STRENGTH_EXERCISES } from '@/features/strength/library/strengthExercises';
 import { WORKOUT_BLOCK_TYPES } from '@/config/architecture';
-import { formatSeconds, THREAT_LABELS, RANGE_LABELS } from '../previewLabels';
+import { formatSeconds, THREAT_LABELS, RANGE_LABELS, FOOTWORK_INTEGRATION_PHASE_LABELS } from '../previewLabels';
 
 const MOVE_NAME_BY_ID = Object.fromEntries(BOXING_MOVES.map((m) => [m.id, m.canonicalName]));
 const EX_NAME_BY_ID = Object.fromEntries(STRENGTH_EXERCISES.map((e) => [e.id, e.displayName]));
@@ -94,6 +94,15 @@ function BoxingAttack({ block }) {
         <Duration seconds={block.plannedSeconds} />
       </Row>
       <p className="text-sm text-foreground break-words leading-relaxed">{seq}</p>
+      {Array.isArray(block.footworkPrescription?.actions) && block.footworkPrescription.actions.length > 0 && (
+        <div className="space-y-0.5">
+          {block.footworkPrescription.actions.map((action, index) => (
+            <p key={`${action.phase}-${action.movementId}-${index}`} className="text-xs text-muted-foreground">
+              {FOOTWORK_INTEGRATION_PHASE_LABELS[action.phase] || action.phase}: {moveName(action.movementId)}
+            </p>
+          ))}
+        </div>
+      )}
       {block.workingRange && (
         <p className="text-xs text-muted-foreground">Mesafe: {RANGE_LABELS[block.workingRange] || block.workingRange}</p>
       )}

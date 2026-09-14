@@ -112,3 +112,7 @@ Gerçek geçmiş, export/import, uygulama ayarları.
 Generation V2 activation, audit V2, preview V2, migration/backward compatibility, full matrix regression.
 
 Numaralar gerekirse değişebilir; kural: bir PART kesin kilitlenmeden sonraki PART production'a karıştırılmaz.
+
+## PART 35 implementation gate
+
+Structured `before_combo / after_combo` prescription support is implemented as dormant metadata. Production generator still does not schedule prescriptions. PART 36 remains responsible for deterministic scheduling/frequency policy.

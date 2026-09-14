@@ -45,7 +45,7 @@ export const FOOTWORK_TECHNIQUE_FORBIDDEN_FIELDS = Object.freeze([
   'footworkPrescription',
 ]);
 
-function isCanonicalActiveFootworkMove(moveId) {
+export function isCanonicalActiveFootworkMove(moveId) {
   const move = MOVE_BY_ID.get(moveId);
   return !!(
     move

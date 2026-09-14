@@ -7,6 +7,7 @@
  * --------------------------------------------------------------
  */
 import { WORKOUT_BLOCK_TYPES, WEEKLY_SESSION_ROLES } from '@/config/architecture';
+import { cloneFootworkPrescription } from './footworkPrescription';
 
 let orderCounter = 0;
 function newBlock(programDayId, type, plannedSeconds, content = {}) {
@@ -70,6 +71,9 @@ export function buildDayBlocks({ programDayId, role, budget, boxingRounds = [], 
               moveCount: round.moveCount,
               workingRange: round.workingRange,
               requiredContext: { ...round.requiredContext },
+              ...(Object.prototype.hasOwnProperty.call(round, 'footworkPrescription')
+                ? { footworkPrescription: cloneFootworkPrescription(round.footworkPrescription) }
+                : {}),
             }));
           } else {
             blocks.push(newBlock(programDayId, WORKOUT_BLOCK_TYPES.BOXING_ATTACK_WORK, seg.durationSeconds, { roundIndex: workRoundIdx }));

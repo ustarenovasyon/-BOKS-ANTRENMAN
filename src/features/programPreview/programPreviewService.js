@@ -14,6 +14,7 @@ import { computeBlueprintFingerprint } from '@/features/programGeneration/bluepr
 import { resolveGenerationPolicyVersion } from '@/features/programGeneration/generationPolicyResolver';
 import { PREVIEWABLE_STATUSES } from './previewLabels';
 import { validateFootworkTechniqueDay } from '@/features/programGeneration/footworkTechniqueBlock';
+import { validateFootworkPrescriptionDay } from '@/features/programGeneration/footworkPrescription';
 import { buildProgramPreviewViewModel } from './previewViewModel';
 
 const ROLE_BOXING = WEEKLY_SESSION_ROLES.BOXING_ONLY_DAY;
@@ -126,6 +127,14 @@ export async function loadProgramPreview(programId) {
       generationPolicyVersion: policy.version,
     });
     if (!footworkValidation.valid) return fail('PREVIEW_DATA_INTEGRITY_FAILED');
+    const footworkPrescriptionValidation = validateFootworkPrescriptionDay({
+      day,
+      dayBlocks: ordered,
+      programDays: sortedDays,
+      settings: version.settingsSnapshot,
+      generationPolicyVersion: policy.version,
+    });
+    if (!footworkPrescriptionValidation.valid) return fail('PREVIEW_DATA_INTEGRITY_FAILED');
 
     // role/block composition guard (preview-level, formal audit PART 17).
     const types = new Set(ordered.map((b) => b.type));

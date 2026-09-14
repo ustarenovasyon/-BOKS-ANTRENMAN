@@ -8,6 +8,7 @@
 import { LOCAL_DB, WEEKLY_SESSION_ROLES, WORKOUT_BLOCK_TYPES, PROGRAM_GENERATION_REASON_CODES } from '@/config/architecture';
 import { resolveGenerationPolicyVersion } from './generationPolicyResolver';
 import { validateFootworkTechniqueDay } from './footworkTechniqueBlock';
+import { validateFootworkPrescriptionDay } from './footworkPrescription';
 import { BOXING_MOVE_IDS } from '@/features/boxing/library/boxingMoves';
 import { BOXING_COMBINATIONS } from '@/features/boxing/combinations/boxingCombinations';
 import { DEFENSE_COUNTER_RULES } from '@/features/boxing/defense/defenseCounterRules';
@@ -85,6 +86,14 @@ export function validateFullProgramBlueprint(blueprint) {
       generationPolicyVersion: policy.version,
     });
     if (!footworkValidation.valid) reasons.push(RC.PROGRAM_BOXING_VALIDATION_FAILED);
+    const footworkPrescriptionValidation = validateFootworkPrescriptionDay({
+      day,
+      dayBlocks,
+      programDays,
+      settings,
+      generationPolicyVersion: policy.version,
+    });
+    if (!footworkPrescriptionValidation.valid) reasons.push(RC.PROGRAM_BOXING_VALIDATION_FAILED);
 
     // forbidden kg keys
     for (const b of dayBlocks) {

@@ -136,6 +136,12 @@ export const BOXING_FOOTWORK_DIRECTIONS = Object.freeze({
   LATERAL_REAR: 'lateral_rear',
 });
 
+// PART 35: Structured footwork integration phases. Metadata only; süre/punch count artırmaz.
+export const BOXING_FOOTWORK_INTEGRATION_PHASES = Object.freeze({
+  BEFORE_COMBO: 'before_combo',
+  AFTER_COMBO: 'after_combo',
+});
+
 // Hareket kütüphanesi versiyonu (DB schema version'dan ayrı bir kavramdır).
 // PART 32: 2 → 3 (footwork movement type + 4 new movements added).
 export const BOXING_MOVE_LIBRARY_VERSION = 3;

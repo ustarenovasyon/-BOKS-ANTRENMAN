@@ -19,7 +19,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Probe deterministic 6M/104 candidates
+      - name: Probe canonical 6M/104 candidate
         run: |
           cat > .part32-probe.mjs <<'EOF'
           import { createServer } from 'vite';
@@ -27,51 +27,38 @@ jobs:
           try {
             const { generateProgramBlueprint } = await server.ssrLoadModule('/src/features/programGeneration/programGenerationEngine.js');
             const { auditProgramSnapshot } = await server.ssrLoadModule('/src/features/programAudit/programAuditEngine.js');
-            const candidates = [
-              {
-                label: 'boxing-only',
-                input: {
-                  programMode: 'boxing_only', durationMonths: 6, daysPerWeek: 4,
-                  selectedWeekdays: ['MONDAY','WEDNESDAY','FRIDAY','SUNDAY'],
-                  sessionDurationMinutes: 30, experienceLevel: 'beginner', difficulty: 'normal',
-                  preferredTrainingTime: null, boxingStance: 'orthodox', boxingMaxMoves: 4,
-                  strengthDaysPerWeek: 0, availableEquipment: [],
-                  generationLocalDate: '2026-01-05',
-                  generationSeed: 'part32-canonical-6m104-seed-v1',
-                  generationRequestId: 'part32-canonical-6m104-request-v1'
-                }
-              },
-              {
-                label: 'combined',
-                input: {
-                  programMode: 'boxing_and_strength', durationMonths: 6, daysPerWeek: 4,
-                  selectedWeekdays: ['MONDAY','WEDNESDAY','FRIDAY','SUNDAY'],
-                  sessionDurationMinutes: 30, experienceLevel: 'beginner', difficulty: 'normal',
-                  preferredTrainingTime: null, boxingStance: 'orthodox', boxingMaxMoves: 4,
-                  strengthDaysPerWeek: 2, availableEquipment: ['dumbbell','barbell','ez_bar'],
-                  generationLocalDate: '2026-01-05',
-                  generationSeed: 'part32-canonical-6m104-seed-v1',
-                  generationRequestId: 'part32-canonical-6m104-request-v1'
-                }
-              }
-            ];
-            for (const { label, input } of candidates) {
-              const a = generateProgramBlueprint(input);
-              const b = generateProgramBlueprint(input);
-              console.log(`CANDIDATE ${label} valid=${a.valid} reasons=${JSON.stringify(a.reasons)}`);
-              if (!a.valid) continue;
-              const audit = auditProgramSnapshot(a.blueprint);
+            const input = {
+              programMode: 'boxing_only',
+              durationMonths: 6,
+              daysPerWeek: 4,
+              selectedWeekdays: ['MONDAY','WEDNESDAY','FRIDAY','SUNDAY'],
+              sessionDurationMinutes: 30,
+              experienceLevel: 'beginner',
+              difficulty: 'normal',
+              preferredTrainingTime: null,
+              boxingStance: 'orthodox',
+              boxingMaxMoves: 4,
+              strengthDaysPerWeek: 0,
+              availableEquipment: [],
+              generationLocalDate: '2026-01-02',
+              generationSeed: 'part32-canonical-6m104-seed-v1',
+              generationRequestId: 'part32-canonical-6m104-request-v1'
+            };
+            const first = generateProgramBlueprint(input);
+            const second = generateProgramBlueprint(input);
+            console.log(`valid=${first.valid} reasons=${JSON.stringify(first.reasons)}`);
+            if (first.valid) {
+              const audit = auditProgramSnapshot(first.blueprint);
               console.log(JSON.stringify({
-                label,
-                days: a.blueprint.programDays.length,
-                start: a.blueprint.programVersion.programStartDate,
-                end: a.blueprint.programVersion.endDateExclusive,
-                fp: a.blueprint.blueprintFingerprint,
+                days: first.blueprint.programDays.length,
+                start: first.blueprint.programVersion.programStartDate,
+                end: first.blueprint.programVersion.endDateExclusive,
+                fp: first.blueprint.blueprintFingerprint,
                 auditOutcome: audit.outcome,
                 afp: audit.auditFingerprint,
                 critical: audit.criticalIssueCount,
                 warnings: audit.warningCount,
-                deepEqual: JSON.stringify(a.blueprint) === JSON.stringify(b.blueprint)
+                deepEqual: JSON.stringify(first.blueprint) === JSON.stringify(second.blueprint)
               }));
             }
           } finally {

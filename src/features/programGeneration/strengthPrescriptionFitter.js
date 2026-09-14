@@ -23,22 +23,16 @@ function estimateWorkSeconds(exercise, setCount, repsOrHold) {
     const sides = isUnilateral(exercise) ? 2 : 1;
     return setCount * repsOrHold * sides * PLANNING_SECONDS_PER_REP;
   }
-  // TIME
   const sides = isUnilateral(exercise) ? 2 : 1;
   return setCount * repsOrHold * sides;
 }
 
-/**
- * Fit prescription. budgets: {workBudgetSeconds, recoveryBudgetSeconds, transitionBudgetSeconds}.
- * tierKey: balanced tier cap (tier_1..tier_4).
- */
 export function fitStrengthPrescription({ template, tierKey, budgets, generationSeed, trainingOrdinal }) {
   const envelope = PRESCRIPTION_TIER_ENVELOPES[tierKey];
   if (!envelope) return { valid: false, reason: 'PROGRAM_STRENGTH_PRESCRIPTION_DOES_NOT_FIT' };
-  const exercises = template.exerciseIds.map((id) => EX_BY_ID[id]).filter(Boolean);
+  const exercises = template.exerciseIds.map((id) => EX_BY_ID.get(id)).filter(Boolean);
   if (exercises.length !== template.exerciseIds.length) return { valid: false, reason: 'PROGRAM_STRENGTH_VALIDATION_FAILED' };
 
-  // Try set counts from preferred down through allowed.
   const setCountsToTry = [envelope.preferredSetCount, ...envelope.allowedSetCounts.filter((s) => s !== envelope.preferredSetCount)].filter((v, i, a) => a.indexOf(v) === i);
   const repTarget = REP_TARGETS[tierKey];
   const holdTarget = HOLD_TARGETS[tierKey];
@@ -50,20 +44,16 @@ export function fitStrengthPrescription({ template, tierKey, budgets, generation
   }
   if (!chosen) return { valid: false, reason: 'PROGRAM_STRENGTH_PRESCRIPTION_DOES_NOT_FIT' };
 
-  // Allocate work budget across exercises proportional to estimated work.
   const estimates = exercises.map((ex) => estimateWorkSeconds(ex, chosen.setCount, chosen.perExercise[ex.id].target));
   const totalEst = estimates.reduce((a, b) => a + b, 0);
   const workWindows = allocateExact(estimates, totalEst, budgets.workBudgetSeconds, exercises.length);
 
-  // Recovery budget across all inter-set events.
   const totalRestEvents = exercises.reduce((a, ex) => a + (chosen.setCount - 1), 0);
   const restValues = allocateRest(budgets.recoveryBudgetSeconds, totalRestEvents, MIN_INTERSET_REST_SECONDS);
   if (!restValues) return { valid: false, reason: 'PROGRAM_STRENGTH_PRESCRIPTION_DOES_NOT_FIT' };
 
-  // Transition budget across (movementCount-1) slots; last=0.
   const transitionValues = allocateTransition(budgets.transitionBudgetSeconds, exercises.length);
 
-  // Build per-exercise prescription.
   const prescriptions = exercises.map((ex, i) => {
     const per = chosen.perExercise[ex.id];
     const interSetRest = [];
@@ -98,18 +88,12 @@ function tryFit(exercises, setCount, repTarget, holdTarget, envelope, budgets) {
   for (const ex of exercises) {
     let target = ex.prescriptionType === STRENGTH_PRESCRIPTION_TYPES.REPS ? repTarget : holdTarget;
     const min = ex.prescriptionType === STRENGTH_PRESCRIPTION_TYPES.REPS ? envelope.repRange.min : envelope.holdRangeSeconds.min;
-    if (estimateWorkSeconds(ex, setCount, target) > budgets.workBudgetSeconds) {
-      target = min;
-    }
+    if (estimateWorkSeconds(ex, setCount, target) > budgets.workBudgetSeconds) target = min;
     perExercise[ex.id] = { target };
     totalEst += estimateWorkSeconds(ex, setCount, target);
   }
-  // Check recovery feasibility: each rest >= MIN_INTERSET_REST
   const totalRestEvents = exercises.reduce((a) => a + (setCount - 1), 0);
-  if (totalRestEvents > 0 && budgets.recoveryBudgetSeconds / totalRestEvents < MIN_INTERSET_REST_SECONDS) {
-    return { valid: false };
-  }
-  // ADAPTIVE: if total exceeds budget, try reducing exercises to min one by one
+  if (totalRestEvents > 0 && budgets.recoveryBudgetSeconds / totalRestEvents < MIN_INTERSET_REST_SECONDS) return { valid: false };
   if (totalEst > budgets.workBudgetSeconds) {
     for (const ex of exercises) {
       const cur = perExercise[ex.id].target;
@@ -122,13 +106,10 @@ function tryFit(exercises, setCount, repTarget, holdTarget, envelope, budgets) {
       }
     }
   }
-  if (totalEst > budgets.workBudgetSeconds) {
-    return { valid: false };
-  }
+  if (totalEst > budgets.workBudgetSeconds) return { valid: false };
   return { valid: true, perExercise };
 }
 
-/** Allocate total across N buckets proportional to weights, exact sum, each >= minEstimate. */
 function allocateExact(weights, totalWeights, budget, n) {
   const result = new Array(n).fill(0);
   if (totalWeights <= 0) {
@@ -172,5 +153,5 @@ function allocateTransition(totalTransition, exerciseCount) {
   let rem = totalTransition - base * slots;
   let i = 0;
   while (rem > 0) { result[i % slots] += 1; rem -= 1; i += 1; }
-  return result; // last index (exerciseCount-1) stays 0
+  return result;
 }

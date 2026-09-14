@@ -12,6 +12,7 @@ import {
   SINGLE_MODE_PRESETS, COMBINED_PRESETS, isPresetDuration, isValidCustomDuration,
   roundTo30, clamp, MODE_BOXING, MODE_STRENGTH, MODE_COMBINED,
 } from './sessionBudgetConstants';
+import { minimumSessionMinutesForMode } from './sessionDurationPolicy';
 import { buildBoxingIntervalBudget } from './boxingIntervalBudget';
 import { getStrengthEligibleMovementCounts, buildStrengthTimeBudget, computePreferredMovementCount } from './strengthTimeBudget';
 
@@ -21,7 +22,8 @@ function validateInput(input) {
   const reasons = [];
   if (!Object.values(PROGRAM_MODES).includes(input.programMode)) reasons.push(RC.SESSION_INVALID_MODE);
   const dur = input.sessionDurationMinutes;
-  if (typeof dur !== 'number' || !Number.isInteger(dur) || dur < 10 || dur > 120) reasons.push(RC.SESSION_INVALID_CUSTOM_DURATION);
+  const minMinutes = minimumSessionMinutesForMode(input.programMode);
+  if (typeof dur !== 'number' || !Number.isInteger(dur) || dur < minMinutes || dur > 120) reasons.push(RC.SESSION_INVALID_CUSTOM_DURATION);
   if (!Object.values(EXPERIENCE_LEVELS).includes(input.experienceLevel)) reasons.push(RC.SESSION_INVALID_EXPERIENCE);
   if (!Object.values(DIFFICULTY_LEVELS).includes(input.difficulty)) reasons.push(RC.SESSION_INVALID_DIFFICULTY);
   return { valid: reasons.length === 0, reasons };

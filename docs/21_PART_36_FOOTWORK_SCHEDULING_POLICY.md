@@ -2,7 +2,7 @@
 
 ## Status
 
-Implementation candidate. Final LOCK only after branch + PR + main gates pass.
+Implementation complete on branch. Branch CI PASS. Final LOCK only after PR + main CI/Pages gates pass.
 
 ## Scope
 
@@ -79,4 +79,19 @@ PART 35 `footworkPrescription` support remains available as dormant metadata. Th
 - production V1 generated isolated footwork count remains 0.
 - production V1 generated prescription count remains 0.
 
+Verified branch results:
+
+- canonical V1: `FP_9b61698b / AFP_3194287436`, 104 sessions — PASS.
+- strength generation regression — PASS.
+- PART 34 isolated footwork: `FP_c45ecc5d / FP_790ff55e` — PASS.
+- PART 35 prescription: `FP_8cda526a / FP_52d704eb` — PASS.
+- PART 36 stage cadence / budget split / V1 lock — PASS.
+- `npm run verify:independent` — PASS.
+- `npm run lint` — PASS.
+- `npm run build` — PASS.
+
+Branch CI run `34834362057` passed all gates.
+
 No DB schema, movement-library, generator-version, or production-policy version bump is part of PART 36.
+
+Known pre-existing JS/JSDoc `npm run typecheck` debt remains outside this PART gate and is not claimed as passing.

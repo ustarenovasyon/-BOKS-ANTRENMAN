@@ -35,7 +35,11 @@ export function selectStrengthTemplate({ eligibleMovementCounts, availableEquipm
   if (pool.length === 0) {
     return { valid: false, reason: balancedMovementCap ? 'PROGRAM_NO_TEMPLATE_WITHIN_BALANCED_CAP' : 'PROGRAM_NO_ELIGIBLE_STRENGTH_TEMPLATE' };
   }
-  const coverage = evaluateStrengthCoverageWindow(previousTemplateIds.slice(-ROLLING_STRENGTH_SESSION_WINDOW));
+  // Rolling-4 audit window = previous 3 sessions + current selection.
+  // Coverage debt therefore must be computed from the previous W-1 sessions,
+  // not the previous W sessions (which would lag the audit window by one session).
+  const coverageHistorySize = Math.max(0, ROLLING_STRENGTH_SESSION_WINDOW - 1);
+  const coverage = evaluateStrengthCoverageWindow(previousTemplateIds.slice(-coverageHistorySize));
   const missingSet = new Set(coverage.missingPatterns);
   const recentTemplates = previousTemplateIds.slice(-MAX_CONSECUTIVE_TEMPLATE_REPEAT);
   const recentRowVariants = lastRowVariantIds(previousTemplateIds, 3);

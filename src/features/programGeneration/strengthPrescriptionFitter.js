@@ -35,7 +35,7 @@ function estimateWorkSeconds(exercise, setCount, repsOrHold) {
 export function fitStrengthPrescription({ template, tierKey, budgets, generationSeed, trainingOrdinal }) {
   const envelope = PRESCRIPTION_TIER_ENVELOPES[tierKey];
   if (!envelope) return { valid: false, reason: 'PROGRAM_STRENGTH_PRESCRIPTION_DOES_NOT_FIT' };
-  const exercises = template.exerciseIds.map((id) => EX_BY_ID[id]).filter(Boolean);
+  const exercises = template.exerciseIds.map((id) => EX_BY_ID.get(id)).filter(Boolean);
   if (exercises.length !== template.exerciseIds.length) return { valid: false, reason: 'PROGRAM_STRENGTH_VALIDATION_FAILED' };
 
   // Try set counts from preferred down through allowed.

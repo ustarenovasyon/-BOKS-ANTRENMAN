@@ -30,6 +30,17 @@ CI independence + regression + lint + build zincirini her push/PR'da çalıştı
 
 GitHub Pages subpath için Vite base, router basename, SPA fallback ve GitHub Actions deploy akışı kurulmuştur. Production preview GitHub Pages üzerinden yayınlanır.
 
+### Strength generation blocker hotfix — CLOSED
+
+Kuvvet içeren program üretimindeki iki blocker kapatıldı:
+
+- Strength exercise registry `Map` erişimi `EX_BY_ID.get(id)` olarak düzeltildi.
+- Rolling-4 strength coverage selector penceresi audit ile hizalandı: önceki 3 session + mevcut seçim.
+
+`Boks + Kuvvet` için production minimum günlük süre 30 dakika olarak kilitlendi. `Sadece Boks` ve `Sadece Kuvvet` için 15/20 dakika desteği korunur.
+
+Regression suite artık 1/3/6 ay × beginner/intermediate/experienced × easy/normal/hard matrisi üzerinde 15 dk strength-only, 20 dk combined fail-closed ve 30 dk combined generation+audit davranışını ayrıca test eder.
+
 ## Açık riskler
 
 ### 1. Historical 1M / 3M / 6M78 executable fixture input'ları eksik

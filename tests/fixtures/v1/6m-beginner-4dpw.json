@@ -1,0 +1,50 @@
+{
+  "fixtureVersion": 1,
+  "id": "v1-6m-beginner-4dpw-part32",
+  "status": "canonical_active_gate",
+  "description": "PART 32 durable V1 boxing-only 6-month / 104-session deterministic regression fixture.",
+  "historicalReference": {
+    "status": "historical_unreproducible",
+    "blueprintFingerprint": "FP_9698c40e",
+    "auditFingerprint": "AFP_628181959",
+    "note": "Historical 6M/104 pair is preserved for reference only because its exact original generation inputs were lost. It is not an active regression gate and must not be overwritten by the canonical values below."
+  },
+  "input": {
+    "programMode": "boxing_only",
+    "durationMonths": 6,
+    "daysPerWeek": 4,
+    "selectedWeekdays": [
+      "MONDAY",
+      "WEDNESDAY",
+      "FRIDAY",
+      "SUNDAY"
+    ],
+    "sessionDurationMinutes": 30,
+    "experienceLevel": "beginner",
+    "difficulty": "normal",
+    "preferredTrainingTime": null,
+    "boxingStance": "orthodox",
+    "boxingMaxMoves": 4,
+    "strengthDaysPerWeek": 0,
+    "availableEquipment": [],
+    "generationLocalDate": "2026-01-02",
+    "generationSeed": "part32-canonical-6m104-seed-v1",
+    "generationRequestId": "part32-canonical-6m104-request-v1"
+  },
+  "expected": {
+    "programStartDate": "2026-01-02",
+    "endDateExclusive": "2026-07-02",
+    "totalPlannedTrainingSessions": 104,
+    "generationPolicyVersion": 1,
+    "boxingMoveLibraryVersion": 3,
+    "boxingMovementCount": 18,
+    "footworkMovementCount": 4,
+    "attackCombinationCount": 52,
+    "v1DefenseRuleCount": 2,
+    "blueprintFingerprint": "FP_9b61698b",
+    "auditOutcome": "pass",
+    "auditFingerprint": "AFP_3194287436",
+    "criticalIssueCount": 0,
+    "warningCount": 0
+  }
+}

@@ -21,6 +21,10 @@ Base44 runtime/auth/backend bağımlılıkları bu bağımsızlaştırma paketin
 - Program preview: `src/features/programPreview/` + `src/pages/ProgramPreview.jsx`
 - Program audit/correction/approval katmanları: `src/features/programAudit`, `programCorrection`, `programApproval`
 - Yerel DB ve repository katmanı: `src/lib/localData/`
+- Kalıcı regression runner: `tests/run-regression.mjs`
+- Canonical PART 32 fixture: `tests/fixtures/v1/6m-beginner-4dpw.json`
+- GitHub CI: `.github/workflows/ci.yml`
+- GitHub Pages deploy: `.github/workflows/deploy-pages.yml`
 
 ## Boks domain durumu
 
@@ -56,10 +60,28 @@ Kaynak kod şu anda yalnız `1, 3, 6` ayı kabul eder. Hedef süre ailesi:
 - Antrenman başlat / duraklat / tamamla akışı yok
 - Workout progress ve history store'ları var fakat UI akışı tamamlanmamış
 
-## Kritik açık konu
+## PART 32 durumu
 
-PART 32 production footwork foundation kodu repository'dedir. Ancak 6M/104 historical fingerprint'in exact fixture'ı kaybolduğu için regression sözleşmesinin dayanıklı, repository'de kalıcı fixture yapısına taşınması gerekmektedir. Eski `FP_9698c40e / AFP_628181959` tarihsel referans olarak korunmalı; yeniden üretilemeyen aktif gate olarak kullanılmamalıdır.
+PART 32 footwork domain foundation implementation ve durable regression finalizasyonu tamamlanmıştır.
+
+Canonical aktif gate:
+
+- Fixture: `tests/fixtures/v1/6m-beginner-4dpw.json`
+- 6 ay / 4 gün-hafta / 104 session
+- Explicit `generationSeed` + `generationRequestId` + tüm generation input'ları fixture içinde self-contained
+- İki bağımsız generation run: deep-equal
+- `FP_9b61698b`
+- Audit: `pass`
+- `AFP_3194287436`
+- Critical: `0`
+- Warning: `0`
+- V1 Catch leak: `0`
+- V1 Footwork attack leak: `0`
+
+Historical fakat exact original input contract'ı kayıp 6M/104 çifti `FP_9698c40e / AFP_628181959` silinmemiştir ve active gate olarak kullanılmaz.
+
+1M / 3M / 6M78 historical exact baseline fingerprint çiftleri de korunur. Bunların original complete input object'leri mevcut repository ve eldeki karar kayıtlarında bulunmadığından uydurulmuş fixture üretilmemiştir.
 
 ## Bir sonraki teknik hedef
 
-Önce dayanıklı regression fixture altyapısı kurup PART 32'yi kesin kapat. Sonra PART 33'te footwork'ün isolated-learning / integration katmanlarından hangisinin ilk uygulanacağı küçük kapsamla seçilmelidir.
+PART 33: Footwork isolated-learning domain/block preflight. Önce yeni block contract, süre bütçesi, preview ve persistence etkisi incelenecek; PART 33 preflight kilitlenmeden isolated drill production implementation'a geçilmeyecektir.

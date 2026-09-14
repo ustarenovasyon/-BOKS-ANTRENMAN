@@ -1,44 +1,76 @@
 # GitHub Çalışma ve Deploy Rehberi
 
-## Repository adı
+## Repository
 
-Hedef repository: `BOX ANTRENMAN`.
+Canonical repository:
 
-## İlk push öncesi
+`ustarenovasyon/-BOKS-ANTRENMAN`
 
-1. Bu temiz ZIP'i aç.
-2. `npm ci`
-3. `npm run verify:independent`
-4. `npm run build`
-5. Git init / remote bağla
-6. İlk commit'i "Independent baseline" olarak at.
+Repository tek source-of-truth'tur. Base44 runtime/backend/auth bağımlılığı yoktur.
+
+## Yerel doğrulama
+
+Değişiklik öncesi/sonrası kapsamına göre en az:
+
+1. `npm ci`
+2. `npm run verify:independent`
+3. `npm run test:regression`
+4. `npm run lint`
+5. `npm run build`
+
+çalıştırılmalıdır.
+
+`npm run typecheck` ayrıca vardır ancak mevcut repository'de pre-existing JS/JSDoc type borcu bulunduğu için şu an lock gate değildir. Typecheck başarısızlığı gizlenmemeli veya diğer PASS sonuçlarıyla karıştırılmamalıdır.
 
 ## Branch stratejisi
 
 - `main`: yalnız locked/stabil durum
-- İsteğe bağlı `part/33-footwork-drill` gibi kısa ömürlü branch
+- Her production PART için kısa ömürlü branch kullan
+- Örnek: `part33-footwork-drill-preflight`
 
-Tek kişi projede bile her PART ayrı commit olmalıdır. Bir regression çıkarsa hangi PART'ın bozduğu kolay bulunur.
+Tek kişi projede bile her PART ayrı commit/merge kapsamı olmalıdır. Regression çıkarsa hangi PART'ın bozduğu izlenebilmelidir.
 
-## Commit örneği
+## Kalıcı GitHub Actions CI
 
-`PART 33: add V2 footwork drill contract`
+Aktif workflow:
 
-## GitHub Actions önerisi
+`.github/workflows/ci.yml`
 
-CI en az:
+Her push/PR için zorunlu zincir:
 
-- npm ci
-- verify:independent
+- `npm ci`
+- `npm run verify:independent`
+- `npm run test:regression`
+- `npm run lint`
+- `npm run build`
+
+PART 32 ile ilk durable regression runner repository'ye eklendi:
+
+- `tests/run-regression.mjs`
+- `tests/fixtures/v1/6m-beginner-4dpw.json`
+
+Yeni PART'lar mevcut gate'i zayıflatmamalı; gerekirse suite'i genişletmelidir.
+
+## GitHub Pages deploy
+
+Aktif workflow:
+
+`.github/workflows/deploy-pages.yml`
+
+Canlı adres:
+
+`https://ustarenovasyon.github.io/-BOKS-ANTRENMAN/`
+
+Deploy yalnız `main` push sonrası çalışır ve publish öncesi:
+
+- independence
+- regression
 - lint
 - build
-- regression test suite
 
-çalıştırmalıdır.
+kontrollerini geçirir.
 
-## Deploy
-
-Uygulama client-side BrowserRouter kullanır. GitHub Pages kullanılacaksa doğrudan subpath hosting için Vite `base` ve SPA fallback konusu çözülmelidir. En sorunsuz seçeneklerden biri özel domain + static host (GitHub Pages/Cloudflare Pages/Render Static Site) ile SPA fallback sağlamaktır.
+Vite repository subpath base ayarı ve BrowserRouter basename ayarı yapılmıştır. Workflow `dist/index.html` kopyasıyla SPA `404.html` fallback üretir; böylece static hosting deep-link davranışı korunur.
 
 Deploy provider değişse bile repository tek source-of-truth kalmalıdır.
 

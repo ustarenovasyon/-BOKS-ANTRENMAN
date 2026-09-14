@@ -23,6 +23,7 @@ Base44 runtime/auth/backend bağımlılıkları kaldırılmıştır. Uygulama Re
 - Yerel DB ve repository katmanı: `src/lib/localData/`
 - Kalıcı regression runner: `tests/run-regression.mjs`
 - Canonical PART 32 fixture: `tests/fixtures/v1/6m-beginner-4dpw.json`
+- PART 34 footwork isolated regression: `tests/part34-footwork-isolated-regression.mjs`
 - GitHub CI: `.github/workflows/ci.yml`
 - GitHub Pages deploy: `.github/workflows/deploy-pages.yml`
 
@@ -41,7 +42,7 @@ Base44 runtime/auth/backend bağımlılıkları kaldırılmıştır. Uygulama Re
 - Curriculum coverage: 18/18
 - Footwork: Step In, Step Out, Lead-side Step, Rear-side Step
 
-Footwork registry + curriculum foundation tamamlandı. Generated workout'a footwork scheduling henüz bağlı değildir; production generated footwork block count = 0.
+Footwork registry + curriculum foundation tamamlandı. PART 34 ile dormant V2 isolated footwork block contract/support kodu da eklendi. Ancak scheduling/frequency production generator'a bağlı değildir; production generated footwork block count = 0 kalır.
 
 ## PART 32 durumu
 
@@ -74,19 +75,41 @@ Future contract:
 - mevcut boxing budget içinden süre kullanır
 - session total artırmaz
 - exact scheduling/frequency PART 36'ya aittir
-- PART 34 support implementation production scheduling açmayacaktır
-
-Critical safety decisions:
-
-- V1 output değişmez
-- `CURRENT_GENERATION_POLICY_VERSION = V1` kalır
-- V2 preview/audit fail-closed kalır
-- DB schema 2 değişmez
-- movement library 3 değişmez
-- future fingerprint `footworkMoveId` içermeli ama mevcut V1 block signatures byte-for-byte korunmalı
-- audit `checkSummary` V1 shape/count koşulsuz değiştirilmemeli; canonical `AFP_3194287436` korunmalı
 
 Ayrıntılı karar: `docs/18_PART_33_FOOTWORK_ISOLATED_PREFLIGHT.md`.
+
+## PART 34 durumu
+
+Dormant V2 footwork isolated drill contract/support implementation tamamlandı ve regression ile doğrulandı.
+
+Eklenen destek:
+
+- `WORKOUT_BLOCK_TYPES.FOOTWORK_TECHNIQUE = 'boxing_footwork_technique'`
+- merkezi isolated footwork descriptor/validator helper
+- Stage 1 eligibility: Step In + Step Out
+- Stage 2+ eligibility: dört canonical footwork movement
+- max 1 isolated footwork block / boxing-capable day
+- warmup sonrası / boxing interval öncesi order contract
+- `footworkTechniqueSeconds + boxingIntervalSeconds = boxingSeconds` exact budget composition
+- forbidden attack/defense/integration alan guard'ları
+- fingerprint identity içinde `footworkMoveId`
+- preview label/render/integrity support
+- audit fail-closed support
+- DB schema bump yok
+
+PART 34 production scheduling açmaz. V1 generator `buildDayBlocks` çağrısına footwork descriptor vermediği için generated V1 block count hâlâ 0'dır. Explicit V2 generation/audit/preview production activation da yapılmamıştır.
+
+Regression sonucu:
+
+- canonical V1: `FP_9b61698b / AFP_3194287436` — değişmedi
+- canonical 104-session fixture PASS
+- strength regression PASS
+- PART 34 isolated regression PASS
+- synthetic Step In fingerprint: `FP_c45ecc5d`
+- alternate Step Out fingerprint: `FP_790ff55e`
+- iki farklı footwork movement aynı fingerprint identity'ye düşmüyor
+
+Ayrıntılı implementation kaydı: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
 
 ## Süre desteği
 
@@ -107,4 +130,4 @@ Kaynak kod şu anda yalnız `1, 3, 6` ayı kabul eder. Hedef süre ailesi:
 
 ## Bir sonraki teknik hedef
 
-PART 34: dormant V2 footwork isolated drill contract/support implementation. V1 output ve canonical PART 32 regression baseline'ları değişmeden kalmalıdır.
+PART 35: structured footwork integration prescription (`before_combo / after_combo`) contract/implementation. Attack `moveIds` ve `moveCount` kesinlikle değişmez. Isolated scheduling/frequency PART 36 gelmeden production'a açılmaz.

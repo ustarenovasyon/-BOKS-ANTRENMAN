@@ -1,0 +1,82 @@
+name: PART32 Probe
+
+on:
+  push:
+    branches:
+      - part32-durable-regression
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Probe deterministic 6M/104 candidates
+        run: |
+          cat > .part32-probe.mjs <<'EOF'
+          import { createServer } from 'vite';
+          const server = await createServer({ server: { middlewareMode: true }, appType: 'custom' });
+          try {
+            const { generateProgramBlueprint } = await server.ssrLoadModule('/src/features/programGeneration/programGenerationEngine.js');
+            const { auditProgramSnapshot } = await server.ssrLoadModule('/src/features/programAudit/programAuditEngine.js');
+            const candidates = [
+              {
+                label: 'boxing-only',
+                input: {
+                  programMode: 'boxing_only', durationMonths: 6, daysPerWeek: 4,
+                  selectedWeekdays: ['MONDAY','WEDNESDAY','FRIDAY','SUNDAY'],
+                  sessionDurationMinutes: 30, experienceLevel: 'beginner', difficulty: 'normal',
+                  preferredTrainingTime: null, boxingStance: 'orthodox', boxingMaxMoves: 4,
+                  strengthDaysPerWeek: 0, availableEquipment: [],
+                  generationLocalDate: '2026-01-05',
+                  generationSeed: 'part32-canonical-6m104-seed-v1',
+                  generationRequestId: 'part32-canonical-6m104-request-v1'
+                }
+              },
+              {
+                label: 'combined',
+                input: {
+                  programMode: 'boxing_and_strength', durationMonths: 6, daysPerWeek: 4,
+                  selectedWeekdays: ['MONDAY','WEDNESDAY','FRIDAY','SUNDAY'],
+                  sessionDurationMinutes: 30, experienceLevel: 'beginner', difficulty: 'normal',
+                  preferredTrainingTime: null, boxingStance: 'orthodox', boxingMaxMoves: 4,
+                  strengthDaysPerWeek: 2, availableEquipment: ['dumbbell','barbell','ez_bar'],
+                  generationLocalDate: '2026-01-05',
+                  generationSeed: 'part32-canonical-6m104-seed-v1',
+                  generationRequestId: 'part32-canonical-6m104-request-v1'
+                }
+              }
+            ];
+            for (const { label, input } of candidates) {
+              const a = generateProgramBlueprint(input);
+              const b = generateProgramBlueprint(input);
+              console.log(`CANDIDATE ${label} valid=${a.valid} reasons=${JSON.stringify(a.reasons)}`);
+              if (!a.valid) continue;
+              const audit = auditProgramSnapshot(a.blueprint);
+              console.log(JSON.stringify({
+                label,
+                days: a.blueprint.programDays.length,
+                start: a.blueprint.programVersion.programStartDate,
+                end: a.blueprint.programVersion.endDateExclusive,
+                fp: a.blueprint.blueprintFingerprint,
+                auditOutcome: audit.outcome,
+                afp: audit.auditFingerprint,
+                critical: audit.criticalIssueCount,
+                warnings: audit.warningCount,
+                deepEqual: JSON.stringify(a.blueprint) === JSON.stringify(b.blueprint)
+              }));
+            }
+          } finally {
+            await server.close();
+          }
+          EOF
+          node .part32-probe.mjs
+          rm .part32-probe.mjs

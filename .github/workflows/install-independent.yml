@@ -1,4 +1,4 @@
-name: Install independent BOX ANTRENMAN
+name: Repair and verify independent BOX ANTRENMAN
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  install:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -17,46 +17,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Unpack independent project into repository root
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f BOX_ANTRENMAN_GITHUB_BAGIMSIZ.zip
-          rm -rf .tmp_box_install
-          mkdir .tmp_box_install
-          unzip -q BOX_ANTRENMAN_GITHUB_BAGIMSIZ.zip -d .tmp_box_install
-          test -f .tmp_box_install/BOX_ANTRENMAN/package.json
-          find . -mindepth 1 -maxdepth 1 \
-            ! -name '.git' \
-            ! -name '.github' \
-            ! -name '.tmp_box_install' \
-            -exec rm -rf {} +
-          cp -a .tmp_box_install/BOX_ANTRENMAN/. .
-          rm -rf .tmp_box_install
-          node scripts/verify-independent.mjs
-
-      - name: Commit installed project
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "chore: install independent BOX ANTRENMAN project"
-            git push origin HEAD:main
-          fi
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Add missing Tailwind animation dependency
+        run: npm install --save-dev --save-exact tailwindcss-animate@1.0.7
 
       - name: Verify independence
         run: npm run verify:independent
+
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Lint
         run: npm run lint
 
       - name: Build
         run: npm run build
+
+      - name: Commit dependency repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "No dependency changes to commit."
+          else
+            git commit -m "fix: add missing tailwindcss-animate build dependency"
+            git push origin HEAD:main
+          fi

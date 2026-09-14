@@ -24,6 +24,8 @@ Base44 runtime/auth/backend bağımlılıkları kaldırılmıştır. Uygulama Re
 - Kalıcı regression runner: `tests/run-regression.mjs`
 - Canonical PART 32 fixture: `tests/fixtures/v1/6m-beginner-4dpw.json`
 - PART 34 footwork isolated regression: `tests/part34-footwork-isolated-regression.mjs`
+- PART 35 footwork prescription regression: `tests/part35-footwork-prescription-regression.mjs`
+- PART 36 footwork scheduling regression: `tests/part36-footwork-scheduling-regression.mjs`
 - GitHub CI: `.github/workflows/ci.yml`
 - GitHub Pages deploy: `.github/workflows/deploy-pages.yml`
 
@@ -42,7 +44,7 @@ Base44 runtime/auth/backend bağımlılıkları kaldırılmıştır. Uygulama Re
 - Curriculum coverage: 18/18
 - Footwork: Step In, Step Out, Lead-side Step, Rear-side Step
 
-Footwork registry + curriculum foundation tamamlandı. PART 34 ile dormant V2 isolated footwork block contract/support kodu da eklendi. Ancak scheduling/frequency production generator'a bağlı değildir; production generated footwork block count = 0 kalır.
+Footwork registry + curriculum foundation tamamlandı. PART 34 dormant isolated block support, PART 35 structured integration prescription support olarak LOCKED durumdadır. PART 36 deterministic scheduling/frequency policy desteğini dormant V2 helper olarak hazırlar; production V1 generator'a bağlanmaz.
 
 ## PART 32 durumu
 
@@ -74,13 +76,12 @@ Future contract:
 - warmup sonrası, boxing interval öncesi
 - mevcut boxing budget içinden süre kullanır
 - session total artırmaz
-- exact scheduling/frequency PART 36'ya aittir
 
 Ayrıntılı karar: `docs/18_PART_33_FOOTWORK_ISOLATED_PREFLIGHT.md`.
 
 ## PART 34 durumu
 
-Dormant V2 footwork isolated drill contract/support implementation tamamlandı ve regression ile doğrulandı.
+Dormant V2 footwork isolated drill contract/support implementation LOCKED.
 
 Eklenen destek:
 
@@ -97,19 +98,59 @@ Eklenen destek:
 - audit fail-closed support
 - DB schema bump yok
 
-PART 34 production scheduling açmaz. V1 generator `buildDayBlocks` çağrısına footwork descriptor vermediği için generated V1 block count hâlâ 0'dır. Explicit V2 generation/audit/preview production activation da yapılmamıştır.
+Regression lock:
 
-Regression sonucu:
+- canonical V1: `FP_9b61698b / AFP_3194287436`
+- synthetic Step In: `FP_c45ecc5d`
+- alternate Step Out: `FP_790ff55e`
 
-- canonical V1: `FP_9b61698b / AFP_3194287436` — değişmedi
-- canonical 104-session fixture PASS
-- strength regression PASS
-- PART 34 isolated regression PASS
-- synthetic Step In fingerprint: `FP_c45ecc5d`
-- alternate Step Out fingerprint: `FP_790ff55e`
-- iki farklı footwork movement aynı fingerprint identity'ye düşmüyor
+Ayrıntılı implementation: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
 
-Ayrıntılı implementation kaydı: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
+## PART 35 durumu
+
+Structured `footworkPrescription` integration support LOCKED.
+
+- canonical phases: `before_combo` / `after_combo`
+- attack `moveIds` değişmez
+- punch `moveCount` değişmez
+- prescription session süresi eklemez
+- canonical active footwork + curriculum eligibility zorunlu
+- fingerprint phase + movement identity içerir yalnız prescription mevcutsa
+- V1 prescription metadata görürse fail-closed
+- V2 production audit/preview hâlâ inactive/fail-closed
+- production generator prescription schedule etmez
+
+Regression lock:
+
+- canonical V1: `FP_9b61698b / AFP_3194287436`
+- PART 35 synthetic prescription: `FP_8cda526a`
+- alternate prescription: `FP_52d704eb`
+
+Main commit: `7d83b30d610a0f83ab19d51614635a3e12570331`. Main CI ve GitHub Pages deploy PASS.
+
+Ayrıntılı implementation: `docs/20_PART_35_FOOTWORK_INTEGRATION_PRESCRIPTION.md`.
+
+## PART 36 durumu
+
+Deterministic footwork scheduling/frequency policy branch implementasyonu hazırlanıyor. Scope dormant V2-only support'tur; production generator'a bağlanmaz.
+
+Policy candidate:
+
+- scheduled isolated footwork = 60 sn
+- süre mevcut boxing budget'tan düşer
+- kalan boxing interval en az 180 sn olmalı
+- stage'in ilk boxing exposure'ında isolated footwork
+- stage yeni footwork açıyorsa introduction window her yeni movement'a bir exposure verir
+- introduction sonrası her 3. stage-local exposure controlled repetition
+- movement seçimi canonical registry + curriculum helper'larından derive edilir
+- V1 explicit fail-closed
+- Intermediate/experienced current timeline tanımsız olduğu için fail-closed
+- production V1 isolated block count = 0
+- production V1 prescription count = 0
+
+Final LOCK ancak branch + PR + main CI/Pages gate'leri geçerse verilir.
+
+Ayrıntılı policy: `docs/21_PART_36_FOOTWORK_SCHEDULING_POLICY.md`.
 
 ## Süre desteği
 
@@ -130,8 +171,4 @@ Kaynak kod şu anda yalnız `1, 3, 6` ayı kabul eder. Hedef süre ailesi:
 
 ## Bir sonraki teknik hedef
 
-PART 35: structured footwork integration prescription (`before_combo / after_combo`) contract/implementation. Attack `moveIds` ve `moveCount` kesinlikle değişmez. Isolated scheduling/frequency PART 36 gelmeden production'a açılmaz.
-
-## PART 35 durumu
-
-Structured `footworkPrescription` integration support branch implementation is present. Attack combo identity and punch `moveCount` remain unchanged; prescription adds no session time. V1 production output must remain unchanged and prescription scheduling remains deferred to PART 36. Final LOCK requires all branch/PR/main gates.
+PART 36 tamamlanıp LOCKED olduktan sonra PART 37: technique cue / guard / balance instruction layer. Sensörsüz observed scoring veya fiziksel doğruluk ölçümü yapılmaz.

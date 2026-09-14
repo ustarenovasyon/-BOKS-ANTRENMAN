@@ -63,17 +63,52 @@ Regression lock:
 - synthetic Step In `FP_c45ecc5d`
 - alternate Step Out `FP_790ff55e`
 
-Production scheduling **açılmadı**. V1 generated footwork block count = 0. V2 generation/audit/preview active değildir. Exact isolated drill frequency/seconds PART 36'ya aittir.
+Production scheduling **açılmadı**. V1 generated footwork block count = 0. V2 generation/audit/preview active değildir.
 
 Ayrıntılı implementation: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
 
-## PART 35 — Footwork integration prescription
+## PART 35 — LOCKED: Footwork integration prescription
 
-Structured `before_combo / after_combo` prescription; attack `moveIds` ve `moveCount` değişmez. Isolated scheduling/frequency bu PART'ta açılmaz.
+Structured `before_combo / after_combo` prescription support tamamlandı:
+
+- attack `moveIds` değişmez
+- punch `moveCount` değişmez
+- prescription süre eklemez
+- canonical active footwork + curriculum stage validation
+- phase/movement fingerprint identity
+- V1 prescription metadata için fail-closed audit
+- preview integrity + dormant future render support
+- production generator prescription schedule etmez
+
+Regression lock:
+
+- canonical V1 `FP_9b61698b / AFP_3194287436`
+- synthetic prescription `FP_8cda526a`
+- alternate prescription `FP_52d704eb`
+
+PR #4 squash merge edildi; main CI ve GitHub Pages deploy PASS.
+
+Ayrıntılı implementation: `docs/20_PART_35_FOOTWORK_INTEGRATION_PRESCRIPTION.md`.
 
 ## PART 36 — Footwork scheduling/frequency policy
 
-Exposure frequency, budget allocation seconds ve hangi session'larda isolated drill bulunacağı kilitlenir. Support/main/challenge ile karışmayan ayrı pedagojik katman.
+Dormant V2-only policy candidate:
+
+- isolated technique allocation = 60 sn
+- kalan boxing interval minimum = 180 sn
+- boxing budget exact composition korunur
+- stage-local ilk boxing exposure teaching exposure
+- stage yeni footwork açıyorsa introduction window her yeni movement'a bir exposure verir
+- introduction sonrası her 3. stage-local exposure controlled repetition
+- selection canonical registry/curriculum source-of-truth'undan derive edilir
+- attack `FOUNDATIONAL / SUPPORT / MAIN / CHALLENGE` role planından bağımsızdır
+- explicit V2 gerekir; V1 fail-closed
+- current intermediate/experienced timeline tanımsız olduğu için fail-closed
+- production V1 generator'a bağlanmaz; generated footwork/prescription count = 0 kalır
+
+Final LOCK için branch + PR + main regression/CI/Pages gate'leri gereklidir.
+
+Ayrıntılı policy: `docs/21_PART_36_FOOTWORK_SCHEDULING_POLICY.md`.
 
 ## PART 37 — Technique cue / guard / balance instruction layer
 
@@ -112,7 +147,3 @@ Gerçek geçmiş, export/import, uygulama ayarları.
 Generation V2 activation, audit V2, preview V2, migration/backward compatibility, full matrix regression.
 
 Numaralar gerekirse değişebilir; kural: bir PART kesin kilitlenmeden sonraki PART production'a karıştırılmaz.
-
-## PART 35 implementation gate
-
-Structured `before_combo / after_combo` prescription support is implemented as dormant metadata. Production generator still does not schedule prescriptions. PART 36 remains responsible for deterministic scheduling/frequency policy.

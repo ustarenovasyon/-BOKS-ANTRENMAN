@@ -37,22 +37,39 @@ Preflight kararları:
 
 Ayrıntılı contract: `docs/18_PART_33_FOOTWORK_ISOLATED_PREFLIGHT.md`.
 
-## PART 34 — Footwork isolated drill implementation
+## PART 34 — LOCKED: Footwork isolated drill implementation
 
-Dormant V2 contract/support implementation:
+Dormant V2 contract/support implementation tamamlandı:
 
-- block type constant
-- isolated block builder/helper
-- validator support
-- fingerprint identity
-- audit/preview fail-closed support
-- regression tests
+- `FOOTWORK_TECHNIQUE = boxing_footwork_technique` block type
+- merkezi isolated footwork descriptor/validator helper
+- Stage 1 yalnız Step In / Step Out
+- Stage 2+ dört canonical footwork movement
+- strength-only day fail-closed
+- max 1 isolated footwork block / boxing-capable day
+- warmup → footwork → boxing interval order contract
+- boxing budget içinden exact süre composition
+- attack/defense/integration field isolation guard'ları
+- fingerprint identity `footworkMoveId` içerir
+- validator/audit/preview fail-closed support
+- preview dedicated render/label support
+- kalıcı PART 34 regression testi
 
-PART 36 scheduling/frequency policy gelmeden generated workout scheduling production'a açılmaz. V1 output kesinlikle değişmez.
+Regression lock:
+
+- V1 canonical `FP_9b61698b / AFP_3194287436` değişmedi
+- 104-session canonical fixture PASS
+- strength regression PASS
+- synthetic Step In `FP_c45ecc5d`
+- alternate Step Out `FP_790ff55e`
+
+Production scheduling **açılmadı**. V1 generated footwork block count = 0. V2 generation/audit/preview active değildir. Exact isolated drill frequency/seconds PART 36'ya aittir.
+
+Ayrıntılı implementation: `docs/19_PART_34_FOOTWORK_ISOLATED_IMPLEMENTATION.md`.
 
 ## PART 35 — Footwork integration prescription
 
-Structured `before_combo / after_combo` prescription; attack `moveCount` değişmez.
+Structured `before_combo / after_combo` prescription; attack `moveIds` ve `moveCount` değişmez. Isolated scheduling/frequency bu PART'ta açılmaz.
 
 ## PART 36 — Footwork scheduling/frequency policy
 

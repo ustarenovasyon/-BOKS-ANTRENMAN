@@ -62,6 +62,8 @@ export default function WorkoutBlockPreview({ block }) {
       return <Row label="Dinlenme"><Duration seconds={block.plannedSeconds} /></Row>;
     case WORKOUT_BLOCK_TYPES.MODE_TRANSITION:
       return <Row label="Boks → Kuvvet Geçişi"><Duration seconds={block.plannedSeconds} /></Row>;
+    case WORKOUT_BLOCK_TYPES.FOOTWORK_TECHNIQUE:
+      return <FootworkTechnique block={block} />;
     case WORKOUT_BLOCK_TYPES.BOXING_ATTACK_WORK:
       return <BoxingAttack block={block} />;
     case WORKOUT_BLOCK_TYPES.BOXING_DEFENSE_WORK:
@@ -71,6 +73,17 @@ export default function WorkoutBlockPreview({ block }) {
     default:
       return <Row label="Bilinmeyen blok">—</Row>;
   }
+}
+
+function FootworkTechnique({ block }) {
+  return (
+    <div className="py-1 space-y-1">
+      <Row label="Footwork Tekniği" strong>
+        <Duration seconds={block.plannedSeconds} />
+      </Row>
+      <p className="text-sm text-foreground break-words leading-relaxed">{moveName(block.footworkMoveId)}</p>
+    </div>
+  );
 }
 
 function BoxingAttack({ block }) {

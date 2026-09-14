@@ -19,6 +19,7 @@ import { pickFocus, applyProgressionFocusBalance, countPushedDimensions } from '
 import { planMixedDefenseSlots } from '@/features/programGeneration/defenseContentSelector';
 import { boxingCandidatePool } from '@/features/programGeneration/boxingContentSelector';
 import { resolveGenerationPolicyVersion } from '@/features/programGeneration/generationPolicyResolver';
+import { validateFootworkTechniqueDay } from '@/features/programGeneration/footworkTechniqueBlock';
 import { WEEKDAY_INDEX, ROLE_BUDGET_MODE } from '@/features/weeklyBalance/weeklyBalanceConstants';
 import { BOXING_COMBINATIONS } from '@/features/boxing/combinations/boxingCombinations';
 import { BOXING_MOVE_IDS, BOXING_MOVES } from '@/features/boxing/library/boxingMoves';
@@ -103,6 +104,28 @@ export function auditProgramSnapshot(snapshot) {
     blocksByDay.get(b.programDayId).push(b);
   }
   for (const arr of blocksByDay.values()) arr.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+
+  // PART 34: V1 must never carry isolated footwork. Future active V2 can reuse
+  // the same central contract without changing the V1 checkSummary shape.
+  for (const day of days) {
+    const footworkValidation = validateFootworkTechniqueDay({
+      day,
+      dayBlocks: blocksByDay.get(day.id) || [],
+      programDays: days,
+      settings,
+      generationPolicyVersion: policy.version,
+    });
+    if (!footworkValidation.valid) {
+      add(
+        RC.AUDIT_FOOTWORK_TECHNIQUE_INVALID,
+        SEV.CRITICAL,
+        CAT.BOXING,
+        'Footwork technique block contract geçersiz.',
+        { trainingOrdinal: day.trainingOrdinal, plannedDate: day.plannedDate },
+        { reasons: footworkValidation.reasons },
+      );
+    }
+  }
 
   // ===== IDENTITY =====
   bump(CAT.IDENTITY);

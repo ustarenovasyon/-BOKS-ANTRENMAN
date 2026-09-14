@@ -13,6 +13,7 @@ import { WEEKLY_SESSION_ROLES, WORKOUT_BLOCK_TYPES } from '@/config/architecture
 import { computeBlueprintFingerprint } from '@/features/programGeneration/blueprintFingerprint';
 import { resolveGenerationPolicyVersion } from '@/features/programGeneration/generationPolicyResolver';
 import { PREVIEWABLE_STATUSES } from './previewLabels';
+import { validateFootworkTechniqueDay } from '@/features/programGeneration/footworkTechniqueBlock';
 import { buildProgramPreviewViewModel } from './previewViewModel';
 
 const ROLE_BOXING = WEEKLY_SESSION_ROLES.BOXING_ONLY_DAY;
@@ -117,6 +118,15 @@ export async function loadProgramPreview(programId) {
     for (let i = 0; i < ordered.length; i++) {
       if (ordered[i].orderIndex !== i) return fail('PREVIEW_INVALID_BLOCK_ORDER');
     }
+    const footworkValidation = validateFootworkTechniqueDay({
+      day,
+      dayBlocks: ordered,
+      programDays: sortedDays,
+      settings: version.settingsSnapshot,
+      generationPolicyVersion: policy.version,
+    });
+    if (!footworkValidation.valid) return fail('PREVIEW_DATA_INTEGRITY_FAILED');
+
     // role/block composition guard (preview-level, formal audit PART 17).
     const types = new Set(ordered.map((b) => b.type));
     if (day.sessionRole === ROLE_BOXING && types.has(WORKOUT_BLOCK_TYPES.STRENGTH_EXERCISE)) {

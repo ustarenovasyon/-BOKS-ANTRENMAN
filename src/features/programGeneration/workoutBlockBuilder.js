@@ -27,12 +27,19 @@ function newBlock(programDayId, type, plannedSeconds, content = {}) {
  * defenseBlock: {defenseRuleId,...,plannedSeconds} or null (replaces one attack round slot).
  * strengthPrescriptions: [{exerciseId,...,plannedBlockSeconds}] or null.
  */
-export function buildDayBlocks({ programDayId, role, budget, boxingRounds = [], defenseRound = null, strengthPrescriptions = null }) {
+export function buildDayBlocks({ programDayId, role, budget, boxingRounds = [], defenseRound = null, strengthPrescriptions = null, footworkTechnique = null }) {
   orderCounter = 0;
   const blocks = [];
   const b = budget.blocks;
 
   blocks.push(newBlock(programDayId, WORKOUT_BLOCK_TYPES.WARMUP, b.warmupSeconds, { label: 'Isınma' }));
+
+  // PART 34: dormant V2 isolated-learning block. Generator V1 passes null.
+  if (footworkTechnique) {
+    blocks.push(newBlock(programDayId, WORKOUT_BLOCK_TYPES.FOOTWORK_TECHNIQUE, footworkTechnique.plannedSeconds, {
+      footworkMoveId: footworkTechnique.footworkMoveId,
+    }));
+  }
 
   // Boxing interval: iterate boxingBudget intervalSegments in order; WORK segments → attack/defense, REST → rest.
   if (b.boxingSeconds > 0) {

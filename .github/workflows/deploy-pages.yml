@@ -34,6 +34,9 @@ jobs:
       - name: Verify independence
         run: npm run verify:independent
 
+      - name: Regression suite
+        run: npm run test:regression
+
       - name: Lint
         run: npm run lint
 

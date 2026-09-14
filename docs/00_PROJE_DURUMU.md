@@ -131,3 +131,7 @@ Kaynak kod şu anda yalnız `1, 3, 6` ayı kabul eder. Hedef süre ailesi:
 ## Bir sonraki teknik hedef
 
 PART 35: structured footwork integration prescription (`before_combo / after_combo`) contract/implementation. Attack `moveIds` ve `moveCount` kesinlikle değişmez. Isolated scheduling/frequency PART 36 gelmeden production'a açılmaz.
+
+## PART 35 durumu
+
+Structured `footworkPrescription` integration support branch implementation is present. Attack combo identity and punch `moveCount` remain unchanged; prescription adds no session time. V1 production output must remain unchanged and prescription scheduling remains deferred to PART 36. Final LOCK requires all branch/PR/main gates.

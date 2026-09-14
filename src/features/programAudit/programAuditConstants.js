@@ -63,6 +63,7 @@ export const AUDIT_REASON_CODES = Object.freeze({
   AUDIT_BOXING_TRANSITION_INVALID: 'audit_boxing_transition_invalid',
   AUDIT_BOXING_CONTEXT_INVALID: 'audit_boxing_context_invalid',
   AUDIT_FOOTWORK_TECHNIQUE_INVALID: 'audit_footwork_technique_invalid',
+  AUDIT_FOOTWORK_PRESCRIPTION_INVALID: 'audit_footwork_prescription_invalid',
   AUDIT_BOXING_INTERVAL_MISMATCH: 'audit_boxing_interval_mismatch',
   AUDIT_EXCESSIVE_CONSECUTIVE_ATTACK_COMBO: 'audit_excessive_consecutive_attack_combo',
   AUDIT_DEFENSE_UNAUTHORIZED: 'audit_defense_unauthorized',

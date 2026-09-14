@@ -31,6 +31,14 @@ function canonicalBlocks(programDays, workoutBlocks) {
   });
 }
 
+function footworkPrescriptionSignature(block) {
+  if (!Object.prototype.hasOwnProperty.call(block, 'footworkPrescription')) return '';
+  const actions = block.footworkPrescription?.actions;
+  if (!Array.isArray(actions)) return ':FWP[invalid]';
+  const actionSig = actions.map((action) => `${action?.phase || ''}>${action?.movementId || ''}`).join(',');
+  return `:FWP[${actionSig}]`;
+}
+
 export function getBlueprintFingerprintSignature(blueprint, seed) {
   const { programVersion, programDays, workoutBlocks } = blueprint;
   const days = canonicalDays(programDays);
@@ -39,7 +47,7 @@ export function getBlueprintFingerprintSignature(blueprint, seed) {
     .map((d) => `${d.trainingOrdinal}|${d.plannedDate}|${d.sessionRole}|${d.phaseId}|${d.progressionFocus}|${d.defenseEligible ? 1 : 0}`)
     .join(';');
   const blockSig = blocks
-    .map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}:${b.plannedSeconds}:${b.combinationId || b.defenseRuleId || b.exerciseId || b.templateId || b.footworkMoveId || ''}`)
+    .map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}:${b.plannedSeconds}:${b.combinationId || b.defenseRuleId || b.exerciseId || b.templateId || b.footworkMoveId || ''}${footworkPrescriptionSignature(b)}`)
     .join(';');
   const sig = [seed, programVersion.programStartDate, programVersion.endDateExclusive, programVersion.totalPlannedTrainingSessions, daySig, blockSig].join('||');
   return { sig, seed, startDate: programVersion.programStartDate, endDate: programVersion.endDateExclusive, total: programVersion.totalPlannedTrainingSessions, daySig, blockSig, daysOrder: days.map((d) => d.trainingOrdinal), blocksOrder: blocks.map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}`) };

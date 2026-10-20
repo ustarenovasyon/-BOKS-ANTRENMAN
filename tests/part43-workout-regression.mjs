@@ -15,6 +15,7 @@ try {
  assert.throws(()=>transitionWorkout(p,'confirm',1000,blocks));
  p=transitionWorkout(p,'tick',2500,blocks);assert.equal(p.actualMs,1500);
  p=transitionWorkout(p,'pause',3000,blocks);assert.equal(p.actualMs,2000);
+ assert.equal(transitionWorkout(p,'pause',3000,blocks),p);assert.equal(transitionWorkout(p,'pause',99999,blocks),p);
  p=transitionWorkout(p,'resume',100000,blocks);
  p=transitionWorkout(p,'tick',101000,blocks);assert.equal(p.actualMs,3000);
  const restored=transitionWorkout(p,'restore',999999,blocks);assert.equal(restored.status,'paused');assert.equal(restored.actualMs,3000);

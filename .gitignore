@@ -30,3 +30,10 @@ dist-ssr
 *.sw?
 
 .vite
+dist-android/
+android/.gradle/
+android/**/build/
+android/local.properties
+*.jks
+*.keystore
+*.apk

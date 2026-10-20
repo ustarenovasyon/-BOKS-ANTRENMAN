@@ -27,13 +27,13 @@ export default function Workout() {
     loadWorkout(dayId,Date.now(),programId).then(result=>{if(active){contextRef.current=result;setContext(result);setLoading(false);}}).catch(e=>{if(active){setError(e.message);setLoading(false);}});
     return()=>{active=false;mounted.current=false;};
   },[dayId,programId]);
-  const execute=useCallback(event=>{
+  const execute=useCallback((event,explicitNow=null)=>{
     if(['start','resume'].includes(event)&&preferences.current.sound&&typeof window.AudioContext==='function') {
       audio.current??=new AudioContext();audio.current.resume().catch(()=>{});
     }
     queue.current=queue.current.then(async()=>{
       const current=contextRef.current;if(!current)return;
-      try{const progress=await applyWorkoutEvent(current,event,Date.now());const next={...current,progress};contextRef.current=next;
+      try{const progress=await applyWorkoutEvent(current,event,explicitNow??Date.now());const next={...current,progress};contextRef.current=next;
         if(currentWorkoutBlock(current.blocks,current.progress.positionMs).index!==currentWorkoutBlock(current.blocks,progress.positionMs).index) {
           if(preferences.current.vibration&&typeof navigator.vibrate==='function')navigator.vibrate(120);
           if(preferences.current.sound&&audio.current?.state==='running') {
@@ -50,7 +50,9 @@ export default function Workout() {
     const timer=window.setInterval(()=>execute('tick'),500);
     const hide=()=>{if(document.hidden)execute('pause');};
     document.addEventListener('visibilitychange',hide);
-    return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',hide);};
+    const nativePause=event=>execute('pause',event.detail?.nowMs??Date.now());
+    window.addEventListener('box:native-pause',nativePause);
+    return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',hide);window.removeEventListener('box:native-pause',nativePause);};
   },[context?.progress.status,error,execute]);
   if(loading)return <><PageHeader title="Antrenman"/><p>Yükleniyor…</p></>;
   if(!context)return <div className="space-y-4"><PageHeader title="Antrenman"/>{error?<p role="alert" className="text-destructive">{error}</p>:<EmptyState title="Sıradaki antrenman hazır değil." description="Program oluştur, incele ve onayla. Tüm seansların sonuçlandıysa yeni program oluşturabilirsin."/>}<Button asChild><Link to="/programs">Programlarım</Link></Button></div>;

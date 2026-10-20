@@ -44,18 +44,18 @@ public class OfflineAppTest {
     @Test public void offlineProgramTimerNativeBackupAndRestore() throws Exception {
         contains("İlk antrenman programını oluştur.");assertEquals("true",js("typeof window.BoxAndroid.postMessage==='function'"));
         nativeClick("a","Yeni program oluştur");click("button","Sadece Boks");contains("Program Süresi");click("button","1 Ay");click("button","1");click("button","Pazartesi");click("button","Başlangıç");click("button","Sol Gard (Orthodox)");click("button","Program Oluştur");contains("Program Önizleme");click("button","Programı Gözden Geçir");click("button","Onayla ve Programı Başlat");click("button","Onayla ve Başlat");contains("Aktif");
-        click("a","Ana Sayfa");click("a","Antrenmana git");click("button","Antrenmanı başlat");contains("Çalışıyor");SystemClock.sleep(2300);
+        nativeClick("a","Ana Sayfa");nativeClick("a","Antrenmana git");click("button","Antrenmanı başlat");contains("Çalışıyor");SystemClock.sleep(2300);
         String position="document.querySelector('progress[aria-label=\"Antrenman ilerlemesi\"]').value";double beforeBackground=Double.parseDouble(js(position));
         activity.getScenario().moveToState(Lifecycle.State.CREATED);SystemClock.sleep(1200);activity.getScenario().moveToState(Lifecycle.State.RESUMED);contains("Duraklatıldı");
         double retained=Double.parseDouble(js(position));assertTrue("Real elapsed checkpoint",retained>0&&retained<7000);assertTrue("Background time must not be counted",retained-beforeBackground<1000);SystemClock.sleep(1200);assertEquals(retained,Double.parseDouble(js(position)),0.0);
-        activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);
+        activity.getScenario().recreate();contains("AKTİF PROGRAM");nativeClick("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);
         click("a","Ayarlar");contains("Android uygulaması");click("button","JSON yedeğini indir");
         UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());UiObject2 save=device.wait(Until.findObject(By.text(Pattern.compile("(?i)save|kaydet"))),10000);assertNotNull("Android create-document UI",save);save.click();contains("Yedek dosyası hazırlandı.");
         nativeClick("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.textContains("box-antrenman-")),3000);
         if(file==null){UiObject2 roots=device.wait(Until.findObject(By.desc(Pattern.compile("(?i)show roots|show navigation drawer|kökleri göster|gezinme çekmecesini aç"))),3000);if(roots!=null){roots.click();UiObject2 downloads=device.wait(Until.findObject(By.text(Pattern.compile("(?i)downloads|indirilenler"))),3000);if(downloads!=null)downloads.click();}file=device.wait(Until.findObject(By.textContains("box-antrenman-")),10000);}
         if(file==null){ByteArrayOutputStream dump=new ByteArrayOutputStream();device.dumpWindowHierarchy(dump);System.out.println("Native picker hierarchy: "+dump.toString("UTF-8"));}
         assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
-        activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);assertFalse(body().contains("Program bütünlüğü doğrulanamadı"));
+        activity.getScenario().recreate();contains("AKTİF PROGRAM");nativeClick("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);assertFalse(body().contains("Program bütünlüğü doğrulanamadı"));
         device.pressBack();contains("AKTİF PROGRAM");
     }
 }

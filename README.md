@@ -7,8 +7,9 @@ Tek kullanıcılı, Türkçe, offline-first boks ve kuvvet antrenman uygulaması
 1. Program Oluştur ekranında süre, günler, deneyim ve ekipmanı seçin.
 2. Önizlemede programı gözden geçirin ve onaylayın.
 3. Ana Sayfa'dan antrenmana geçin. Sayaç bitince tamamlamayı kendiniz onaylayın.
-4. Geçmiş ekranında gerçek sonuçları ve isteğe bağlı not/zorluk beyanını görün.
-5. Ayarlar'dan JSON yedeğini dışa aktarın veya içe aktarın.
+4. Programlarım’dan yeni program oluşturun, mevcut programı düzenleyin veya kopyalayın. Silmek gerekmez. Aktif programın duruşu değiştirilebilir; geçmiş korunur. Duraklatma, arşiv ve geri alınabilir çöp kutusu da bu ekrandadır.
+5. Geçmiş ekranında gerçek sonuçları ve isteğe bağlı not/zorluk beyanını görün.
+6. Ayarlar'dan JSON yedeğini dışa aktarın veya içe aktarın.
 
 Yeni programlar V2 ile 1, 3, 6, 9, 12, 15, 18 veya 24 aylık oluşturulur. Üç deneyim seviyesi ve boks/kuvvet/birleşik mod desteklenir. Eski V1 programları korunur. Footwork ayrı teknik blok ve kombinasyon öncesi/sonrası talimat olarak sunulur; yumruk sayısına eklenmez. Teknik ipuçları ölçüm veya performans skoru değildir. Pivot ve Stance Reset kapsam dışı/DEFER durumundadır.
 
@@ -45,3 +46,5 @@ Günlük yerel kurtarma kopyası ve içe aktarma/sıfırlama öncesi atomik kurt
 Başlangıç: [güncel durum](docs/00_PROJE_DURUMU.md), [mimari](docs/01_MIMARI_ANAYASA.md), [PART kararları](docs/07_PART_YOL_HARITASI.md), [geliştirme kuralları](docs/12_GELISTIRME_KURALLARI.md), [V2 aktivasyon kapısı](docs/29_PART_45_V2_ACTIVATION.md).
 
 Repository tek kaynak deposudur. V1 default compatibility sabiti değiştirilmez; oluşturma UI'sı explicit V2 ister. Bilinmeyen/null sürümler fail-closed kalır.
+
+Program yönetimi ve veri koruma sözleşmesi: [PART46](docs/31_PART_46_PROGRAM_MANAGEMENT.md).

@@ -12,12 +12,15 @@ import { ArrowLeft } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { loadProgramPreview } from '@/features/programPreview/programPreviewService';
 import { PREVIEW_ERROR_MESSAGES } from '@/features/programPreview/previewLabels';
+import ProgramActions from '@/features/programManagement/ProgramActions';
+import {programTitle} from '@/features/programManagement/programManagementService';
 import ProgramSummary from '@/features/programPreview/components/ProgramSummary';
 import ProgramMonthSection from '@/features/programPreview/components/ProgramMonthSection';
 
 export default function ProgramPreview() {
   const { programId } = useParams();
   const navigate = useNavigate();
+  const [refresh,setRefresh]=useState(0);
   const [state, setState] = useState(/** @type {{status: string, reason?: string, viewModel?: Record<string, any>, blocksByDay?: Map<string, any[]>}} */ ({ status: 'loading' }));
 
   useEffect(() => {
@@ -32,7 +35,7 @@ export default function ProgramPreview() {
       }
     })();
     return () => { active = false; };
-  }, [programId]);
+  }, [programId,refresh]);
 
   if (state.status === 'loading') {
     return (
@@ -72,6 +75,8 @@ export default function ProgramPreview() {
         <ArrowLeft className="w-4 h-4" /> Programlarım
       </Link>
 
+      <h2 className="text-lg font-semibold break-words">{programTitle(viewModel.program)}</h2>
+      <ProgramActions program={viewModel.program} onChanged={()=>setRefresh(value=>value+1)}/>
       <ProgramSummary program={viewModel.program} version={viewModel.version} summary={viewModel.summary} />
 
       <div className="space-y-2">

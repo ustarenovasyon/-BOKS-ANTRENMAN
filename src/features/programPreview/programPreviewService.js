@@ -33,7 +33,7 @@ function fail(reason, extra = {}) {
  * Persisted program'ı read-only yükle + integrity doğrula.
  * Returns { valid:true, viewModel } | { valid:false, reason }.
  */
-export async function loadProgramPreview(programId) {
+export async function loadProgramPreview(programId,versionId=null) {
   if (!programId) return fail('PREVIEW_PROGRAM_NOT_FOUND');
 
   let program;
@@ -46,11 +46,13 @@ export async function loadProgramPreview(programId) {
 
   let version;
   try {
-    version = await programVersionRepository.getById(program.currentVersionId);
+    version = await programVersionRepository.getById(versionId||program.currentVersionId);
   } catch (e) {
     return fail('PREVIEW_READ_FAILED', { error: String(e) });
   }
   if (!version) return fail('PREVIEW_VERSION_NOT_FOUND');
+  // Historical snapshots use their own identity/metadata for read-only audit.
+  if(versionId)program={...program,currentVersionId:version.id,programMode:version.settingsSnapshot?.programMode,durationMonths:version.settingsSnapshot?.durationMonths};
 
   // PART 20: Generation policy version check (fail-closed for unsupported/inactive).
   const policy = resolveGenerationPolicyVersion(version);

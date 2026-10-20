@@ -1,0 +1,76 @@
+import {test,expect} from '@playwright/test';
+import {createApprovedProgram} from './helpers';
+
+async function skipDay(page,dayId) {
+  await page.goto(`/workout?day=${dayId}`);await page.getByRole('button',{name:'Antrenmanı sonlandır',exact:true}).click();await page.getByRole('button',{name:'Sonlandır ve kaydet',exact:true}).click();await expect(page.getByText('Sonucun kaydedildi.')).toBeVisible();
+}
+
+for(const policy of [1,2]) {
+test(`active V${policy} stance edit preserves original versions, real history and a paused timer; stale writes and incompatible edits fail`,async({page})=>{
+  await page.goto('/');const firstDay=await createApprovedProgram(page,{generationPolicyVersion:policy,generationSeed:`management-v${policy}`,generationRequestId:`management-v${policy}`});await skipDay(page,firstDay);
+  const initial=await page.evaluate(async()=>{
+    const repos=await import('/src/lib/localData/repositories/index.js');const program=(await repos.programRepository.list())[0],version=await repos.programVersionRepository.getById(program.currentVersionId),days=(await repos.programDayRepository.getAllByIndex('by_programVersionId',version.id)).sort((a,b)=>a.trainingOrdinal-b.trainingOrdinal);
+    return {programId:program.id,version,history:await repos.workoutHistoryRepository.list(),secondDay:days[1].id};
+  });
+  await page.goto(`/workout?day=${initial.secondDay}`);await page.clock.install({time:new Date('2026-01-07T09:00:00Z')});await page.getByRole('button',{name:'Antrenmanı başlat',exact:true}).click();await page.clock.fastForward(5000);await page.getByRole('button',{name:'Duraklat',exact:true}).click();
+  const beforeEdit=await page.evaluate(async()=>{const {loadWorkout}=await import('/src/features/workout/workoutService.js');return loadWorkout(new URLSearchParams(location.search).get('day'),Date.now());});
+  await page.getByRole('link',{name:'Programı düzenle',exact:true}).click();await expect(page.getByRole('button',{name:'Sol Gard (Orthodox)',exact:true})).toHaveAttribute('aria-pressed','true');await page.getByLabel('Program adı',{exact:true}).fill('Akşam boksu');await page.getByRole('button',{name:'Sağ Gard (Southpaw)',exact:true}).click();await page.getByRole('button',{name:'Değişiklikleri uygula',exact:true}).click();await page.getByRole('button',{name:'Düzenlemeyi onayla',exact:true}).click();await expect(page).toHaveURL(/program-preview\//);await expect(page.getByText('Aktif',{exact:true})).toBeVisible();
+  const after=await page.evaluate(async({initial,beforeEdit})=>{
+    const repos=await import('/src/lib/localData/repositories/index.js'),management=await import('/src/features/programManagement/programManagementService.js'),workout=await import('/src/features/workout/workoutService.js'),backup=await import('/src/features/backup/dataBackup.js');
+    const program=await repos.programRepository.getById(initial.programId),version=await repos.programVersionRepository.getById(program.currentVersionId),old=await repos.programVersionRepository.getById(initial.version.id),overview=await workout.loadTrainingOverview();
+    let staleRejected=false;try{await workout.applyWorkoutEvent(beforeEdit,'resume',Date.now());}catch{staleRejected=true;}
+    const source=await management.loadProgramForEditing(program.id);let incompatibleRejected=false;try{await management.editProgram(source,{...version.settingsSnapshot,sessionDurationMinutes:40},program.name,'incompatible-real-edit');}catch(e){incompatibleRejected=e.message.includes('Yarım kalan');}
+    const exported=await backup.createDataBackup();await backup.parseDataBackup(JSON.stringify(exported));
+    return {oldUnchanged:JSON.stringify(old)===JSON.stringify(initial.version),historyUnchanged:JSON.stringify(await repos.workoutHistoryRepository.list())===JSON.stringify(initial.history),stance:version.settingsSnapshot.boxingStance,done:overview.plans[0].done,versionNumber:version.versionNumber,staleRejected,incompatibleRejected,currentUnchanged:(await repos.programRepository.getById(program.id)).currentVersionId===version.id,backupValid:true};
+  },{initial,beforeEdit});
+  expect(after).toEqual({oldUnchanged:true,historyUnchanged:true,stance:'southpaw',done:1,versionNumber:2,staleRejected:true,incompatibleRejected:true,currentUnchanged:true,backupValid:true});
+  await page.getByRole('link',{name:'Ana Sayfa',exact:true}).click();await page.getByRole('link',{name:'Antrenmana git',exact:true}).click();await expect(page.getByText('Duruş: Sağ Gard (Southpaw)',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Devam et',exact:true})).toBeVisible();await expect(page.getByText('Yapılan 00:05',{exact:false})).toBeVisible();
+  await page.goto('/history');await expect(page.getByText('Duruş: Sol Gard (Orthodox)',{exact:true})).toBeVisible();await page.getByRole('link',{name:'Antrenmanı görüntüle',exact:true}).click();await expect(page.getByText('Sonucun kaydedildi.')).toBeVisible();
+});
+
+}
+
+test('copy creates an independent V2 program; every Home button targets its program; pause/archive/trash/restore preserve data',async({page})=>{
+  await page.goto('/');const dayId=await createApprovedProgram(page);await skipDay(page,dayId);
+  const originalId=await page.evaluate(async()=>{const {programRepository}=await import('/src/lib/localData/repositories/index.js');return (await programRepository.list())[0].id;});
+  await page.goto('/programs');await expect(page.getByRole('link',{name:'Yeni program oluştur',exact:true})).toBeVisible();await page.getByRole('link',{name:'Kopyasını oluştur',exact:true}).click();await page.getByLabel('Program adı',{exact:true}).fill('İkinci program');await page.getByRole('button',{name:'Yeni kopya oluştur',exact:true}).click();await expect(page).toHaveURL(/program-preview\//);await page.getByRole('button',{name:'Programı Gözden Geçir',exact:true}).click();await page.getByRole('button',{name:'Onayla ve Programı Başlat',exact:true}).click();await page.getByRole('button',{name:'Onayla ve Başlat',exact:true}).click();await expect(page.getByText('Aktif',{exact:true})).toBeVisible();
+  const copyId=await page.evaluate(async()=>{const repos=await import('/src/lib/localData/repositories/index.js');const programs=await repos.programRepository.list();const copy=programs.find(p=>p.name==='İkinci program'),version=await repos.programVersionRepository.getById(copy.currentVersionId);if(programs.length!==2||version.generationPolicyVersion!==2)throw new Error('Copy was not independent V2');return copy.id;});
+  await page.goto('/');await expect(page.getByRole('link',{name:'Antrenmana git',exact:true})).toHaveCount(2);await page.locator(`a[href="/workout?program=${copyId}"]`).click();await expect(page.getByText('İkinci program',{exact:true})).toBeVisible();await page.goto('/');await page.locator(`a[href="/workout?program=${originalId}"]`).click();await expect(page.getByText('Antrenman 2',{exact:true})).toBeVisible();
+  await page.goto('/programs');const original=page.getByRole('article',{name:'Sadece Boks · 1 ay',exact:true});await original.getByRole('button',{name:'Programı duraklat',exact:true}).click();await expect(original.getByText('Duraklatıldı',{exact:true})).toBeVisible();await original.getByRole('link',{name:'Önizle',exact:true}).click();await expect(page.getByText('Duraklatıldı',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Programa devam et',exact:true}).click();await expect(page.getByText('Aktif',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Arşivle',exact:true}).click();await page.getByRole('button',{name:'Arşivlemeyi onayla',exact:true}).click();await expect(page.getByText('Arşivlendi',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Arşivden çıkar',exact:true}).click();await expect(page.getByText('Aktif',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Sil',exact:true}).click();await page.getByRole('button',{name:'Çöp kutusuna taşı',exact:true}).click();await expect(page.getByRole('button',{name:'Programı geri al',exact:true})).toBeVisible();
+  await page.goto('/programs');await page.getByLabel('Program listesi',{exact:true}).selectOption('trash');await page.getByRole('button',{name:'Programı geri al',exact:true}).click();await page.getByLabel('Program listesi',{exact:true}).selectOption('all');await expect(page.getByRole('article')).toHaveCount(2);
+  await page.setViewportSize({width:320,height:720});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);await page.screenshot({path:'test-results/program-management-mobile.png',fullPage:true});
+  const result=await page.evaluate(async()=>{const repos=await import('/src/lib/localData/repositories/index.js'),backup=await import('/src/features/backup/dataBackup.js');await backup.parseDataBackup(JSON.stringify(await backup.createDataBackup()));return {history:await repos.workoutHistoryRepository.count(),versions:await repos.programVersionRepository.count(),programs:await repos.programRepository.count()};});expect(result).toEqual({history:1,versions:2,programs:2});
+});
+
+test('history trash and note deletion are independent and reversible; historical workout remains readable',async({page})=>{
+  await page.goto('/');await skipDay(page,await createApprovedProgram(page));await page.goto('/history');await page.getByText('Not ve kendi değerlendirmem',{exact:true}).click();await page.getByLabel('Antrenman notu',{exact:true}).fill('Gerçek kullanıcı notu');await page.getByRole('button',{name:'Notu kaydet',exact:true}).click();await expect(page.getByText('Kaydedildi.',{exact:true})).toBeVisible();
+  page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Notu sil',exact:true}).click();await expect(page.getByText('Not ve değerlendirme silindi.',{exact:true})).toBeVisible();await expect(page.getByLabel('Antrenman notu',{exact:true})).toHaveValue('');
+  await page.getByRole('button',{name:'Kaydı sil',exact:true}).click();await page.getByRole('button',{name:'Kaydı çöp kutusuna taşı',exact:true}).click();await expect(page.getByRole('heading',{name:'Antrenman 1',exact:true})).toHaveCount(0);await page.getByLabel('Çöp kutusunu göster',{exact:true}).check();await page.getByRole('button',{name:'Kaydı geri al',exact:true}).click();await page.getByLabel('Çöp kutusunu göster',{exact:true}).uncheck();await expect(page.getByRole('heading',{name:'Antrenman 1',exact:true})).toBeVisible();
+  const result=await page.evaluate(async()=>{const repos=await import('/src/lib/localData/repositories/index.js');const progress=await repos.workoutProgressRepository.list();return {history:await repos.workoutHistoryRepository.count(),feedback:await repos.feedbackRepository.count(),status:progress[0].status};});expect(result).toEqual({history:1,feedback:0,status:'skipped'});await page.getByRole('link',{name:'Antrenmanı görüntüle',exact:true}).click();await expect(page.getByText('Sonucun kaydedildi.')).toBeVisible();
+});
+
+test('general V2 edits retain real completion across multiple versions and backup round-trip; forged lineage is rejected',async({page})=>{
+ await page.goto('/');await skipDay(page,await createApprovedProgram(page,{generationPolicyVersion:2,generationSeed:'management-long-edit',generationRequestId:'management-long-edit'}));
+ const result=await page.evaluate(async()=>{
+   const repos=await import('/src/lib/localData/repositories/index.js'),management=await import('/src/features/programManagement/programManagementService.js'),workout=await import('/src/features/workout/workoutService.js'),backup=await import('/src/features/backup/dataBackup.js');
+   let program=(await repos.programRepository.list())[0],source=await management.loadProgramForEditing(program.id);const history=JSON.stringify(await repos.workoutHistoryRepository.list());
+   program=await management.editProgram(source,{...source.programVersion.settingsSnapshot,durationMonths:3,daysPerWeek:2,selectedWeekdays:['MONDAY','FRIDAY'],sessionDurationMinutes:40},'Yeni düzen','management-edit-2');
+   source=await management.loadProgramForEditing(program.id);program=await management.editProgram(source,{...source.programVersion.settingsSnapshot,durationMonths:6,boxingStance:'southpaw'},'Yeni düzen','management-edit-3');
+   let overview=await workout.loadTrainingOverview(),version=await repos.programVersionRepository.getById(program.currentVersionId);
+   const exported=await backup.createDataBackup();await backup.restoreDataBackup(await backup.parseDataBackup(JSON.stringify(exported)));
+   const bad=structuredClone(exported.stores),v=bad.program_versions.find(v=>v.id===version.id),first=Object.keys(v.carriedResults)[0];v.carriedResults[first]='missing-real-result';let badRejected=false;try{backup.validateBackupStores(bad);}catch{badRejected=true;}
+   const before=JSON.stringify(await repos.programRepository.getById(program.id));let staleRejected=false;try{await management.editProgram(source,{...source.programVersion.settingsSnapshot,difficulty:'easy'},'Stale','stale-request');}catch{staleRejected=true;}
+   return {done:overview.plans[0].done,version:version.versionNumber,stance:version.settingsSnapshot.boxingStance,duration:program.durationMonths,historyUnchanged:history===JSON.stringify(await repos.workoutHistoryRepository.list()),badRejected,staleRejected,atomic:before===JSON.stringify(await repos.programRepository.getById(program.id)),versions:await repos.programVersionRepository.count()};
+ });
+ expect(result).toEqual({done:1,version:3,stance:'southpaw',duration:6,historyUnchanged:true,badRejected:true,staleRejected:true,atomic:true,versions:3});
+});
+
+test('an archived unapproved draft remains archived when edited and becomes approvable when restored',async({page})=>{
+ await page.goto('/');await createApprovedProgram(page);
+ const result=await page.evaluate(async()=>{
+  const repos=await import('/src/lib/localData/repositories/index.js'),management=await import('/src/features/programManagement/programManagementService.js'),{generateProgramBlueprint}=await import('/src/features/programGeneration/programGenerationEngine.js'),{persistProgramBlueprint}=await import('/src/features/programGeneration/programPersistenceService.js'),{approveProgram}=await import('/src/features/programApproval/programApprovalService.js');
+  const first=(await repos.programVersionRepository.list())[0],input={...first.settingsSnapshot,generationPolicyVersion:2,generationLocalDate:'2026-01-05',generationSeed:'archived-draft',generationRequestId:'archived-draft'};const generated=generateProgramBlueprint(input);await persistProgramBlueprint(generated.blueprint);
+  let program=await repos.programRepository.getById(generated.blueprint.program.id);program=await management.manageProgram(program,'archive');const source=await management.loadProgramForEditing(program.id);program=await management.editProgram(source,{...source.programVersion.settingsSnapshot,boxingStance:'southpaw'},'Arşiv taslağı','archived-draft-edit');const archived=program.status;program=await management.manageProgram(program,'unarchive');const ready=program.status;const approved=await approveProgram(program.id);return {archived,ready,approved:approved.success};
+ });expect(result).toEqual({archived:'archived',ready:'ready_for_approval',approved:true});
+});

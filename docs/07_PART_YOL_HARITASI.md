@@ -119,3 +119,7 @@ Gerçek geçmiş, öz beyan feedback, atomik JSON backup/import/kurtarma, settin
 Generator/audit/preview/persistence birlikte açıldı. 216 exact FP/AFP fixture ve 6 gerçek browser testi; V1 lock korundu. Final branch/main CI ve Pages release gate'i ayrıca izlenir. Karar: `29_PART_45_V2_ACTIVATION.md`.
 
 PART32–36 bölümlerindeki dormant/synthetic ifadeleri o tarihteki durumdur. Güncel production V2 davranışı PART45 kaydıyla belirlenir. Her lockable değişiklik ayrı commit'tir; 39–41 tek coherent support PART olarak kilitlenmiştir.
+
+## PART46 — Yerel PASS / LOCK: Program düzenleme ve yönetim
+
+Mevcut programı silmeden yeni/kopya program, aktif duruş ve tercih düzenleme, immutable eski version/history, uyumlu yarım kalan süreyi taşıma, doğru çoklu program hedefi, pause/archive/geri alınabilir çöp kutusu ve History yönetimi. 12/12 gerçek browser testi, tüm regression/typecheck/lint/build PASS. Final GitHub CI/Pages release kapısı ayrıca izlenir. Karar ve exact changed files: `31_PART_46_PROGRAM_MANAGEMENT.md`.

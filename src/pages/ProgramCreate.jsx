@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,8 @@ import {
 } from '@/features/programCreate/programPreferences';
 import { generateProgramBlueprint } from '@/features/programGeneration/programGenerationEngine';
 import { persistProgramBlueprint } from '@/features/programGeneration/programPersistenceService';
+import {loadProgramForEditing,editProgram,programTitle} from '@/features/programManagement/programManagementService';
+import {Link} from 'react-router-dom';
 import { mapProgramReason } from '@/features/programGeneration/reasonLabels';
 import { generateId } from '@/lib/localData/id';
 import { localCivilDate } from '@/lib/localData/time';
@@ -46,6 +48,9 @@ function SectionTitle({ children }) {
 
 export default function ProgramCreate() {
   const navigate = useNavigate();
+  const [params]=useSearchParams(),editId=params.get('edit'),copyId=params.get('copy');
+  const [source,setSource]=useState(null),[programName,setProgramName]=useState(''),[confirmEdit,setConfirmEdit]=useState(false);
+  const pageTitle=editId?'Programı Düzenle':copyId?'Programı Kopyala':'Program Oluştur';
   const [form, setForm] = useState(DEFAULT_FORM);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -55,21 +60,25 @@ export default function ProgramCreate() {
   const buttonAreaRef = useRef(null);
 
   useEffect(() => {
-    let active = true;
+    let active = true;setLoading(true);setSource(null);setStatus(null);setConfirmEdit(false);
     (async () => {
       try {
-        const rec = await trainingProfileRepository.get();
-        if (active) setForm(formFromRecord(rec));
+        if(editId||copyId){
+          const existing=await loadProgramForEditing(editId||copyId);
+          if(active){setSource(existing);setForm(formFromRecord(existing.programVersion.settingsSnapshot));setProgramName(copyId?programTitle(existing.program).slice(0,72)+' Kopyası':programTitle(existing.program));}
+        }else{
+          const rec=await trainingProfileRepository.get();if(active)setForm(formFromRecord(rec));
+        }
       } catch (e) {
-        console.error('Profile load failed', e);
+        if(active)setStatus({type:'error',message:e.message});
       } finally {
         if (active) setLoading(false);
       }
     })();
     return () => { active = false; };
-  }, []);
+  }, [editId,copyId]);
 
-  const set = (patch) => { setForm((f) => ({ ...f, ...patch })); setStatus(null); };
+  const set = (patch) => { setForm((f) => ({ ...f, ...patch })); setStatus(null);setConfirmEdit(false); };
 
   const scrollToValidation = () => {
     buttonAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -80,7 +89,7 @@ export default function ProgramCreate() {
   const showStrength = hasStrength(form.programMode);
   const isCombined = form.programMode === PROGRAM_MODES.BOXING_AND_STRENGTH;
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (confirmed=false) => {
     setStatus({ type: 'checking', message: 'Kontrol ediliyor...' });
     await new Promise((r) => setTimeout(r, 0));
     const { valid, errors } = validateProgramPreferences(form);
@@ -89,10 +98,14 @@ export default function ProgramCreate() {
       scrollToValidation();
       return;
     }
+    if(programName.trim().length>80){setStatus({type:'error',message:'Program adı en fazla 80 karakter olabilir.'});return;}
+    if((editId||copyId)&&!source){setStatus({type:'error',message:'Kaynak program yüklenemedi.'});return;}
+    if(editId&&!confirmed){setConfirmEdit(true);setStatus(null);scrollToValidation();return;}
     setIsGenerating(true);
     setStatus({ type: 'checking', message: 'Program oluşturuluyor...' });
     try {
       const normalized = normalizeProgramPreferences(form);
+      if(editId){const updated=await editProgram(source,normalized,programName,generateId('EDIT'));navigate(`/program-preview/${updated.id}`);return;}
       const existing = await trainingProfileRepository.get();
       const record = toPersistedRecord(normalized, existing);
       await trainingProfileRepository.save(record);
@@ -124,6 +137,7 @@ export default function ProgramCreate() {
         setStatus({ type: 'error', message: 'Program oluşturulamadı:', errors: [mapProgramReason(reason)] });
         return;
       }
+      result.blueprint.program.name=programName.trim();
       const persisted = await persistProgramBlueprint(result.blueprint);
       if (!persisted.valid || !persisted.persisted) {
         const reason = (persisted.reasons && persisted.reasons[0]) || null;
@@ -174,7 +188,7 @@ export default function ProgramCreate() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Program Oluştur" description="Antrenman tercihlerini belirle." />
+        <PageHeader title={pageTitle} description="Antrenman tercihlerini belirle." />
         <p className="text-sm text-muted-foreground">Yükleniyor...</p>
       </div>
     );
@@ -185,8 +199,10 @@ export default function ProgramCreate() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Program Oluştur" description="Antrenman tercihlerini belirle." />
+      <PageHeader title={pageTitle} description="Antrenman tercihlerini belirle." />
 
+      <p className="text-sm text-muted-foreground">{editId?'Mevcut programın ve geçmiş antrenmanların korunur. Değişiklikler kontrol edildikten sonra uygulanır; aktif program aktif kalır. Yarım kalan antrenman farklılaşırsa önce sonuçlandırman istenir.':copyId?'Bu tercihlerle bağımsız yeni program oluşturulur. Kaynak programın ve geçmişin değişmez.':'Yeni program oluşturmak için mevcut programlarını silmen gerekmez.'}</p>
+      <Field label="Program adı (opsiyonel)"><Input aria-label="Program adı" maxLength={80} value={programName} onChange={e=>{setProgramName(e.target.value);setConfirmEdit(false);}} placeholder="Örn. Sabah boks programım"/></Field>
       <Field label="Program Türü">
         <SegmentedOptions options={modeOptions} value={form.programMode} onChange={(v) => set({ programMode: v })} />
       </Field>
@@ -194,7 +210,7 @@ export default function ProgramCreate() {
       {form.programMode && (
         <>
           <Field label="Program Süresi">
-            <SegmentedOptions options={durationOptions} value={form.durationMonths} onChange={(v) => set({ durationMonths: v })} />
+            <SegmentedOptions options={editId&&source?.programVersion.generationPolicyVersion!==2?durationOptions.filter(o=>o.value<=6):durationOptions} value={form.durationMonths} onChange={(v) => set({ durationMonths: v })} />
           </Field>
 
           <Field label="Haftada Kaç Gün">
@@ -273,7 +289,7 @@ export default function ProgramCreate() {
                   <span className="text-foreground font-medium">{line.label}:</span> {line.value}
                 </p>
               ))}
-              <p className="text-xs text-muted-foreground pt-1">Program henüz oluşturulmadı.</p>
+              <p className="text-xs text-muted-foreground pt-1">{editId?'Yalnız duruş değişikliği mevcut hareketleri ve kayıtlı süreyi korur. Diğer tercihler mevcut başlangıç tarihinden yeniden planlanır.':'Program henüz oluşturulmadı.'}</p>
             </div>
           )}
 
@@ -296,12 +312,14 @@ export default function ProgramCreate() {
                 )}
               </div>
             )}
-            <Button onClick={handleSave} disabled={saving || isGenerating} variant="outline" className="w-full">
+            {!editId&&!copyId&&<Button onClick={handleSave} disabled={saving || isGenerating} variant="outline" className="w-full">
               {saving ? 'Kaydediliyor...' : 'Tercihleri Kaydet'}
+            </Button>}
+            <Button onClick={()=>handleGenerate()} disabled={isGenerating || saving} className="w-full">
+              {isGenerating ? 'Kaydediliyor...' : editId?'Değişiklikleri uygula':copyId?'Yeni kopya oluştur':'Program Oluştur'}
             </Button>
-            <Button onClick={handleGenerate} disabled={isGenerating || saving} className="w-full">
-              {isGenerating ? 'Program oluşturuluyor...' : 'Program Oluştur'}
-            </Button>
+            {confirmEdit&&<div className="rounded-lg border p-3 space-y-2"><p className="text-sm">Yeni tercihler denetlenip uygulanacak. Tamamlanmış seanslar yeniden başlatılmaz; önceki sürüm ve geçmiş korunur. Yarım kalan uyumlu antrenman duraklatılmış olarak taşınır.</p><Button className="w-full" disabled={isGenerating} onClick={()=>handleGenerate(true)}>Düzenlemeyi onayla</Button><Button variant="ghost" onClick={()=>setConfirmEdit(false)}>Vazgeç</Button></div>}
+            <Button variant="ghost" className="w-full" asChild><Link to={editId?`/program-preview/${editId}`:'/programs'}>Programlarıma dön</Link></Button>
           </div>
         </>
       )}

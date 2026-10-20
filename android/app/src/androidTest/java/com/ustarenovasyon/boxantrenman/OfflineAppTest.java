@@ -13,6 +13,7 @@ import android.os.SystemClock;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.json.JSONTokener;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,8 +30,17 @@ public class OfflineAppTest {
     private String body() throws Exception {Object value=new JSONTokener(js("document.body.innerText")).nextValue();return String.valueOf(value);}
     private void contains(String text) throws Exception {for(int i=0;i<120;i++){if(body().contains(text))return;SystemClock.sleep(200);}fail("Missing UI: "+text+"; actual: "+body());}
     private void click(String tag,String text) throws Exception {
-        String code="(function(){var e=Array.from(document.querySelectorAll("+JSONObject.quote(tag)+")).find(e=>e.textContent.trim()==="+JSONObject.quote(text)+");if(e){e.click();return true;}return false;})()";
-        for(int i=0;i<100;i++){if("true".equals(js(code))){SystemClock.sleep(150);return;}SystemClock.sleep(200);}fail("Missing control: "+text+"; "+body());
+        String lookup="Array.from(document.querySelectorAll("+JSONObject.quote(tag)+")).find(e=>e.textContent.trim()==="+JSONObject.quote(text)+")";
+        for(int i=0;i<100;i++) {
+            if("true".equals(js("(function(){var e="+lookup+";if(!e)return false;e.scrollIntoView({block:'center'});return true;})()"))) {
+                SystemClock.sleep(200);
+                JSONArray point=new JSONArray(js("(function(){var r=("+lookup+").getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2,innerWidth];})()"));
+                int[] origin=new int[2],width={0};activity.getScenario().onActivity(host->{host.getAppWebView().getLocationOnScreen(origin);width[0]=host.getAppWebView().getWidth();});
+                double scale=width[0]/point.getDouble(2);UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(origin[0]+(int)(point.getDouble(0)*scale),origin[1]+(int)(point.getDouble(1)*scale));SystemClock.sleep(200);return;
+            }
+            SystemClock.sleep(200);
+        }
+        fail("Missing control: "+text+"; "+body());
     }
     @Test public void offlineProgramTimerNativeBackupAndRestore() throws Exception {
         contains("İlk antrenman programını oluştur.");assertEquals("true",js("typeof window.BoxAndroid.postMessage==='function'"));

@@ -117,7 +117,7 @@ export function resolvePhase(durationMonths, trainingOrdinal, totalSessions) {
 /** Self-check: phase weights sum to 1.00; active phase counts match model. */
 export function validatePhaseModels() {
   const reasons = [];
-  const expectedCounts = { [PROGRAM_DURATION_MONTHS.ONE]: 3, [PROGRAM_DURATION_MONTHS.THREE]: 4, [PROGRAM_DURATION_MONTHS.SIX]: 5 };
+  const expectedCounts = Object.fromEntries(Object.values(PROGRAM_DURATION_MONTHS).map((duration) => [duration, duration === 1 ? 3 : duration === 3 ? 4 : 5]));
   for (const dur of Object.keys(expectedCounts)) {
     const durNum = Number(dur);
     const phases = activePhasesFor(durNum);

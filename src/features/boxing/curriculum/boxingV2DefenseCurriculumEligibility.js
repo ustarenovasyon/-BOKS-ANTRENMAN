@@ -33,7 +33,7 @@ const COMBINED_V2_DEFENSE_RULES = Object.freeze([...DEFENSE_COUNTER_RULES, ...BO
  * V2 defense selector supported curriculum stages.
  * Stage 5/6 unsupported until long-duration defense policy is defined.
  */
-export const V2_DEFENSE_SELECTOR_SUPPORTED_STAGES = Object.freeze([1, 2, 3, 4]);
+export const V2_DEFENSE_SELECTOR_SUPPORTED_STAGES = Object.freeze([1, 2, 3, 4, 5, 6]);
 
 /**
  * Defense rule required stage (DERIVED from PART 21 mapping).

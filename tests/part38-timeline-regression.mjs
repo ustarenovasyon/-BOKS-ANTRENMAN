@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'vite';
-const server = await createServer({server: {middlewareMode: true}, appType: 'custom', logLevel: 'error'});
+const server = await createServer({optimizeDeps: {noDiscovery: true, entries: []},server: {middlewareMode: true}, appType: 'custom', logLevel: 'error'});
 try {
   const {TARGET_PROGRAM_DURATIONS, buildExtendedTimeline, resolveTrainingCycle} = await server.ssrLoadModule('/src/features/boxing/curriculum/longTermTimelinePolicy.js');
   for (const duration of TARGET_PROGRAM_DURATIONS) for (const experience of ['beginner','intermediate','experienced']) for (const total of [1,2,3,5,13,104,416]) {

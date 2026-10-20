@@ -21,6 +21,7 @@
  * Strength-only gün boxing exposure DEĞİLDİR.
  * --------------------------------------------------------------
  */
+import { buildExtendedTimeline, getTimelineMaxStage, TARGET_PROGRAM_DURATIONS } from './longTermTimelinePolicy';
 import { WEEKLY_SESSION_ROLES, EXPERIENCE_LEVELS, PROGRAM_DURATION_MONTHS } from '@/config/architecture';
 import { BOXING_CURRICULUM_STAGES, getCurriculumStageName } from './boxingTechniqueCurriculum';
 
@@ -38,11 +39,7 @@ const BOXING_EXPOSURE_ROLES = Object.freeze(new Set([
  * 1M → Stage 2, 3M → Stage 3, 6M → Stage 4.
  * Stage 5/6 1/3/6 programlarda çıkmaz.
  */
-export const BEGINNER_DURATION_MAX_STAGE = Object.freeze({
-  [PROGRAM_DURATION_MONTHS.ONE]: BOXING_CURRICULUM_STAGES.BASIC_COMBINATION,
-  [PROGRAM_DURATION_MONTHS.THREE]: BOXING_CURRICULUM_STAGES.DEFENSE_INTEGRATION,
-  [PROGRAM_DURATION_MONTHS.SIX]: BOXING_CURRICULUM_STAGES.ADVANCED_STRIKE_INTEGRATION,
-});
+export const BEGINNER_DURATION_MAX_STAGE = Object.freeze(Object.fromEntries(TARGET_PROGRAM_DURATIONS.map((duration) => [duration, getTimelineMaxStage(duration, EXPERIENCE_LEVELS.BEGINNER)])));
 
 /** @type {ReadonlySet<number>} */
 const VALID_DURATIONS = Object.freeze(new Set(Object.values(PROGRAM_DURATION_MONTHS)));
@@ -105,7 +102,7 @@ export function resolveBoxingCurriculumStage({ durationMonths, experienceLevel, 
     return { valid: false, reason: 'invalid_duration_months', stage: null, stageKey: null };
   }
   // Validate experience — only Beginner defined for V2 curriculum
-  if (experienceLevel !== EXPERIENCE_LEVELS.BEGINNER) {
+  if (!Object.values(EXPERIENCE_LEVELS).some((value) => value === experienceLevel)) {
     return { valid: false, reason: 'curriculum_timeline_not_defined_for_experience_level', stage: null, stageKey: null };
   }
   // Validate total
@@ -117,6 +114,12 @@ export function resolveBoxingCurriculumStage({ durationMonths, experienceLevel, 
     return { valid: false, reason: 'invalid_boxing_exposure_ordinal', stage: null, stageKey: null };
   }
 
+  if (durationMonths > 6 || experienceLevel !== EXPERIENCE_LEVELS.BEGINNER) {
+    const timeline = buildExtendedTimeline(durationMonths, experienceLevel, totalBoxingExposures);
+    const segment = timeline?.segments.find((item) => boxingExposureOrdinal >= item.start && boxingExposureOrdinal <= item.end);
+    if (!segment) return {valid: false, reason: 'invalid_timeline', stage: null, stageKey: null};
+    return {valid: true, stage: segment.stage, stageKey: getCurriculumStageName(segment.stage), boxingExposureOrdinal, totalBoxingExposures, durationMonths, experienceLevel};
+  }
   let stage;
   if (durationMonths === PROGRAM_DURATION_MONTHS.ONE) {
     const { stage1End } = computeBoundaries1Month(totalBoxingExposures);
@@ -152,12 +155,17 @@ export function resolveBoxingCurriculumStage({ durationMonths, experienceLevel, 
  * Bir duration için curriculum stage boundary'lerini çözer (test/debug için).
  * Invalid input → null.
  */
-/** @returns {{stage1End: number, stage2End?: number, stage3End?: number, maxStage: number}|null} */
+/** @returns {{stage1End: number, stage2End?: number, stage3End?: number, stage4End?: number, stage5End?: number, maxStage: number, segments?: ReadonlyArray<{stage: number, start: number, end: number}>}|null} */
 export function resolveCurriculumBoundaries(durationMonths, experienceLevel, totalBoxingExposures) {
   if (!VALID_DURATIONS.has(durationMonths)) return null;
-  if (experienceLevel !== EXPERIENCE_LEVELS.BEGINNER) return null;
+  if (!Object.values(EXPERIENCE_LEVELS).includes(experienceLevel)) return null;
   if (!isValidPositiveInt(totalBoxingExposures)) return null;
 
+  if (durationMonths > 6 || experienceLevel !== EXPERIENCE_LEVELS.BEGINNER) {
+    const timeline = buildExtendedTimeline(durationMonths, experienceLevel, totalBoxingExposures);
+    if (!timeline) return null;
+    return {stage1End: 0, ...Object.fromEntries(timeline.segments.map((item) => [`stage${item.stage}End`, item.end])), maxStage: timeline.maxStage, segments: timeline.segments};
+  }
   if (durationMonths === PROGRAM_DURATION_MONTHS.ONE) {
     return { ...computeBoundaries1Month(totalBoxingExposures), maxStage: BEGINNER_DURATION_MAX_STAGE[durationMonths] };
   }

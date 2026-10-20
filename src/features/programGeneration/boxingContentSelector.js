@@ -25,7 +25,7 @@ const WORK = BOXING_INTERVAL_SEGMENT_TYPES.WORK;
  * programs which produce Stage 1–4. Stage 5/6 (rhythm/performance)
  * are unsupported until long-duration policy is defined.
  */
-const V2_ATTACK_SELECTOR_SUPPORTED_STAGES = Object.freeze([1, 2, 3, 4]);
+const V2_ATTACK_SELECTOR_SUPPORTED_STAGES = Object.freeze([1, 2, 3, 4, 5, 6]);
 
 const V2_VALID_ROLES = Object.freeze(new Set(Object.values(V2_ATTACK_ROUND_ROLES)));
 

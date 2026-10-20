@@ -39,6 +39,7 @@ export function buildExtendedTimeline(durationMonths, experienceLevel, total) {
   return Object.freeze({maxStage, startStage, segments: Object.freeze(segments)});
 }
 
+/** @param {{durationMonths?: number, programWeekIndex?: number, stage?: number}} input */
 export function resolveTrainingCycle({durationMonths, programWeekIndex, stage = 1} = {}) {
   if (!TARGET_PROGRAM_DURATIONS.includes(durationMonths) || !Number.isInteger(programWeekIndex) || programWeekIndex < 1) return null;
   // A fourth-week recovery changes intensity and task difficulty, never total time.

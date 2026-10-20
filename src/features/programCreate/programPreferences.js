@@ -12,7 +12,7 @@ import { minimumSessionMinutesForMode } from '@/features/sessionBudget/sessionDu
 import { nowIso } from '@/lib/localData/time';
 
 export const PROGRAM_MODE_VALUES = Object.values(PROGRAM_MODES);
-export const DURATION_VALUES = Object.values(PROGRAM_DURATION_MONTHS);
+export const DURATION_VALUES = [1, 3, 6];
 export const EXPERIENCE_VALUES = Object.values(EXPERIENCE_LEVELS);
 export const DIFFICULTY_VALUES = Object.values(DIFFICULTY_LEVELS);
 export const STANCE_VALUES = Object.values(BOXING_STANCES);

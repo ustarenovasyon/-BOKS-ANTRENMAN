@@ -13,9 +13,12 @@ const D = PROGRESSION_PHASES.DEVELOPMENT;
 const E = PROGRESSION_PHASES.EXPANSION;
 const I = PROGRESSION_PHASES.INTEGRATION;
 const C = PROGRESSION_PHASES.CONSOLIDATION;
+const LONG_DURATIONS = Object.values(PROGRAM_DURATION_MONTHS).filter((duration) => duration > 6);
+const longEntries = (value) => Object.fromEntries(LONG_DURATIONS.map((duration) => [duration, Object.freeze(value)]));
 
 /** Her duration için aktif phase sırası (canonical progression order). */
 export const ACTIVE_PHASES = Object.freeze({
+  ...longEntries([F, D, E, I, C]),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze([F, D, C]),
   [PROGRAM_DURATION_MONTHS.THREE]: Object.freeze([F, D, I, C]),
   [PROGRAM_DURATION_MONTHS.SIX]: Object.freeze([F, D, E, I, C]),
@@ -23,6 +26,7 @@ export const ACTIVE_PHASES = Object.freeze({
 
 /** Phase ağırlıkları (her duration'da toplam 1.00). */
 export const PHASE_WEIGHTS = Object.freeze({
+  ...longEntries({[F]: 0.05, [D]: 0.1, [E]: 0.15, [I]: 0.4, [C]: 0.3}),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze({ [F]: 0.35, [D]: 0.40, [C]: 0.25 }),
   [PROGRAM_DURATION_MONTHS.THREE]: Object.freeze({ [F]: 0.20, [D]: 0.30, [I]: 0.30, [C]: 0.20 }),
   [PROGRAM_DURATION_MONTHS.SIX]: Object.freeze({ [F]: 0.15, [D]: 0.20, [E]: 0.25, [I]: 0.25, [C]: 0.15 }),
@@ -30,6 +34,7 @@ export const PHASE_WEIGHTS = Object.freeze({
 
 /** Boxing combo ceiling tablosu (duration × experience), active phase sırasına hizalı. */
 export const COMBO_CEILINGS = Object.freeze({
+  ...longEntries({beginner: Object.freeze([2,3,4,6,7]), intermediate: Object.freeze([3,4,5,6,7]), experienced: Object.freeze([3,4,5,6,7])}),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze({
     [EXPERIENCE_LEVELS.BEGINNER]: Object.freeze([2, 3, 4]),
     [EXPERIENCE_LEVELS.INTERMEDIATE]: Object.freeze([3, 4, 5]),
@@ -49,6 +54,7 @@ export const COMBO_CEILINGS = Object.freeze({
 
 /** Boxing work progression offset (sn), active phase sırasına hizalı. */
 export const WORK_OFFSETS = Object.freeze({
+  ...longEntries([0,15,15,30,30]),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze([0, 15, 15]),
   [PROGRAM_DURATION_MONTHS.THREE]: Object.freeze([0, 15, 15, 30]),
   [PROGRAM_DURATION_MONTHS.SIX]: Object.freeze([0, 15, 15, 30, 30]),
@@ -58,6 +64,7 @@ export const BOXING_WORK_SECONDS_CAP = 120;
 
 /** Defense exposure: (duration × experience) → { phaseId: level }. */
 export const DEFENSE_EXPOSURE = Object.freeze({
+  ...longEntries(Object.fromEntries(Object.values(EXPERIENCE_LEVELS).map((experience) => [experience, Object.freeze({[F]: experience === EXPERIENCE_LEVELS.BEGINNER ? 'none' : 'intro', [D]: 'intro', [E]: 'regular', [I]: 'regular', [C]: 'regular'})]))),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze({
     [EXPERIENCE_LEVELS.BEGINNER]: Object.freeze({ [F]: 'none', [D]: 'intro', [C]: 'intro' }),
     [EXPERIENCE_LEVELS.INTERMEDIATE]: Object.freeze({ [F]: 'intro', [D]: 'intro', [C]: 'regular' }),
@@ -77,6 +84,7 @@ export const DEFENSE_EXPOSURE = Object.freeze({
 
 /** Strength movement-count advance steps, active phase sırasına hizalı. */
 export const STRENGTH_ADVANCE_STEPS = Object.freeze({
+  ...longEntries([0,0,1,1,2]),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze([0, 0, 1]),
   [PROGRAM_DURATION_MONTHS.THREE]: Object.freeze([0, 0, 1, 1]),
   [PROGRAM_DURATION_MONTHS.SIX]: Object.freeze([0, 0, 1, 1, 2]),
@@ -84,6 +92,7 @@ export const STRENGTH_ADVANCE_STEPS = Object.freeze({
 
 /** Strength prescription tier base (phase), active phase sırasına hizalı. */
 export const PRESCRIPTION_TIER_BASE = Object.freeze({
+  ...longEntries([1,2,3,3,4]),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze([1, 1, 2]),
   [PROGRAM_DURATION_MONTHS.THREE]: Object.freeze([1, 2, 2, 3]),
   [PROGRAM_DURATION_MONTHS.SIX]: Object.freeze([1, 2, 3, 4, 4]),

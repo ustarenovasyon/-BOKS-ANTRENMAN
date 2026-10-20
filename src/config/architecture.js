@@ -42,6 +42,11 @@ export const PROGRAM_DURATION_MONTHS = Object.freeze({
   ONE: 1,
   THREE: 3,
   SIX: 6,
+  NINE: 9,
+  TWELVE: 12,
+  FIFTEEN: 15,
+  EIGHTEEN: 18,
+  TWENTY_FOUR: 24,
 });
 
 // --- Boks maksimum hamle sayısı (kullanıcı seçer, kütüphaneyi filtreler) ---

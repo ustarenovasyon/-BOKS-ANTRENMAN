@@ -35,7 +35,7 @@ public class OfflineAppTest {
             if("true".equals(js("(function(){var e="+lookup+";if(!e)return false;e.scrollIntoView({block:'center'});return true;})()"))) {
                 SystemClock.sleep(200);
                 JSONArray point=new JSONArray(js("(function(){var r=("+lookup+").getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2,innerWidth];})()"));
-                int[] origin=new int[2],width={0};activity.getScenario().onActivity(host->{host.getAppWebView().getLocationOnScreen(origin);width[0]=host.getAppWebView().getWidth();});
+                int[] origin=new int[2],width={0};activity.getScenario().onActivity(host->{host.getAppWebView().getLocationOnScreen(origin);origin[0]+=host.getAppWebView().getPaddingLeft();origin[1]+=host.getAppWebView().getPaddingTop();width[0]=host.getAppWebView().getWidth()-host.getAppWebView().getPaddingLeft()-host.getAppWebView().getPaddingRight();});
                 double scale=width[0]/point.getDouble(2);UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(origin[0]+(int)(point.getDouble(0)*scale),origin[1]+(int)(point.getDouble(1)*scale));SystemClock.sleep(200);return;
             }
             SystemClock.sleep(200);

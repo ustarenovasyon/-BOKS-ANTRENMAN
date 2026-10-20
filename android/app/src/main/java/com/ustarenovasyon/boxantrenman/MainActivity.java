@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
                 if(request.isForMainFrame()&&isAppRoute(uri.getPath())) {
                     try{return new WebResourceResponse("text/html","UTF-8",getAssets().open("index.html"));}catch(Exception e){return blocked();}
                 }
-                return loader.shouldInterceptRequest(uri);
+                WebResourceResponse response=loader.shouldInterceptRequest(uri);return response==null?blocked():response;
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request) {
                 Uri uri=request.getUrl();
@@ -78,7 +78,7 @@ public class MainActivity extends Activity {
                 pendingJson=json;pendingId=id;pendingReply=reply;
                 Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE,name);
                 startActivityForResult(intent,SAVE_JSON);
-            } catch(Exception e) {if(pendingReply==reply){pendingReply=null;pendingJson=null;pendingId=null;}sendReply(reply,id,false,"Yedek kaydedilemedi: "+e.getMessage());}
+            } catch(Exception e) {if(pendingReply==reply&&id.equals(pendingId)){pendingReply=null;pendingJson=null;pendingId=null;}sendReply(reply,id,false,"Yedek kaydedilemedi: "+e.getMessage());}
         });
         webView.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView view,ValueCallback<Uri[]> callback,FileChooserParams params) {

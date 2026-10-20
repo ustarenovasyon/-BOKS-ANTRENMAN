@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
         if(code==OPEN_JSON&&upload!=null){Uri uri=data==null?null:data.getData();upload.onReceiveValue(result==RESULT_OK&&uri!=null&&"content".equals(uri.getScheme())?new Uri[]{uri}:null);upload=null;}
         if(code==SAVE_JSON&&pendingReply!=null) {
             boolean ok=false;String error="Dosya kaydı iptal edildi.";
-            if(result==RESULT_OK&&data!=null&&data.getData()!=null)try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"wt")){if(stream==null)throw new Exception("Dosya açılamadı.");stream.write(pendingJson.getBytes(StandardCharsets.UTF_8));ok=true;error="";}catch(Exception e){error="Dosya kaydedilemedi: "+e.getMessage();}
+            if(result==RESULT_OK&&data!=null&&data.getData()!=null)try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"wt")){if(stream==null)throw new Exception("Dosya açılamadı.");stream.write(pendingJson.getBytes(StandardCharsets.UTF_8));ok=true;error="";}catch(Exception e){ok=false;error="Dosya kaydedilemedi: "+e.getMessage();}
             sendReply(pendingReply,pendingId,ok,error);pendingReply=null;pendingJson=null;pendingId=null;
         }
     }

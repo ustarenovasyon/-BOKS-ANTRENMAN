@@ -37,8 +37,8 @@ public class OfflineAppTest {
     private void nativeClick(String tag,String text) throws Exception {
         assertEquals("true",js("(function(){var e=Array.from(document.querySelectorAll("+JSONObject.quote(tag)+")).find(e=>e.textContent.trim()==="+JSONObject.quote(text)+");if(!e)return false;e.scrollIntoView({block:'center'});return true;})()"));
         SystemClock.sleep(500);UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject2 target=device.wait(Until.findObject(By.textContains(text)),5000);
-        if(target==null)target=device.wait(Until.findObject(By.descContains(text)),2000);
+        UiObject2 target=device.wait(Until.findObject(By.text(text).clickable(true)),5000);
+        if(target==null)target=device.wait(Until.findObject(By.desc(text).clickable(true)),2000);
         assertNotNull("Native touch control: "+text,target);target.click();SystemClock.sleep(250);
     }
     @Test public void offlineProgramTimerNativeBackupAndRestore() throws Exception {

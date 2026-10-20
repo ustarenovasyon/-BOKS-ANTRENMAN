@@ -46,6 +46,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser and IndexedDB regression
+        run: npm run test:browser
+
       - name: Add SPA fallback
         run: cp dist/index.html dist/404.html
 

@@ -7,6 +7,7 @@
  * --------------------------------------------------------------
  */
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import WorkoutBlockPreview from './WorkoutBlockPreview';
 import {
@@ -57,6 +58,7 @@ export default function ProgramDayCard({ day, blocks }) {
             <span className="text-xs text-muted-foreground">Toplam</span>
             <span className="text-sm font-medium text-foreground">{formatSeconds(totalSec)}</span>
           </div>
+          <Link className="block py-2 text-center text-sm underline" to={`/workout?day=${day.id}`}>Bu antrenmanı aç</Link>
         </div>
       )}
     </div>

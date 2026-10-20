@@ -11,6 +11,7 @@ import androidx.test.uiautomator.Until;
 import androidx.lifecycle.Lifecycle;
 import android.os.SystemClock;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.Pattern;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -50,8 +51,8 @@ public class OfflineAppTest {
         String position="document.querySelector('progress[aria-label=\"Antrenman ilerlemesi\"]').value";double retained=Double.parseDouble(js(position));assertTrue("Real elapsed checkpoint",retained>0&&retained<7000);SystemClock.sleep(1200);assertEquals(retained,Double.parseDouble(js(position)),0.0);
         activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);
         click("a","Ayarlar");contains("Android uygulaması");click("button","JSON yedeğini indir");
-        UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());UiObject2 save=device.wait(Until.findObject(By.textMatches("(?i)save|kaydet")),10000);assertNotNull("Android create-document UI",save);save.click();contains("Yedek dosyası hazırlandı.");
-        click("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.textMatches("box-antrenman-.*\\.json")),10000);assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
+        UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());UiObject2 save=device.wait(Until.findObject(By.text(Pattern.compile("(?i)save|kaydet"))),10000);assertNotNull("Android create-document UI",save);save.click();contains("Yedek dosyası hazırlandı.");
+        click("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.text(Pattern.compile("box-antrenman-.*\\.json"))),10000);assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
         activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);assertFalse(body().contains("Program bütünlüğü doğrulanamadı"));
         device.pressBack();contains("AKTİF PROGRAM");
     }

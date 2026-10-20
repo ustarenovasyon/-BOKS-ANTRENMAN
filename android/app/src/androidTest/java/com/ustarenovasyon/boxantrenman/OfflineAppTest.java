@@ -11,6 +11,7 @@ import androidx.test.uiautomator.Until;
 import androidx.lifecycle.Lifecycle;
 import android.os.SystemClock;
 import java.util.concurrent.CountDownLatch;
+import java.io.ByteArrayOutputStream;
 import java.util.regex.Pattern;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
@@ -50,7 +51,10 @@ public class OfflineAppTest {
         activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);
         click("a","Ayarlar");contains("Android uygulaması");click("button","JSON yedeğini indir");
         UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());UiObject2 save=device.wait(Until.findObject(By.text(Pattern.compile("(?i)save|kaydet"))),10000);assertNotNull("Android create-document UI",save);save.click();contains("Yedek dosyası hazırlandı.");
-        nativeClick("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.text(Pattern.compile("box-antrenman-.*\\.json"))),10000);assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
+        nativeClick("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.textContains("box-antrenman-")),3000);
+        if(file==null){UiObject2 roots=device.wait(Until.findObject(By.desc(Pattern.compile("(?i)show roots|show navigation drawer|kökleri göster|gezinme çekmecesini aç"))),3000);if(roots!=null){roots.click();UiObject2 downloads=device.wait(Until.findObject(By.text(Pattern.compile("(?i)downloads|indirilenler"))),3000);if(downloads!=null)downloads.click();}file=device.wait(Until.findObject(By.textContains("box-antrenman-")),10000);}
+        if(file==null){ByteArrayOutputStream dump=new ByteArrayOutputStream();device.dumpWindowHierarchy(dump);System.out.println("Native picker hierarchy: "+dump.toString("UTF-8"));}
+        assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
         activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);assertFalse(body().contains("Program bütünlüğü doğrulanamadı"));
         device.pressBack();contains("AKTİF PROGRAM");
     }

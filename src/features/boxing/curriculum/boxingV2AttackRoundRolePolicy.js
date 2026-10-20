@@ -19,12 +19,11 @@
  * timeline formülleri DUPLICATE EDİLMEZ.
  * --------------------------------------------------------------
  */
-import { EXPERIENCE_LEVELS } from '@/config/architecture';
+import { getTimelineMaxStage } from './longTermTimelinePolicy';
 import { BOXING_CURRICULUM_STAGES } from './boxingTechniqueCurriculum';
 import {
   resolveBoxingCurriculumStage,
   resolveCurriculumBoundaries,
-  BEGINNER_DURATION_MAX_STAGE,
 } from './boxingCurriculumStageResolver';
 
 /** Immutable V2 attack round role constants. */
@@ -50,8 +49,8 @@ const SUPPORT_RATIO = 0.20;
  * Stage-local exposure ordinal'ı PART 22 resolver üzerinden derive eder.
  * Timeline formüllerini duplicate ETMEZ — resolveCurriculumBoundaries kullanır.
  *
- * @returns {{ valid: boolean, stageLocalOrdinal: number|null, stage: number|null, stageStart: number|null, ... }}
  */
+/** @param {{durationMonths?: number, experienceLevel?: string, boxingExposureOrdinal?: number, totalBoxingExposures?: number}} input */
 export function deriveStageLocalExposureOrdinal({
   durationMonths,
   experienceLevel,
@@ -75,6 +74,8 @@ export function deriveStageLocalExposureOrdinal({
 
   const stage = stageResult.stage;
   let stageStart;
+  const segment = boundaries.segments?.find((item) => item.stage === stage);
+  if (segment) return {valid: true, stage, stageStart: segment.start, stageLocalOrdinal: boxingExposureOrdinal - segment.start + 1};
 
   if (stage === BOXING_CURRICULUM_STAGES.FUNDAMENTALS) {
     stageStart = 1;
@@ -128,8 +129,7 @@ function isChallengeEligible({ attackRoundCount, currentStage, finalStage, durat
  * Duplicate edilmez.
  */
 function resolveFinalReachableStage(durationMonths, experienceLevel) {
-  if (experienceLevel !== EXPERIENCE_LEVELS.BEGINNER) return null;
-  return BEGINNER_DURATION_MAX_STAGE[durationMonths] || null;
+  return getTimelineMaxStage(durationMonths, experienceLevel);
 }
 
 /**
@@ -166,12 +166,11 @@ function distributeSupportSlots(attackRoundCount, supportCount, challengeIndex) 
  *   remaining                  → MAIN
  *
  * @param {object} input
- * @param {number} input.attackRoundCount
- * @param {number} input.durationMonths
- * @param {string} input.experienceLevel
- * @param {number} input.boxingExposureOrdinal
- * @param {number} input.totalBoxingExposures
- * @returns {{ valid: boolean, rolePlan: string[], counts: object, ... }}
+ * @param {number} [input.attackRoundCount]
+ * @param {number} [input.durationMonths]
+ * @param {string} [input.experienceLevel]
+ * @param {number} [input.boxingExposureOrdinal]
+ * @param {number} [input.totalBoxingExposures]
  */
 export function buildV2AttackRoundRolePlan({
   attackRoundCount,

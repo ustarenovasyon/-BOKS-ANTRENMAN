@@ -24,7 +24,7 @@ const RULE_BY_ID = new Map(DEFENSE_COUNTER_RULES.map((r) => [r.id, r]));
  * @param {number} exposureCounter
  * @param {object} [options]
  * @param {number} [options.generationPolicyVersion=V1]
- * @param {number} [options.curriculumStage=null] — required for V2
+ * @param {number} [options.curriculumStage] - required for V2
  */
 export function selectDefenseRule(exposureCounter, options = {}) {
   const { generationPolicyVersion = GENERATION_POLICY_VERSIONS.V1, curriculumStage = null } = options;

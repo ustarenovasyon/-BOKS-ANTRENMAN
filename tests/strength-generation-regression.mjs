@@ -27,7 +27,8 @@ try {
   assert.equal(COMBINED_MIN_SESSION_MINUTES, 30);
 
   const equipment = Object.values(STRENGTH_EQUIPMENT);
-  const durations = Object.values(PROGRAM_DURATION_MONTHS);
+  // V1 production duration contract. The V2 matrix covers extended durations.
+  const durations = Object.values(PROGRAM_DURATION_MONTHS).filter((duration) => duration <= 6);
   const experiences = Object.values(EXPERIENCE_LEVELS);
   const difficulties = Object.values(DIFFICULTY_LEVELS);
   const selectedWeekdays = ['MONDAY', 'TUESDAY', 'THURSDAY', 'SATURDAY'];

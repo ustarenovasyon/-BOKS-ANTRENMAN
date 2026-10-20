@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createServer} from 'vite';
+const server=await createServer({optimizeDeps:{noDiscovery:true,entries:[]},server:{middlewareMode:true},appType:'custom',logLevel:'error'});
+try {
+ const fixture=JSON.parse(await readFile(new URL('./fixtures/v1/6m-beginner-4dpw.json',import.meta.url),'utf8'));
+ const {generateProgramBlueprint}=await server.ssrLoadModule('/src/features/programGeneration/programGenerationEngine.js');
+ const {createWorkoutProgress,transitionWorkout,workoutHistoryRecord,currentWorkoutBlock}=await server.ssrLoadModule('/src/features/workout/workoutState.js');
+ const {strengthPlaybackSegments}=await server.ssrLoadModule('/src/features/workout/strengthPlayback.js');
+ const blueprint=generateProgramBlueprint(fixture.input).blueprint,day=blueprint.programDays[0],version=blueprint.programVersion;
+ const blocks=blueprint.workoutBlocks.filter(b=>b.programDayId===day.id);
+ const initial=createWorkoutProgress(day,version,blocks),before=structuredClone(initial);
+ let p=transitionWorkout(initial,'start',1000,blocks);
+ assert.deepEqual(initial,before);
+ assert.throws(()=>transitionWorkout(p,'confirm',1000,blocks));
+ p=transitionWorkout(p,'tick',2500,blocks);assert.equal(p.actualMs,1500);
+ p=transitionWorkout(p,'pause',3000,blocks);assert.equal(p.actualMs,2000);
+ p=transitionWorkout(p,'resume',100000,blocks);
+ p=transitionWorkout(p,'tick',101000,blocks);assert.equal(p.actualMs,3000);
+ const restored=transitionWorkout(p,'restore',999999,blocks);assert.equal(restored.status,'paused');assert.equal(restored.actualMs,3000);
+ p=transitionWorkout(p,'tick',101000+p.totalMs,blocks);
+ assert.equal(p.status,'awaiting_completion_confirmation');assert.equal(workoutHistoryRecord(p,day),null);
+ assert.equal(p.actualMs,p.totalMs);assert.equal(currentWorkoutBlock(blocks,p.positionMs).block,null);
+ p=transitionWorkout(p,'confirm',2000000,blocks);assert.equal(p.status,'completed');
+ assert.equal(transitionWorkout(p,'confirm',2000001,blocks),p);
+ assert.equal(workoutHistoryRecord(p,day).id,`WH_${day.id}`);
+ let skipped=transitionWorkout(initial,'start',0,blocks);
+ skipped=transitionWorkout(skipped,'skip_block',1000,blocks);
+ skipped=transitionWorkout(skipped,'tick',skipped.totalMs,blocks);
+ skipped=transitionWorkout(skipped,'confirm',skipped.totalMs+1,blocks);assert.equal(skipped.status,'partial');
+ assert.equal(transitionWorkout(initial,'skip_workout',0,blocks).status,'skipped');
+ assert.equal(transitionWorkout(transitionWorkout(initial,'start',0,blocks),'finish_partial',5000,blocks).status,'partial');
+ const strength=generateProgramBlueprint({...fixture.input,programMode:'strength_only',availableEquipment:['dumbbell','barbell','ez_bar'],boxingMaxMoves:null}).blueprint;
+ for(const block of strength.workoutBlocks.filter(b=>b.type==='strength_exercise'))assert.equal(strengthPlaybackSegments(block).reduce((sum,s)=>sum+s.seconds,0),block.plannedSeconds);
+ console.log('PASS part43: clock, pause, restore, explicit confirmation, partial/skipped, idempotency and strength set/rest windows');
+} finally {await server.close();}

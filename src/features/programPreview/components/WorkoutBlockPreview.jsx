@@ -26,7 +26,7 @@ function Duration({ seconds }) {
   return <span className="text-muted-foreground">{formatSeconds(seconds)}</span>;
 }
 
-function Row({ label, children, strong }) {
+function Row({ label, children, strong = false }) {
   return (
     <div className="flex items-baseline justify-between gap-2 py-0.5">
       <span className={strong ? 'text-foreground font-medium' : 'text-muted-foreground'}>{label}</span>

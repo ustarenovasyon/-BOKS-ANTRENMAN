@@ -7,12 +7,14 @@
  * --------------------------------------------------------------
  */
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import WorkoutBlockPreview from './WorkoutBlockPreview';
 import {
   ROLE_LABELS, PHASE_LABELS, FOCUS_LABELS, formatCivilDate, formatSeconds,
 } from '../previewLabels';
 import { LABELS } from '@/features/programCreate/programPreferences';
+import {TRAINING_OBJECTIVE_INSTRUCTIONS} from '@/features/boxing/instructions/trainingObjectiveInstructions';
 
 const WD_LABELS = LABELS.weekdays;
 
@@ -50,6 +52,7 @@ export default function ProgramDayCard({ day, blocks }) {
       </button>
       {open && (
         <div className="border-t border-border px-3 py-2 space-y-1">
+          {day.trainingCycleSnapshot&&<p className="rounded bg-muted p-2 text-xs">{TRAINING_OBJECTIVE_INSTRUCTIONS[day.trainingCycleSnapshot.objective]} {day.trainingCycleSnapshot.effortCue}</p>}
           {blocks.map((b) => (
             <WorkoutBlockPreview key={b.id} block={b} />
           ))}
@@ -57,6 +60,7 @@ export default function ProgramDayCard({ day, blocks }) {
             <span className="text-xs text-muted-foreground">Toplam</span>
             <span className="text-sm font-medium text-foreground">{formatSeconds(totalSec)}</span>
           </div>
+          <Link className="block py-2 text-center text-sm underline" to={`/workout?day=${day.id}`}>Bu antrenmanı aç</Link>
         </div>
       )}
     </div>

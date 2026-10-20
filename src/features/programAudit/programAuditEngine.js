@@ -6,6 +6,7 @@
  * Beklenen değerler PART 12/13/14 gerçek motorlarıyla yeniden hesaplanır.
  * --------------------------------------------------------------
  */
+import {auditProgramSnapshotV2} from './programAuditV2';
 import { LOCAL_PROGRAM_AUDIT_ENGINE_VERSION, PROGRAM_AUDIT_OUTCOMES, AUDIT_FINDING_SEVERITIES, AUDIT_CHECK_CATEGORIES, AUDIT_REASON_CODES, AUDIT_WARNING_CODES, FULL_PATTERN_MASK, PATTERN_BITS } from './programAuditConstants';
 import { makeFinding, templatePatternMask, missingPatterns } from './auditFinding';
 import { stableHash } from '@/features/programGeneration/deterministicSelection';
@@ -96,6 +97,7 @@ export function auditProgramSnapshot(snapshot) {
     return finalize(findings, checkSummary, snapshot);
   }
 
+  if(policy.version===2)return auditProgramSnapshotV2(snapshot);
   const settings = programVersion.settingsSnapshot || {};
   const days = (snapshot.programDays || []).slice().sort((a, b) => (a.trainingOrdinal || 0) - (b.trainingOrdinal || 0));
   const blocks = snapshot.workoutBlocks || [];

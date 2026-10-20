@@ -116,3 +116,9 @@ CI `.github/workflows/ci.yml` içinde her push/PR'da:
 - `npm run build`
 
 çalışır. GitHub Pages deploy workflow'u da publish öncesi regression suite'i çalıştırır.
+
+## PART45 güncel suite kapsamı
+
+`test:regression` tüm sonraki PART runner'larını da içerir. `tests/part45-v2-regression.mjs` 216 self-contained fixture'ı (8 süre × 3 deneyim × 3 mod × 3 zorluk) bağımsız iki generation/audit, exact FP/AFP, calendar/stage/role/recovery ve yeniden imzalanmış adversarial bozulma kontrolleriyle tüketir. Fixture overwrite edilmez. Unknown/null policy/library fail-closed testleri korunur; explicit V2 artık geçerli gerçek V2 programlar için aktiftir.
+
+`test:browser` 6 gerçek Chromium/IndexedDB senaryosunu çalıştırır. CI ve Pages typecheck ile browser suite'i de zorunlu tutar. Canonical V1 ve tarihsel baseline'lar değişmez. Ayrıntı: `29_PART_45_V2_ACTIVATION.md`.

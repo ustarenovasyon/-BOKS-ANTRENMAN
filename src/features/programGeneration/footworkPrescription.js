@@ -63,6 +63,7 @@ export function validateFootworkPrescriptionShape(prescription) {
   return { valid: reasons.length === 0, reasons };
 }
 
+/** @param {{actions?: Array<{phase: string, movementId: string}>}} input */
 export function buildFootworkPrescription({ actions } = {}) {
   const prescription = { actions: Array.isArray(actions) ? actions.map((action) => ({ ...action })) : actions };
   const validation = validateFootworkPrescriptionShape(prescription);
@@ -80,6 +81,7 @@ export function cloneFootworkPrescription(prescription) {
   };
 }
 
+/** @param {{block?: Record<string, any>, settings?: Record<string, any>, programDays?: Array<Record<string, any>>, day?: Record<string, any>}} input */
 export function validateFootworkPrescriptionOnAttackBlock({ block, settings, programDays, day } = {}) {
   const reasons = [];
   if (!block || block.type !== WORKOUT_BLOCK_TYPES.BOXING_ATTACK_WORK) {
@@ -105,6 +107,7 @@ export function validateFootworkPrescriptionOnAttackBlock({ block, settings, pro
   return { valid: reasons.length === 0, present: true, reasons, stage: stageResult.stage };
 }
 
+/** @param {{day?: Record<string, any>, dayBlocks?: Array<Record<string, any>>, programDays?: Array<Record<string, any>>, settings?: Record<string, any>, generationPolicyVersion?: number}} input */
 export function validateFootworkPrescriptionDay({
   day,
   dayBlocks,

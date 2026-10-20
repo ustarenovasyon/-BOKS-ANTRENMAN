@@ -7,6 +7,8 @@ import { ensureBoxingTransitionMatrix } from '@/features/boxing/transitions/ensu
 import { ensureBoxingCombinationLibrary } from '@/features/boxing/combinations/ensureBoxingCombinationLibrary';
 import { ensureDefenseCounterLibrary } from '@/features/boxing/defense/ensureDefenseCounterLibrary';
 import { ensureStrengthTemplateLibrary } from '@/features/strength/templates/ensureStrengthTemplateLibrary';
+import {ensureDailyBackup} from '@/features/backup/dataBackup';
+import {loadAppPreferences,applyTheme} from '@/features/settings/appPreferences';
 
 /**
  * Güvenli yerel başlatma akışı.
@@ -16,9 +18,11 @@ import { ensureStrengthTemplateLibrary } from '@/features/strength/templates/ens
  */
 export function useAppInit() {
   const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [warning,setWarning]=useState('');
 
   const run = useCallback(async () => {
     setStatus('loading');
+    setWarning('');
     try {
       await settingsRepository.ensureInitialized();
       await appMetaRepository.ensureInitialized();
@@ -28,6 +32,8 @@ export function useAppInit() {
       await ensureBoxingCombinationLibrary();
       await ensureDefenseCounterLibrary();
       await ensureStrengthTemplateLibrary();
+      applyTheme((await loadAppPreferences()).theme);
+      try{await ensureDailyBackup();}catch{setWarning('Otomatik yerel yedek alınamadı. Ayarlar’dan JSON yedeğini indir.');}
       setStatus('ready');
     } catch (e) {
       console.error('App init failed:', e);
@@ -43,5 +49,5 @@ export function useAppInit() {
     run();
   }, [run]);
 
-  return { status, retry };
+  return { status, retry, warning };
 }

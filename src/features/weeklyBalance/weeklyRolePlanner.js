@@ -28,6 +28,7 @@ export function planWeeklyRoles(programMode, selectedWeekdays, strengthDaysPerWe
   }
   const slots = WEEKDAYS.map((weekday, idx) => {
     const scheduled = selectedSet.has(weekday);
+    /** @type {string} */
     let sessionRole = UNSCHEDULED;
     if (scheduled) {
       if (programMode === PROGRAM_MODES.BOXING_ONLY) sessionRole = BOXING;
@@ -66,7 +67,7 @@ export function computeWeeklyMetrics(slots, sessionDurationMinutes) {
     let max = 0;
     for (const start of idxArr) {
       let len = 0, cur = start;
-      while (set.has(cur)) { len += 1; cur = (cur + 1) % 7; }
+      while (set.has(cur) && len < WEEKDAYS.length) { len += 1; cur = (cur + 1) % 7; }
       max = Math.max(max, len);
     }
     return max;

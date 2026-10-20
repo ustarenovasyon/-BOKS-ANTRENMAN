@@ -4,19 +4,19 @@ AMAÇ
 Bu repository tek kullanıcılı, offline-first boks + kuvvet antrenman uygulamasıdır. React + Vite kullanır. Kalıcı veri IndexedDB'dedir ve yalnız repository katmanı üzerinden erişilir. Harici backend, hesap/login, platform builder veya bulut AI zorunluluğu ekleme.
 
 MEVCUT DURUM
-- Production generation policy: V1.
-- V2 tanımlı fakat production'da inactive; audit/preview fail-closed.
-- Desteklenen program süreleri şu an 1, 3, 6 ay.
-- Hedef süreler: 1, 3, 6, 9, 12, 15, 18, 24 ay.
+- Yeni program UI production policy: explicit V2; legacy/default CURRENT=V1 korunur.
+- V2 generator/audit/preview/persistence birlikte aktif; null/unknown fail-closed.
+- V2 süreler: 1, 3, 6, 9, 12, 15, 18, 24 ay; V1 yalnız 1/3/6.
 - Boks movement toplamı 18: 10 strike, 4 defense, 4 footwork.
 - Canonical attack combo: 52.
 - V2 foundational supplemental attack: 2; combined 54.
 - V1 defense: 2 Slip-counter.
 - V2 supplemental defense: 2 Catch-counter; combined 4.
 - Footwork: Step In, Step Out, Lead-side Step, Rear-side Step.
-- Footwork registry/curriculum'da var fakat generated workout'a henüz bağlanmadı.
-- Workout, History ve Settings ekranları büyük ölçüde tamamlanmamış/placeholder.
-- PART 32 footwork foundation kodu mevcut; final durable 6M/104 regression fixture işi tamamlanmalı.
+- V2 footwork isolated block ve structured prescription aktif; V1 ayrı kalır.
+- Home/Workout/History/Settings, durable timer, backup ve offline shell tamamlandı.
+- PART32 canonical 104 seans fixture tamam: FP_9b61698b / AFP_3194287436.
+- PART45 yerel 216 V2 fixture ve 6 browser testi PASS; final CI/Pages release gate.
 
 DEĞİŞMEZ MİMARİ KURALLAR
 1. Tek kullanıcı. Login/kayıt/rol sistemi ekleme.
@@ -36,8 +36,8 @@ DEĞİŞMEZ MİMARİ KURALLAR
 FOOTWORK KİLİDİ
 OPTION D+ korunacak:
 - Technique layer: first-class footwork registry + curriculum.
-- Isolated learning layer: ileride ayrı V2-only footwork drill/block.
-- Integration layer: ileride structured footworkPrescription.
+- Isolated learning layer: ayrı V2-only footwork drill/block.
+- Integration layer: structured footworkPrescription.
 Örnek: Step In -> Jab -> Cross -> Step Out gösterilebilir; attack combo yine Jab -> Cross ve moveCount=2 kalır.
 Stance Reset ve Pivot şu an DEFER. Pivot için angle/rotation modeli gerekir.
 
@@ -48,7 +48,7 @@ Stage3: Slip Lead/Rear, body hooks.
 Stage4: uppercuts.
 Stage5: Rhythm Advanced.
 Stage6: Performance.
-Stage5/6 uzun süre policy tamamlanana kadar yeni movement açmıyor.
+Stage5/6 yeni movement açmaz; görev/ritim/defense bağlamını geliştirir.
 
 REGRESSION / DETERMINISM
 Bilinen exact historical baselines:
@@ -57,21 +57,21 @@ Bilinen exact historical baselines:
 - 6M/78: FP_eab5e5c1 / AFP_1046783139
 Historical fakat exact fixture kayıp:
 - 6M/104: FP_9698c40e / AFP_628181959
-Bu son çifti silme veya yeni değeri eskiymiş gibi overwrite etme. Historical/unreproducible olarak sakla. Repository içinde explicit generationSeed, generationRequestId ve tüm generation input'larını içeren yeni canonical 6M/104 fixture oluştur; iki bağımsız run aynı FP/AFP ve deep-equal blueprint üretmeli.
+Bu son çifti silme veya yeni değeri eskiymiş gibi overwrite etme. Historical/unreproducible olarak sakla. Repository içinde explicit generationSeed, generationRequestId ve tüm generation input'larını içeren yeni canonical 6M/104 fixture korunur; iki bağımsız run aynı FP/AFP ve deep-equal blueprint üretmeli.
 Fixture'lar başka fixture'dan seed/requestId miras almamalı; self-contained olmalı.
 
 V1/V2
 GENERATION_POLICY_VERSIONS: V1=1, V2=2. CURRENT=V1.
 Missing legacy generationPolicyVersion -> V1.
 Explicit V1 -> active.
-Explicit V2 -> inactive/fail-closed.
+Explicit V2 -> active; gerçek V2 contract ve semantic audit zorunlu.
 Null/unknown -> fail-closed.
 Movement library current=3; legacy 1,2,3 audit tarafından desteklenmeli; unknown/null fail.
 
 UZUN SÜRE YOLU
 9/12/15/18/24 ay eklerken yalnız duration enum/UI değiştirme. Aynı PART zincirinde curriculum boundary, progression, combo length policy, round roles, defense eligibility, weekly balance, audit, preview ve deterministic fixtures güncellenmeli. Uzun süre daha uzun combo demek değildir. Kısa kombinasyon ileri footwork/defense/angle bağlamıyla advanced kalabilir.
 
-ÖNERİLEN DEVAM SIRASI
+TAMAMLANAN PART SIRASI (GÜNCEL KARAR: docs/29_PART_45_V2_ACTIVATION.md)
 1. PART32 durable regression fixture finalizasyonu.
 2. Footwork isolated-learning block preflight ve implementation.
 3. Structured footworkPrescription entegrasyonu (before_combo/after_combo).
@@ -93,8 +93,8 @@ Her değişiklikte:
 3. Minimum kapsamlı kod değişikliği yap.
 4. Library/curriculum değiştiyse coverage/validator çalıştır.
 5. npm run verify:independent çalıştır.
-6. npm run lint ve npm run build çalıştır.
-7. Regression fixture/testleri çalıştır.
+6. npm run typecheck, npm run lint ve npm run build çalıştır.
+7. Regression fixture/testleri ve build sonrası npm run test:browser çalıştır.
 8. V1 farkı varsa root-cause bulmadan expected baseline değiştirme.
 9. Sonuçları ve exact changed files listesini raporla.
 10. PASS/LOCK ancak tüm blocker'lar kapalıysa ver.

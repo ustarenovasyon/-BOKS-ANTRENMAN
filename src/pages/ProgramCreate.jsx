@@ -100,6 +100,7 @@ export default function ProgramCreate() {
 
       const requestId = generateId('REQ');
       const input = {
+        generationPolicyVersion: 2,
         programMode: record.programMode,
         durationMonths: record.durationMonths,
         daysPerWeek: record.daysPerWeek,

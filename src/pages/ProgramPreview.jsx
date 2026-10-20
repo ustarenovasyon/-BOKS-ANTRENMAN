@@ -18,7 +18,7 @@ import ProgramMonthSection from '@/features/programPreview/components/ProgramMon
 export default function ProgramPreview() {
   const { programId } = useParams();
   const navigate = useNavigate();
-  const [state, setState] = useState({ status: 'loading' });
+  const [state, setState] = useState(/** @type {{status: string, reason?: string, viewModel?: Record<string, any>, blocksByDay?: Map<string, any[]>}} */ ({ status: 'loading' }));
 
   useEffect(() => {
     let active = true;

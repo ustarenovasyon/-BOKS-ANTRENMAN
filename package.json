@@ -9,9 +9,10 @@
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
-    "test:regression": "node tests/run-regression.mjs && node tests/strength-generation-regression.mjs && node tests/part34-footwork-isolated-regression.mjs && node tests/part35-footwork-prescription-regression.mjs && node tests/part36-footwork-scheduling-regression.mjs && node tests/part37-technique-instruction-regression.mjs",
+    "test:regression": "node tests/run-regression.mjs && node tests/strength-generation-regression.mjs && node tests/part34-footwork-isolated-regression.mjs && node tests/part35-footwork-prescription-regression.mjs && node tests/part36-footwork-scheduling-regression.mjs && node tests/part37-technique-instruction-regression.mjs && node tests/part38-timeline-regression.mjs && node tests/part39-long-duration-support.mjs && node tests/part43-workout-regression.mjs && node tests/part45-v2-regression.mjs",
     "preview": "vite preview",
-    "verify:independent": "node scripts/verify-independent.mjs"
+    "verify:independent": "node scripts/verify-independent.mjs",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

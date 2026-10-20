@@ -11,7 +11,8 @@ export default function SegmentedOptions({ options, value, onChange }) {
             key={String(opt.value)}
             type="button"
             onClick={() => onChange(opt.value)}
-            className={`px-3 py-2 rounded-md text-sm border transition-colors ${
+            aria-pressed={active}
+            className={`min-h-11 px-3 py-2 rounded-md text-sm border transition-colors ${
               active
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'bg-background text-foreground border-border'

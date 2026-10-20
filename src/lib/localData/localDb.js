@@ -37,13 +37,13 @@ function openDb() {
     const request = indexedDB.open(LOCAL_DB.NAME, LOCAL_DB.VERSION);
 
     request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      const tx = event.target.transaction;
+      const db = request.result;
+      const tx = request.transaction;
       runMigrations(db, event.oldVersion, tx);
     };
 
     request.onsuccess = (event) => {
-      dbInstance = event.target.result;
+      dbInstance = request.result;
       resolve(dbInstance);
     };
     request.onerror = () => reject(request.error);

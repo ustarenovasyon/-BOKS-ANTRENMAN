@@ -148,10 +148,10 @@ try {
   synthetic.blueprintFingerprint = stepInFp;
   synthetic.programVersion.blueprintFingerprint = stepInFp;
   const v2Audit = auditProgramSnapshot(synthetic);
-  assert.equal(v2Audit.outcome, 'fail', 'Explicit V2 audit must remain fail-closed while V2 is inactive.');
+  assert.equal(v2Audit.outcome, 'fail', 'PART45: manually relabeling a V1 blueprint is not a valid V2 program.');
   assert.ok(
-    v2Audit.findings.some((finding) => finding.code === AUDIT_REASON_CODES.AUDIT_UNSUPPORTED_GENERATION_POLICY_VERSION),
-    'Inactive V2 audit must report unsupported generation policy.',
+    v2Audit.findings.some((finding) => finding.code !== AUDIT_REASON_CODES.AUDIT_UNSUPPORTED_GENERATION_POLICY_VERSION),
+    'Active V2 must validate its actual curriculum/scheduling contract, not accept relabeled V1 data.',
   );
 
   const v1Tampered = clone(synthetic);

@@ -17,7 +17,9 @@ import { EXPERIENCE_LEVELS, PROGRAM_DURATION_MONTHS } from '@/config/architectur
  * Beginner V2 combo-length profiles.
  * Her duration için: supportRange, floor, targetRange, normalCeiling, challengeCeiling.
  */
+const LONG_PROFILE = Object.freeze({supportRange: Object.freeze([2, 3]), floor: 3, targetRange: Object.freeze([3, 4, 5]), normalCeiling: 6, challengeCeiling: 7});
 const V2_LENGTH_PROFILES = Object.freeze({
+  ...Object.fromEntries(Object.values(PROGRAM_DURATION_MONTHS).filter((duration) => duration > 6).map((duration) => [duration, LONG_PROFILE])),
   [PROGRAM_DURATION_MONTHS.ONE]: Object.freeze({
     supportRange: Object.freeze([2]),
     floor: 2,
@@ -41,12 +43,8 @@ const V2_LENGTH_PROFILES = Object.freeze({
   }),
 });
 
-const SUPPORTED_DURATIONS = Object.freeze([
-  PROGRAM_DURATION_MONTHS.ONE,
-  PROGRAM_DURATION_MONTHS.THREE,
-  PROGRAM_DURATION_MONTHS.SIX,
-]);
-const SUPPORTED_EXPERIENCE = Object.freeze([EXPERIENCE_LEVELS.BEGINNER]);
+const SUPPORTED_DURATIONS = Object.freeze(Object.values(PROGRAM_DURATION_MONTHS));
+const SUPPORTED_EXPERIENCE = Object.freeze(Object.values(EXPERIENCE_LEVELS));
 
 /**
  * V2 combo-length policy resolver.

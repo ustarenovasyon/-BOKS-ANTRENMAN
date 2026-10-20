@@ -106,8 +106,8 @@ try {
     experienceLevel: EXPERIENCE_LEVELS.INTERMEDIATE,
     boxingExposureOrdinal: 1,
   });
-  assert.equal(unsupportedExperience.valid, false);
-  assert.equal(unsupportedExperience.reason, 'curriculum_timeline_not_defined_for_experience_level');
+  assert.equal(unsupportedExperience.valid, true, 'PART39 defines intermediate timeline explicitly.');
+  assert.equal(unsupportedExperience.stage, 2);
 
   const generated = generateProgramBlueprint(clone(fixture.input));
   assert.equal(generated.valid, true);

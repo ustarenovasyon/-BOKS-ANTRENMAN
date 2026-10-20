@@ -39,7 +39,7 @@ function deriveAllowedWorkingRanges(moveIds) {
   for (let i = 0; i < moveIds.length - 1; i++) {
     const t = PAIR_INDEX[`${moveIds[i]}>${moveIds[i + 1]}`];
     if (!t) return [];
-    allowed = allowed ? allowed.filter((r) => t.allowedRanges.includes(r)) : t.allowedRanges.slice();
+    allowed = allowed ? allowed.filter((r) => new Set(t.allowedRanges).has(r)) : t.allowedRanges.slice();
     if (allowed.length === 0) return [];
   }
   return allowed || [];

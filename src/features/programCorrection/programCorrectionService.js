@@ -138,6 +138,7 @@ export async function correctFailedProgram(programId) {
   // 5. Deterministic rebuild with same settings + new seed
   const settings = sourceVersion.settingsSnapshot || {};
   const correctionInput = buildCorrectionInput(settings, programId, correctionKey, sourceVersion.programStartDate);
+  correctionInput.generationPolicyVersion = sourceVersion.generationPolicyVersion;
   const gen = generateProgramBlueprint(correctionInput);
   if (!gen.valid) {
     return { success: false, reason: RC.CORRECTION_REBUILD_FAILED, rebuildReasons: gen.reasons };
@@ -177,6 +178,11 @@ export async function correctFailedProgram(programId) {
   }
 
   // 7. Validate corrected blueprint (generator's own validation)
+  // Remapping changes fingerprint identity; keep source version untouched.
+  blueprint.program.currentVersionId = newVersionId;
+  const correctedFingerprint = computeBlueprintFingerprint(blueprint, blueprint.programVersion.generationSeed);
+  blueprint.blueprintFingerprint = correctedFingerprint;
+  blueprint.programVersion.blueprintFingerprint = correctedFingerprint;
   const validation = validateFullProgramBlueprint(blueprint);
   if (!validation.valid) {
     return { success: false, reason: RC.CORRECTION_VALIDATION_FAILED, validationReasons: validation.reasons };

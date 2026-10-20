@@ -73,9 +73,9 @@ PR #5 squash merge edildi; main CI ve GitHub Pages deploy PASS.
 
 Ayrıntılı policy: `docs/21_PART_36_FOOTWORK_SCHEDULING_POLICY.md`.
 
-## PART 37 — Technique cue / guard / balance instruction layer
+## PART 37 — LOCKED: Technique cue / guard / balance instruction layer
 
-Instruction-only layer implementation candidate:
+Instruction-only layer tamamlandı; final type hygiene ve yerel gate kaydı `23_PART_37_FINAL_GATE.md` içinde.
 
 - 18/18 canonical movement coverage
 - `techniqueCue`
@@ -90,40 +90,32 @@ Instruction-only layer implementation candidate:
 - source block mutate edilmez
 - generator/persisted blueprint/fingerprint değişmez
 
-Final LOCK için final branch + PR + main regression/CI/Pages gate'leri gereklidir.
+Bu uygulama katmanı yerel tam gate ile kilitlendi. Final release branch/main CI ve Pages ile ayrıca doğrulanır.
 
 Ayrıntılı karar: `docs/22_PART_37_TECHNIQUE_INSTRUCTION_LAYER.md`.
 
-## PART 38 — Uzun süre timeline architecture
+## PART 38 — LOCKED: Uzun süre architecture
 
-9 / 12 / 15 / 18 / 24 ay için curriculum boundary model. Beginner'dan sonra intermediate/experienced timeline ayrıca tanımlanmalı.
+Merkezi exposure timeline, 9+ ay recovery ve deneyim seviyesi modeli. Karar: `24_PART_38_LONG_TERM_ARCHITECTURE.md`.
 
-## PART 39 — 9/12 ay implementation
+## PART 39–41 — LOCKED: Ortak uzun süre support
 
-Stage 4–5 geçişi, rhythm/defense/footwork integration.
+Sekiz süre/üç deneyim için curriculum, progression, role ve length contract birlikte uygulandı. Production V2 PART45'e kadar kapalı kaldı. Karar: `25_PART_39_41_LONG_DURATION_SUPPORT.md`.
 
-## PART 40 — 15/18 ay implementation
+## PART 42 — LOCKED: Rotation architecture; Pivot DEFER
 
-Sürdürülebilir ileri progression; kısa combo + ileri footwork/defense hâlâ mümkün.
+Lead/Rear-relative rotation modeli belgelendi. Pivot ve Stance Reset uygulanmadı. Karar: `26_PART_42_ROTATION_ARCHITECTURE.md`.
 
-## PART 41 — 24 ay implementation
+## PART 43 — LOCKED: Workout
 
-Stage 6 performance curriculum; tekrar yönetimi, varyasyon, deload ve uzun vadeli monotonluk kontrolü.
+Gerçek Home/Workout, durable timer, explicit confirmation, atomic progress/history ve gerçek IndexedDB browser testleri. Karar: `27_PART_43_WORKOUT_PLAYER.md`.
 
-## PART 42 — Pivot/angle architecture
+## PART 44 — LOCKED: History / Settings / backup / offline
 
-Rotation/angle model olmadan pivot eklenmez. Stance-relative angle semantics tanımlanır.
+Gerçek geçmiş, öz beyan feedback, atomik JSON backup/import/kurtarma, settings ve production offline shell. Karar: `28_PART_44_HISTORY_SETTINGS_BACKUP.md`.
 
-## PART 43 — Workout player
+## PART 45 — Yerel PASS / LOCK: Ortak V2 aktivasyonu
 
-Timer, work/rest, pause/resume, completion confirmation, workout_progress/history.
+Generator/audit/preview/persistence birlikte açıldı. 216 exact FP/AFP fixture ve 6 gerçek browser testi; V1 lock korundu. Final branch/main CI ve Pages release gate'i ayrıca izlenir. Karar: `29_PART_45_V2_ACTIVATION.md`.
 
-## PART 44 — History / Settings / backup
-
-Gerçek geçmiş, export/import, uygulama ayarları.
-
-## PART 45 — V2 activation + full production gate
-
-Generation V2 activation, audit V2, preview V2, migration/backward compatibility, full matrix regression.
-
-Numaralar gerekirse değişebilir; kural: bir PART kesin kilitlenmeden sonraki PART production'a karıştırılmaz.
+PART32–36 bölümlerindeki dormant/synthetic ifadeleri o tarihteki durumdur. Güncel production V2 davranışı PART45 kaydıyla belirlenir. Her lockable değişiklik ayrı commit'tir; 39–41 tek coherent support PART olarak kilitlenmiştir.

@@ -195,6 +195,7 @@ export function getCurriculumStageName(stage) {
  */
 export function validateCurriculumCoverage() {
   const libraryIds = BOXING_MOVES.map((m) => m.id);
+  /** @type {Set<string>} */
   const librarySet = new Set(libraryIds);
   const curriculumIds = Object.keys(CURRICULUM_ENTRIES);
 

@@ -1,6 +1,16 @@
 # BOX ANTRENMAN
 
-Tek kullanıcılı, offline-first boks ve kuvvet antrenman uygulaması. Uygulama React + Vite ile çalışır; kalıcı veri tarayıcı IndexedDB üzerinde repository katmanı aracılığıyla tutulur. Harici backend ve hesap/giriş sistemi zorunlu değildir.
+Tek kullanıcılı, Türkçe, offline-first boks ve kuvvet antrenman uygulaması. React + Vite kullanır; veri yalnız cihazdaki IndexedDB'de repository katmanı üzerinden tutulur. Hesap veya backend gerekmez.
+
+## Kullanım
+
+1. Program Oluştur ekranında süre, günler, deneyim ve ekipmanı seçin.
+2. Önizlemede programı gözden geçirin ve onaylayın.
+3. Ana Sayfa'dan antrenmana geçin. Sayaç bitince tamamlamayı kendiniz onaylayın.
+4. Geçmiş ekranında gerçek sonuçları ve isteğe bağlı not/zorluk beyanını görün.
+5. Ayarlar'dan JSON yedeğini dışa aktarın veya içe aktarın.
+
+Yeni programlar V2 ile 1, 3, 6, 9, 12, 15, 18 veya 24 aylık oluşturulur. Üç deneyim seviyesi ve boks/kuvvet/birleşik mod desteklenir. Eski V1 programları korunur. Footwork ayrı teknik blok ve kombinasyon öncesi/sonrası talimat olarak sunulur; yumruk sayısına eklenmez. Teknik ipuçları ölçüm veya performans skoru değildir. Pivot ve Stance Reset kapsam dışı/DEFER durumundadır.
 
 ## Kurulum
 
@@ -9,32 +19,29 @@ npm ci
 npm run dev
 ```
 
-Vite yerel adresini açın. Production build:
+Production ve kontrol:
 
 ```bash
+npm run verify:independent
+npm run test:regression
 npm run typecheck
 npm run lint
 npm run build
+npx playwright install --with-deps chromium
+npm run test:browser
 npm run preview
 ```
 
-## Mimari
+Tarayıcı testleri gerçek IndexedDB ve üretim motorunu kullanır. CI ve Pages aynı kapıları yayın öncesinde çalıştırır. Test matrisi: 216 V2 kombinasyonu; her biri iki bağımsız üretim/audit ve exact FP/AFP kontrolü. V1 canonical gate: `FP_9b61698b / AFP_3194287436` (104 seans).
 
-- React 18 + Vite
-- React Router
-- IndexedDB local persistence
-- Deterministic program generation
-- V1 aktif generation policy; V2 geliştirme altında ve fail-closed
-- Boks movement/combo/defense/curriculum kütüphaneleri
-- Kuvvet exercise/template sistemi
-- Program generation, audit, correction ve approval katmanları
+## Çevrimdışı çalışma ve veri
 
-Detaylı proje kaynakları `docs/` klasöründedir. Geliştirmeye başlamadan önce özellikle `docs/00_PROJE_DURUMU.md`, `docs/01_MIMARI_ANAYASA.md`, `docs/07_PART_YOL_HARITASI.md` ve `docs/12_GELISTIRME_KURALLARI.md` okunmalıdır.
+Production ilk başarılı çevrimiçi açılıştan sonra uygulama dosyalarını service worker ile önbelleğe alır. Sonraki açılışlar çevrimdışı çalışır. Geliştirme sunucusu service worker kullanmaz. Sekme arka plana gidince sayaç durur; yeniden açılışta son kayıtlı noktadan duraklatılmış olarak devam edilir. Süre dolması kendiliğinden tamamlandı kaydı oluşturmaz.
 
-## Veri
+Günlük yerel kurtarma kopyası ve içe aktarma/sıfırlama öncesi atomik kurtarma kaydı vardır. Tarayıcı verilerini temizlemek bunları da siler; Ayarlar'dan dışa aktarılan JSON'u cihaz dışında saklayın. İçe aktarma biçim, sürüm, bütünlük ve program ilişkilerini doğrular; hata varsa mevcut veri korunur.
 
-Veriler kullanıcı cihazındaki IndexedDB'de tutulur. Tarayıcı verisi temizlenirse yerel kayıtlar silinebilir; ileride export/import ve native/SQLite katmanı planlanmalıdır.
+## Geliştirme
 
-## Repository
+Başlangıç: [güncel durum](docs/00_PROJE_DURUMU.md), [mimari](docs/01_MIMARI_ANAYASA.md), [PART kararları](docs/07_PART_YOL_HARITASI.md), [geliştirme kuralları](docs/12_GELISTIRME_KURALLARI.md), [V2 aktivasyon kapısı](docs/29_PART_45_V2_ACTIVATION.md).
 
-Bu repository projenin tek kaynak deposu olacak şekilde hazırlanmıştır. Harici builder senkronizasyonuna bağlı değildir.
+Repository tek kaynak deposudur. V1 default compatibility sabiti değiştirilmez; oluşturma UI'sı explicit V2 ister. Bilinmeyen/null sürümler fail-closed kalır.

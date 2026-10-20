@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Sayfa başlığı için sade, tekrar kullanılabilir header.
  */
-export default function PageHeader({ title, description }) {
+export default function PageHeader({ title, description = null }) {
   return (
     <header className="mb-6">
       <h1 className="text-2xl font-heading tracking-tight leading-tight">{title}</h1>

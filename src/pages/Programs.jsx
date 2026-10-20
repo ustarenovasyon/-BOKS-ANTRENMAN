@@ -8,7 +8,7 @@ import { LABELS } from '@/features/programCreate/programPreferences';
 import { formatIsoCivilDate, PROGRAM_STATUS_LABELS } from '@/features/programPreview/previewLabels';
 
 export default function Programs() {
-  const [state, setState] = useState({ status: 'loading' });
+  const [state, setState] = useState(/** @type {{status: string, programs?: Record<string, any>[]}} */ ({ status: 'loading' }));
   const navigate = useNavigate();
 
   useEffect(() => {

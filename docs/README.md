@@ -17,3 +17,5 @@ Okuma sırası:
 Diğer dosyalar footwork, UI, GitHub, uzun süre planı, bağımsızlaştırma ve kalite konularını detaylandırır.
 
 `PROJE_TALIMATI_7800_ALTI.txt` repository kökünde bulunur ve yeni bir geliştirme oturumunda kısa ana talimat olarak kullanılabilir.
+
+Güncel tamamlanma/aktivasyon kararı: `29_PART_45_V2_ACTIVATION.md`. PART23–29 ayrı commit ve test kayıtlarını içerir.

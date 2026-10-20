@@ -71,6 +71,7 @@ export function buildDayBlocks({ programDayId, role, budget, boxingRounds = [], 
               moveCount: round.moveCount,
               workingRange: round.workingRange,
               requiredContext: { ...round.requiredContext },
+              ...(Object.hasOwn(round, 'attackRoundRole') ? {attackRoundRole: round.attackRoundRole} : {}),
               ...(Object.prototype.hasOwnProperty.call(round, 'footworkPrescription')
                 ? { footworkPrescription: cloneFootworkPrescription(round.footworkPrescription) }
                 : {}),

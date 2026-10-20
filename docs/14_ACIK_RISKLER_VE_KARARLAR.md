@@ -1,82 +1,23 @@
-# Açık Riskler ve Karar Gerektiren Konular
+# Açık Riskler ve Kararlar
 
-## Çözülen konular
+## Kapanan işler
 
-### PART 32 durable regression fixture — CLOSED
+- Canonical PART 32 fixture: 104 seans, `FP_9b61698b / AFP_3194287436`.
+- Independence/regression/typecheck/lint/build CI kapıları; pre-existing checkJs hataları PART 37 final gate'te düzeltildi.
+- Strength registry Map erişimi ve rolling-4 coverage hizası.
+- 1–24 ay ve üç deneyim seviyesinin ortak V2 generator/audit/preview aktivasyonu.
+- Gerçek Workout/Home/History/Settings, kullanıcı completion onayı.
+- Atomik JSON export/import/kurtarma, DB migration ve offline production shell.
+- Pages subpath build ve SPA fallback; browser suite deploy öncesi çalışır.
 
-Historical 6M/104 `FP_9698c40e / AFP_628181959` çifti historical/unreproducible olarak korunur ve active gate değildir.
+## Kalan sınırlar
 
-Yeni canonical self-contained fixture repository'ye eklendi:
+1. Historical 1M/3M/6M78 ve eski 6M104 original complete input'ları eksik. Bilinen FP/AFP tarihçesi korunur; tahmini seed ile eskiymiş gibi fixture üretilmez.
+2. Veri cihazdadır. Yerel kurtarma kopyası browser storage temizliğini atlatamaz; dışa aktarılan JSON ayrı yerde saklanmalıdır.
+3. Pivot/Stance Reset DEFER. Rotation mimarisi `26_PART_42_ROTATION_ARCHITECTURE.md` içinde tanımlıdır; domain/movement/UI uygulaması yapılmamıştır.
+4. Kamera/sensör yoktur; hareket doğruluğu veya fiziksel performans ölçülmez. Teknik ipuçları talimat, history eforu öz beyandır.
+5. Görsel/GIF/video eklenmemiştir; metin tabanlı mimari korunur.
+6. Chromium otomasyonu mobil boyutta çalışır. Gerçek cihazların ses/titreşim izinleri, iOS storage eviction ve farklı browser motorları ayrı cihaz testidir.
+7. Ani process kapanışında en son yarım saniyelik workout checkpoint kaybolabilir. Yeniden açılış kapalı zamanı çalışılmış saymaz.
 
-- `tests/fixtures/v1/6m-beginner-4dpw.json`
-- 104 session
-- explicit generation seed/request ID
-- iki bağımsız run deep-equal
-- `FP_9b61698b`
-- `AFP_3194287436`
-- audit pass / critical 0 / warning 0
-
-### Minimum otomatik regression altyapısı — CLOSED FOR PART 32
-
-Standart kalıcı runner artık vardır:
-
-- `npm run test:regression`
-- `tests/run-regression.mjs`
-- `.github/workflows/ci.yml`
-
-CI independence + regression + lint + build zincirini her push/PR'da çalıştırır. Bu, tüm gelecekteki regression matrix'in tamamlandığı anlamına gelmez; suite ilerleyen PART'larda genişletilmelidir.
-
-### SPA deploy — CLOSED
-
-GitHub Pages subpath için Vite base, router basename, SPA fallback ve GitHub Actions deploy akışı kurulmuştur. Production preview GitHub Pages üzerinden yayınlanır.
-
-### Strength generation blocker hotfix — CLOSED
-
-Kuvvet içeren program üretimindeki iki blocker kapatıldı:
-
-- Strength exercise registry `Map` erişimi `EX_BY_ID.get(id)` olarak düzeltildi.
-- Rolling-4 strength coverage selector penceresi audit ile hizalandı: önceki 3 session + mevcut seçim.
-
-`Boks + Kuvvet` için production minimum günlük süre 30 dakika olarak kilitlendi. `Sadece Boks` ve `Sadece Kuvvet` için 15/20 dakika desteği korunur.
-
-Regression suite artık 1/3/6 ay × beginner/intermediate/experienced × easy/normal/hard matrisi üzerinde 15 dk strength-only, 20 dk combined fail-closed ve 30 dk combined generation+audit davranışını ayrıca test eder.
-
-## Açık riskler
-
-### 1. Historical 1M / 3M / 6M78 executable fixture input'ları eksik
-
-Bilinen exact historical baseline çiftleri korunur:
-
-- 1M: `FP_d703233d / AFP_1456231044`
-- 3M: `FP_cf99b187 / AFP_1436708599`
-- 6M/78: `FP_eab5e5c1 / AFP_1046783139`
-
-Ancak original complete generation input object'leri repository'de ve eldeki karar kayıtlarında bulunmamaktadır. Seed/requestId/date tahminiyle sahte exact fixture oluşturulmaz. Gelecekte güvenilir original input evidence bulunursa executable gate olarak eklenebilir.
-
-### 2. TypeScript/checkJs borcu
-
-Kod JavaScript ağırlıklıdır ve JSDoc/checkJs tipleri bazı feature dosyalarında eksik/gevşektir. `npm run typecheck` mevcut durumda çok sayıda pre-existing hata verir. Runtime logic değiştirmeden kademeli type hygiene yapılmalıdır.
-
-### 3. Workout player eksik
-
-Program üretilebiliyor ama gerçek antrenman yürütme ekranı placeholder. Kullanıcı değerinin büyük kısmı burada oluşacaktır.
-
-### 4. Data export/import yok
-
-Offline-only storage tarayıcı temizliğiyle kaybolabilir. Backup kritik.
-
-### 5. 9–24 ay yok
-
-UI/generator yalnız 1/3/6. Hedefe 9/12/15/18/24 eklenmeli.
-
-### 6. Intermediate/experienced V2 timeline
-
-V2 curriculum stage resolver şu anda beginner timeline odaklıdır. Diğer experience seviyeleri için fail-safe davranış korunurken gerçek timeline tanımlanmalıdır.
-
-### 7. Pivot/angle yok
-
-Direction translation mevcut; rotation/angle domain yok. Pivot eklemek için ayrı architecture gerekir.
-
-### 8. Media kararı çatışması
-
-Current source text-only/no-images kilidi taşır. Eğer ürün hedefi hareket video/GIF/animasyon zorunluluğu ise mimari karar resmi olarak güncellenmelidir.
+Final release için exact GitHub branch/main CI ve Pages başarıları ayrıca doğrulanmalıdır. Yerel PASS tek başına deploy kanıtı değildir.

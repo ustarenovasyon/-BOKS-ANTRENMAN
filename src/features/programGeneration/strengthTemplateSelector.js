@@ -30,8 +30,9 @@ export function strengthCandidatePool(eligibleMovementCounts, availableEquipment
  * Select template for a strength session.
  * previousTemplateIds: önceki strength session template id listesi (en sondan).
  */
-export function selectStrengthTemplate({ eligibleMovementCounts, availableEquipment, balancedMovementCap, previousTemplateIds = [], generationSeed, trainingOrdinal }) {
-  const pool = strengthCandidatePool(eligibleMovementCounts, availableEquipment, balancedMovementCap);
+export function selectStrengthTemplate({ eligibleMovementCounts, availableEquipment, balancedMovementCap, previousTemplateIds = [], generationSeed, trainingOrdinal, eligibleTemplateIds = null }) {
+  const pool = strengthCandidatePool(eligibleMovementCounts, availableEquipment, balancedMovementCap)
+    .filter(template=>!Array.isArray(eligibleTemplateIds)||eligibleTemplateIds.includes(template.id));
   if (pool.length === 0) {
     return { valid: false, reason: balancedMovementCap ? 'PROGRAM_NO_TEMPLATE_WITHIN_BALANCED_CAP' : 'PROGRAM_NO_ELIGIBLE_STRENGTH_TEMPLATE' };
   }

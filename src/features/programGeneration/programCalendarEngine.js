@@ -6,7 +6,7 @@
  * Yalnız selected weekdays schedule edilir. Partial hafta desteklenir.
  * --------------------------------------------------------------
  */
-import { WEEKDAYS } from '@/config/architecture';
+import { WEEKDAYS, PROGRAM_DURATION_MONTHS } from '@/config/architecture';
 
 function parseYMD(s) {
   const parts = String(s).split('-').map(Number);
@@ -86,7 +86,7 @@ export function buildScheduledDates(programStartDate, endDateExclusive, selected
 }
 
 function resolveProgramMonthIndex(programStartDate, dateStr) {
-  for (let k = 1; k <= 12; k++) {
+  for (let k = 1; k <= Math.max(...Object.values(PROGRAM_DURATION_MONTHS)); k++) {
     const segStart = addCalendarMonthsClamped(programStartDate, k - 1);
     const segEnd = addCalendarMonthsClamped(programStartDate, k);
     if (dateStr >= segStart && dateStr < segEnd) return k;

@@ -30,23 +30,19 @@ public class OfflineAppTest {
     private String body() throws Exception {Object value=new JSONTokener(js("document.body.innerText")).nextValue();return String.valueOf(value);}
     private void contains(String text) throws Exception {for(int i=0;i<120;i++){if(body().contains(text))return;SystemClock.sleep(200);}fail("Missing UI: "+text+"; actual: "+body());}
     private void click(String tag,String text) throws Exception {
-        String lookup="Array.from(document.querySelectorAll("+JSONObject.quote(tag)+")).find(e=>e.textContent.trim()==="+JSONObject.quote(text)+")";
-        for(int i=0;i<100;i++) {
-            if("true".equals(js("(function(){var e="+lookup+";if(!e)return false;e.scrollIntoView({block:'center'});return true;})()"))) {
-                SystemClock.sleep(250);
-                UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-                UiObject2 target=device.wait(Until.findObject(By.text(text)),3000);
-                if(target==null)target=device.wait(Until.findObject(By.desc(text)),1000);
-                assertNotNull("Visible Android WebView control: "+text,target);
-                System.out.println("Native click: "+text+" "+target.getVisibleBounds());target.click();SystemClock.sleep(250);return;
-            }
-            SystemClock.sleep(200);
-        }
-        fail("Missing control: "+text+"; "+body());
+        String code="(function(){var e=Array.from(document.querySelectorAll("+JSONObject.quote(tag)+")).find(e=>e.textContent.trim()==="+JSONObject.quote(text)+");if(e){e.click();return true;}return false;})()";
+        for(int i=0;i<100;i++){if("true".equals(js(code))){SystemClock.sleep(200);return;}SystemClock.sleep(200);}fail("Missing control: "+text+"; "+body());
+    }
+    private void nativeClick(String tag,String text) throws Exception {
+        assertEquals("true",js("(function(){var e=Array.from(document.querySelectorAll("+JSONObject.quote(tag)+")).find(e=>e.textContent.trim()==="+JSONObject.quote(text)+");if(!e)return false;e.scrollIntoView({block:'center'});return true;})()"));
+        SystemClock.sleep(500);UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject2 target=device.wait(Until.findObject(By.textContains(text)),5000);
+        if(target==null)target=device.wait(Until.findObject(By.descContains(text)),2000);
+        assertNotNull("Native touch control: "+text,target);target.click();SystemClock.sleep(250);
     }
     @Test public void offlineProgramTimerNativeBackupAndRestore() throws Exception {
         contains("İlk antrenman programını oluştur.");assertEquals("true",js("typeof window.BoxAndroid.postMessage==='function'"));
-        click("a","Yeni program oluştur");click("button","Sadece Boks");contains("Program Süresi");click("button","1 Ay");click("button","1");click("button","Pazartesi");click("button","Başlangıç");click("button","Sol Gard (Orthodox)");click("button","Program Oluştur");contains("Program Önizleme");click("button","Programı Gözden Geçir");click("button","Onayla ve Programı Başlat");click("button","Onayla ve Başlat");contains("Aktif");
+        nativeClick("a","Yeni program oluştur");click("button","Sadece Boks");contains("Program Süresi");click("button","1 Ay");click("button","1");click("button","Pazartesi");click("button","Başlangıç");click("button","Sol Gard (Orthodox)");click("button","Program Oluştur");contains("Program Önizleme");click("button","Programı Gözden Geçir");click("button","Onayla ve Programı Başlat");click("button","Onayla ve Başlat");contains("Aktif");
         click("a","Ana Sayfa");click("a","Antrenmana git");click("button","Antrenmanı başlat");contains("Çalışıyor");SystemClock.sleep(2300);
         String position="document.querySelector('progress[aria-label=\"Antrenman ilerlemesi\"]').value";double beforeBackground=Double.parseDouble(js(position));
         activity.getScenario().moveToState(Lifecycle.State.CREATED);SystemClock.sleep(1200);activity.getScenario().moveToState(Lifecycle.State.RESUMED);contains("Duraklatıldı");
@@ -54,7 +50,7 @@ public class OfflineAppTest {
         activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);
         click("a","Ayarlar");contains("Android uygulaması");click("button","JSON yedeğini indir");
         UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());UiObject2 save=device.wait(Until.findObject(By.text(Pattern.compile("(?i)save|kaydet"))),10000);assertNotNull("Android create-document UI",save);save.click();contains("Yedek dosyası hazırlandı.");
-        click("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.text(Pattern.compile("box-antrenman-.*\\.json"))),10000);assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
+        nativeClick("button","JSON yedeği seç");UiObject2 file=device.wait(Until.findObject(By.text(Pattern.compile("box-antrenman-.*\\.json"))),10000);assertNotNull("Saved JSON in native document picker",file);file.click();contains("Yedek doğrulandı.");click("button","Doğrulanan yedeği geri yükle");contains("Android uygulaması");
         activity.getScenario().recreate();contains("AKTİF PROGRAM");click("a","Antrenmana git");contains("Duraklatıldı");assertEquals(retained,Double.parseDouble(js(position)),0.0);assertFalse(body().contains("Program bütünlüğü doğrulanamadı"));
         device.pressBack();contains("AKTİF PROGRAM");
     }

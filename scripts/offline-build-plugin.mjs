@@ -1,5 +1,6 @@
 import {readdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
+import {createAppIcons} from './app-icons.mjs';
 import {createHash} from 'node:crypto';
 export function offlineBuildPlugin() {
  let config;
@@ -12,6 +13,8 @@ export function offlineBuildPlugin() {
     else if(!path.endsWith('.map')&&path!=='sw.js')files.push(path);
    }
   }
+  await createAppIcons(root);
+  if(config.mode==='android')return;
   await walk(root);files.sort();const hash=createHash('sha256');for(const file of files)hash.update(await readFile(join(root,file)));
   const base=config.base,urls=files.map(file=>base+file),prefix=`box-shell-${createHash('sha256').update(base).digest('hex').slice(0,8)}-`,cache=prefix+hash.digest('hex').slice(0,16);
   await writeFile(join(root,'sw.js'),`

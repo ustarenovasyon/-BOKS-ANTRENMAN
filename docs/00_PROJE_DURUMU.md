@@ -1,6 +1,10 @@
 # BOX ANTRENMAN — Güncel Proje Durumu
 
-## Son durum — PART 46
+## Son durum — PART 47
+
+Android APK paketi eklendi: uygulama dosyaları paketin içindedir, ilk açılış çevrimdışıdır ve Chrome gerektirmez. JSON export/import Android dosya seçicisi üzerinden çalışır. Web ve APK verileri ayrı originlerde tutulduğu için taşıma JSON yedeğiyle yapılır. Android arka plan duraklaması ve yeniden açılış checkpoint sözleşmesi korunur. CI Android build/lint ve API35 çevrimdışı native UI kapısını içerir. İmzalama anahtarı repository dışında özel yedeklenir. Ayrıntı: `32_PART_47_ANDROID.md`.
+
+## PART 46 program yönetimi
 
 Programlarım’da her zaman yeni program, mevcut aktif programı düzenleme, kopyalama, adlandırma, duraklatma/devam, arşiv ve geri alınabilir çöp kutusu var. Duruş değişikliği yarım kalan süreyi korur; eski version ve history değiştirilmez. Birden fazla programın antrenman hedefleri ayrıldı. History kayıt/not silme ve geri alma eklendi. Ayrıntı: `31_PART_46_PROGRAM_MANAGEMENT.md`.
 

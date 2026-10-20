@@ -1,0 +1,75 @@
+name: Android APK
+on:
+  push:
+    branches: [main, codex/android-apk]
+    paths: ['android/**', 'src/**', 'scripts/**', 'public/**', 'vite.config.js', 'index.html', 'package*.json', '.github/workflows/android-apk.yml']
+  pull_request:
+    paths: ['android/**', 'src/**', 'scripts/**', 'public/**', 'vite.config.js', 'index.html', 'package*.json', '.github/workflows/android-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Bundle offline Android assets
+        run: npm run build:android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build and lint Android
+        run: gradle -p android --no-daemon assembleRelease assembleDebug assembleDebugAndroidTest lintDebug
+      - name: Prepare unsigned release and signing tool
+        run: |
+          mkdir -p android-delivery
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk android-delivery/BOX-ANTRENMAN-1.0.0-unsigned.apk
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" android-delivery/apksigner.jar
+          sha256sum android-delivery/*.apk > android-delivery/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: box-android-unsigned
+          path: android-delivery/
+          retention-days: 30
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Native offline and backup tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            adb shell svc wifi disable
+            adb shell svc data disable
+            gradle -p android --no-daemon connectedDebugAndroidTest
+      - name: Native test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports
+          path: |
+            android/app/build/reports/
+            android/app/build/outputs/androidTest-results/
+          if-no-files-found: ignore

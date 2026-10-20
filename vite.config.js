@@ -6,8 +6,8 @@ import {offlineBuildPlugin} from './scripts/offline-build-plugin.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig(({command,isPreview})=>({
-  base: (command==='build'||isPreview)&&process.env.GITHUB_ACTIONS ? '/-BOKS-ANTRENMAN/' : '/',
+export default defineConfig(({command,isPreview,mode})=>({
+  base: mode==='android' ? '/' : (command==='build'||isPreview)&&process.env.GITHUB_ACTIONS ? '/-BOKS-ANTRENMAN/' : '/',
   plugins: [react(),offlineBuildPlugin()],
   resolve: {
     alias: {
@@ -15,6 +15,8 @@ export default defineConfig(({command,isPreview})=>({
     },
   },
   build: {
-    sourcemap: true,
+    outDir: mode==='android'?'dist-android':'dist',
+    target: mode==='android'?'chrome90':undefined,
+    sourcemap: mode!=='android',
   },
 }))

@@ -28,6 +28,7 @@ export function transitionWorkout(progress,event,nowMs,blocks) {
     throw new Error('Bu antrenman sonuçlandırıldı.');
   }
   if(event==='restore')return progress.status===S.IN_PROGRESS?{...progress,status:S.PAUSED,lastTickMs:null,revision:progress.revision+1}:progress;
+  if(event==='pause'&&progress.status===S.PAUSED)return progress;
   const p={...progress,skippedBlockIds:[...progress.skippedBlockIds]};
   if(p.status===S.IN_PROGRESS) {
     const delta=Math.min(Math.max(0,nowMs-p.lastTickMs),total-p.positionMs);

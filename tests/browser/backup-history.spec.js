@@ -41,6 +41,9 @@ test('IndexedDB v1 migration preserves existing settings and adds v2 indexes',as
 test('production build reloads and navigates offline after cache install',async({page,context})=>{
  const base='http://127.0.0.1:4174'+(process.env.GITHUB_ACTIONS?'/-BOKS-ANTRENMAN/':'/');
  await page.goto(base);await expect(page.getByText('İlk antrenman programını oluştur.')).toBeVisible();
+ const manifest=await page.evaluate(async()=>{const url=document.querySelector('link[rel=manifest]').href;const manifest=await (await fetch(url)).json();return {url,manifest,start:new URL(manifest.start_url,url).href,scope:new URL(manifest.scope,url).href};});
+ expect(manifest.url).toBe(base+'manifest.json');expect(manifest.start).toBe(base);expect(manifest.scope).toBe(base);expect(manifest.manifest.display).toBe('standalone');
+ for(const size of [192,512]){const icon=manifest.manifest.icons.find(i=>i.sizes===`${size}x${size}`);expect(icon).toBeTruthy();const image=await page.evaluate(async url=>{const image=new Image();image.src=url;await image.decode();return {width:image.naturalWidth,height:image.naturalHeight};},new URL(icon.src,manifest.url).href);expect(image).toEqual({width:size,height:size});}
  await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
  await expect.poll(()=>page.evaluate(()=>!!navigator.serviceWorker.controller)).toBe(true);
  await context.setOffline(true);await page.reload();await expect(page.getByText('İlk antrenman programını oluştur.')).toBeVisible();

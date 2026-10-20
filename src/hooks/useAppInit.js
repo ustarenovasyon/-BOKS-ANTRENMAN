@@ -7,6 +7,8 @@ import { ensureBoxingTransitionMatrix } from '@/features/boxing/transitions/ensu
 import { ensureBoxingCombinationLibrary } from '@/features/boxing/combinations/ensureBoxingCombinationLibrary';
 import { ensureDefenseCounterLibrary } from '@/features/boxing/defense/ensureDefenseCounterLibrary';
 import { ensureStrengthTemplateLibrary } from '@/features/strength/templates/ensureStrengthTemplateLibrary';
+import {ensureDailyBackup} from '@/features/backup/dataBackup';
+import {loadAppPreferences,applyTheme} from '@/features/settings/appPreferences';
 
 /**
  * Güvenli yerel başlatma akışı.
@@ -28,6 +30,8 @@ export function useAppInit() {
       await ensureBoxingCombinationLibrary();
       await ensureDefenseCounterLibrary();
       await ensureStrengthTemplateLibrary();
+      applyTheme((await loadAppPreferences()).theme);
+      await ensureDailyBackup();
       setStatus('ready');
     } catch (e) {
       console.error('App init failed:', e);

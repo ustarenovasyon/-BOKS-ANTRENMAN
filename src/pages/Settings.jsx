@@ -1,13 +1,26 @@
-import React from 'react';
+import {useEffect,useRef,useState} from 'react';
 import PageHeader from '@/components/PageHeader';
+import {Button} from '@/components/ui/button';
+import {createDataBackup,parseDataBackup,restoreDataBackup,restoreRecoveryBackup,resetTrainingData,getRecoveryBackup} from '@/features/backup/dataBackup';
+import {loadAppPreferences,saveAppPreferences} from '@/features/settings/appPreferences';
 
 export default function Settings() {
-  return (
-    <div>
-      <PageHeader title="Ayarlar" />
-      <p className="text-sm text-muted-foreground leading-relaxed">
-        Uygulama ayarları sonraki geliştirme aşamalarında burada yapılandırılacaktır.
-      </p>
-    </div>
-  );
+  const [preferences,setPreferences]=useState(null),[recovery,setRecovery]=useState(null),[pending,setPending]=useState(null),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[resetText,setResetText]=useState('');
+  const file=useRef(null);
+  useEffect(()=>{let active=true;Promise.all([loadAppPreferences(),getRecoveryBackup()]).then(([p,r])=>{if(active){setPreferences(p);setRecovery(r);}}).catch(()=>setMessage('Ayarlar okunamadı.'));return()=>{active=false;};},[]);
+  const run=async action=>{setBusy(true);setMessage('');try{await action();}catch(e){setMessage(e.message);}finally{setBusy(false);}};
+  const change=async update=>run(async()=>{setPreferences(await saveAppPreferences({...preferences,...update}));setMessage('Ayarlar kaydedildi.');});
+  return <div className="space-y-5"><PageHeader title="Ayarlar" description="Yerel verilerin, yedeklerin ve uygulama tercihlerin."/>
+    <p role="status" className="text-sm break-words">{message}</p>
+    {preferences&&<section className="rounded-xl border p-4 space-y-3"><h2 className="font-medium">Antrenman ve görünüm</h2><label className="flex items-center justify-between gap-2">Blok değişim sesi<input type="checkbox" checked={preferences.sound} onChange={e=>change({sound:e.target.checked})} disabled={busy}/></label><label className="flex items-center justify-between gap-2">Blok değişim titreşimi<input type="checkbox" checked={preferences.vibration} onChange={e=>change({vibration:e.target.checked})} disabled={busy||!('vibrate' in navigator)}/></label>{!('vibrate' in navigator)&&<p className="text-xs text-muted-foreground">Bu tarayıcı titreşim desteklemiyor.</p>}<label className="block">Tema<select aria-label="Tema" className="mt-1 w-full rounded border bg-background p-2" value={preferences.theme} disabled={busy} onChange={e=>change({theme:e.target.value})}><option value="system">Cihaza uy</option><option value="light">Açık</option><option value="dark">Koyu</option></select></label></section>}
+    <section className="rounded-xl border p-4 space-y-3"><h2 className="font-medium">Veri yedekleme</h2><p className="text-sm text-muted-foreground">Programların ve geçmişin bu tarayıcıda tutulur. Başka cihaza taşımak için JSON yedeğini indir.</p>
+      <Button className="w-full" disabled={busy} onClick={()=>run(async()=>{const backup=await createDataBackup();const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`box-antrenman-${backup.exportedAt.slice(0,10)}.json`;a.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);setMessage('Yedek dosyası hazırlandı.');})}>JSON yedeğini indir</Button>
+      <input ref={file} aria-label="JSON yedek dosyası" type="file" accept=".json,application/json" className="hidden" onChange={e=>{const chosen=e.target.files?.[0];e.target.value='';if(chosen)run(async()=>{if(chosen.size>100*1024*1024)throw new Error('Yedek dosyası 100 MB sınırını aşıyor.');const backup=await parseDataBackup(await chosen.text());setPending(backup);setMessage('Yedek doğrulandı. Geri yüklemek için aşağıdan onayla.');});}}/>
+      <Button variant="outline" className="w-full" disabled={busy} onClick={()=>file.current.click()}>JSON yedeği seç</Button>
+      {pending&&<div className="rounded-lg bg-muted p-3 space-y-2"><p className="text-sm">{pending.stores.programs.length} program bulundu. Mevcut yerel veriler bu yedekle değiştirilecek; işlem öncesi geri dönüş yedeği tutulacak.</p><Button className="w-full" disabled={busy} onClick={()=>run(async()=>{await restoreDataBackup(pending);window.location.reload();})}>Doğrulanan yedeği geri yükle</Button><Button variant="ghost" onClick={()=>setPending(null)}>Vazgeç</Button></div>}
+      {recovery&&<div className="border-t pt-3 space-y-2"><p className="text-xs text-muted-foreground">Son yerel geri dönüş yedeği: {new Date(recovery.createdAt).toLocaleString('tr-TR')}</p><Button variant="outline" className="w-full" disabled={busy} onClick={()=>{if(window.confirm('Yerel veriler son geri dönüş yedeğiyle değiştirilsin mi?'))run(async()=>{await restoreRecoveryBackup();window.location.reload();});}}>Son yerel yedeğe dön</Button></div>}
+    </section>
+    <section className="rounded-xl border border-destructive/30 p-4 space-y-3"><h2 className="font-medium">Yerel verileri temizle</h2><p className="text-sm text-muted-foreground">Programlar, geçmiş ve ayarlar temizlenir. Son geri dönüş yedeği cihazında tutulur. Onay için SİL yaz.</p><input aria-label="Temizleme onayı" value={resetText} onChange={e=>setResetText(e.target.value)} className="w-full rounded border bg-background p-2"/><Button variant="destructive" className="w-full" disabled={busy||resetText!=='SİL'} onClick={()=>{if(window.confirm('Tüm yerel antrenman verilerini temizlemek istediğinden emin misin?'))run(async()=>{await resetTrainingData();window.location.reload();});}}>Verileri temizle</Button></section>
+    <p className="text-xs text-muted-foreground">Sayaç arka planda duraklar. Üretim tercihleri Program Oluştur ekranından değiştirilir.</p>
+  </div>;
 }

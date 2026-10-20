@@ -5,9 +5,8 @@
  * dinamik kayıtlar bu helper ile benzersiz ID alır.
  */
 function fallbackUuid() {
-  const rnd = () => Math.random().toString(16).slice(2).padStart(4, '0');
-  const now = Date.now().toString(16);
-  return `${now}-${rnd()}${rnd()}-${rnd()}${rnd()}`;
+  if (typeof crypto === 'undefined' || typeof crypto.getRandomValues !== 'function') throw new Error('Güvenli kimlik üretimi bu tarayıcıda desteklenmiyor.');
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 export function generateId(prefix) {

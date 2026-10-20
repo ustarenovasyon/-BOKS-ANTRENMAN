@@ -9,21 +9,36 @@ import {loadWorkout,applyWorkoutEvent} from '@/features/workout/workoutService';
 import {currentWorkoutBlock,WORKOUT_STATUS_LABELS,TERMINAL_WORKOUT_STATUSES} from '@/features/workout/workoutState';
 import {formatCivilDate,formatSeconds,BLOCK_TYPE_LABELS} from '@/features/programPreview/previewLabels';
 import {currentStrengthPhase} from '@/features/workout/strengthPlayback';
+import {loadAppPreferences} from '@/features/settings/appPreferences';
 
 export default function Workout() {
   const [params]=useSearchParams();const dayId=params.get('day');
   const [context,setContext]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState('');
   const contextRef=useRef(null),queue=useRef(Promise.resolve()),mounted=useRef(true);
   const [confirmStop,setConfirmStop]=useState(false);
+  const preferences=useRef({sound:false,vibration:false});
+  const audio=useRef(null);
+  useEffect(()=>{loadAppPreferences().then(value=>{preferences.current=value;}).catch(()=>{});return()=>{audio.current?.close();};},[]);
   useEffect(()=>{
     let active=true;mounted.current=true;setLoading(true);setError('');
     loadWorkout(dayId,Date.now()).then(result=>{if(active){contextRef.current=result;setContext(result);setLoading(false);}}).catch(e=>{if(active){setError(e.message);setLoading(false);}});
     return()=>{active=false;mounted.current=false;};
   },[dayId]);
   const execute=useCallback(event=>{
+    if(['start','resume'].includes(event)&&preferences.current.sound&&typeof window.AudioContext==='function') {
+      audio.current??=new AudioContext();audio.current.resume().catch(()=>{});
+    }
     queue.current=queue.current.then(async()=>{
       const current=contextRef.current;if(!current)return;
-      try{const progress=await applyWorkoutEvent(current,event,Date.now());const next={...current,progress};contextRef.current=next;if(mounted.current){setContext(next);setError('');setConfirmStop(false);}}
+      try{const progress=await applyWorkoutEvent(current,event,Date.now());const next={...current,progress};contextRef.current=next;
+        if(currentWorkoutBlock(current.blocks,current.progress.positionMs).index!==currentWorkoutBlock(current.blocks,progress.positionMs).index) {
+          if(preferences.current.vibration&&typeof navigator.vibrate==='function')navigator.vibrate(120);
+          if(preferences.current.sound&&audio.current?.state==='running') {
+            const oscillator=audio.current.createOscillator(),gain=audio.current.createGain();gain.gain.value=0.15;
+            oscillator.frequency.value=660;oscillator.connect(gain);gain.connect(audio.current.destination);oscillator.start();oscillator.stop(audio.current.currentTime+0.15);
+          }
+        }
+        if(mounted.current){setContext(next);setError('');setConfirmStop(false);}}
       catch(e){if(mounted.current)setError(e.message);}
     });return queue.current;
   },[]);

@@ -28,6 +28,7 @@ export function planWeeklyRoles(programMode, selectedWeekdays, strengthDaysPerWe
   }
   const slots = WEEKDAYS.map((weekday, idx) => {
     const scheduled = selectedSet.has(weekday);
+    /** @type {string} */
     let sessionRole = UNSCHEDULED;
     if (scheduled) {
       if (programMode === PROGRAM_MODES.BOXING_ONLY) sessionRole = BOXING;

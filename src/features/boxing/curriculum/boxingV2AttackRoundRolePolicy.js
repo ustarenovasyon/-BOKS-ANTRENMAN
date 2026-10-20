@@ -50,8 +50,8 @@ const SUPPORT_RATIO = 0.20;
  * Stage-local exposure ordinal'ı PART 22 resolver üzerinden derive eder.
  * Timeline formüllerini duplicate ETMEZ — resolveCurriculumBoundaries kullanır.
  *
- * @returns {{ valid: boolean, stageLocalOrdinal: number|null, stage: number|null, stageStart: number|null, ... }}
  */
+/** @param {{durationMonths?: number, experienceLevel?: string, boxingExposureOrdinal?: number, totalBoxingExposures?: number}} input */
 export function deriveStageLocalExposureOrdinal({
   durationMonths,
   experienceLevel,
@@ -166,12 +166,11 @@ function distributeSupportSlots(attackRoundCount, supportCount, challengeIndex) 
  *   remaining                  → MAIN
  *
  * @param {object} input
- * @param {number} input.attackRoundCount
- * @param {number} input.durationMonths
- * @param {string} input.experienceLevel
- * @param {number} input.boxingExposureOrdinal
- * @param {number} input.totalBoxingExposures
- * @returns {{ valid: boolean, rolePlan: string[], counts: object, ... }}
+ * @param {number} [input.attackRoundCount]
+ * @param {number} [input.durationMonths]
+ * @param {string} [input.experienceLevel]
+ * @param {number} [input.boxingExposureOrdinal]
+ * @param {number} [input.totalBoxingExposures]
  */
 export function buildV2AttackRoundRolePlan({
   attackRoundCount,

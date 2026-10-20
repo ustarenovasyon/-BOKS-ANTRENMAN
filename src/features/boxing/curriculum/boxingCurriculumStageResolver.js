@@ -44,6 +44,7 @@ export const BEGINNER_DURATION_MAX_STAGE = Object.freeze({
   [PROGRAM_DURATION_MONTHS.SIX]: BOXING_CURRICULUM_STAGES.ADVANCED_STRIKE_INTEGRATION,
 });
 
+/** @type {ReadonlySet<number>} */
 const VALID_DURATIONS = Object.freeze(new Set(Object.values(PROGRAM_DURATION_MONTHS)));
 
 function isValidPositiveInt(n) {
@@ -93,11 +94,10 @@ function computeBoundaries6Month(total) {
  * Bir boxing exposure ordinali için curriculum stage çözer.
  *
  * @param {object} input
- * @param {number} input.durationMonths — 1, 3, veya 6
- * @param {string} input.experienceLevel — 'beginner' (diğerleri henüz tanımlı değil)
- * @param {number} input.boxingExposureOrdinal — 1-based
- * @param {number} input.totalBoxingExposures — pozitif integer
- * @returns {{ valid: boolean, stage: number|null, stageKey: string|null, ... }}
+ * @param {number} [input.durationMonths] - 1, 3, veya 6
+ * @param {string} [input.experienceLevel] - 'beginner' (diğerleri henüz tanımlı değil)
+ * @param {number} [input.boxingExposureOrdinal] - 1-based
+ * @param {number} [input.totalBoxingExposures] - pozitif integer
  */
 export function resolveBoxingCurriculumStage({ durationMonths, experienceLevel, boxingExposureOrdinal, totalBoxingExposures } = {}) {
   // Validate duration
@@ -152,6 +152,7 @@ export function resolveBoxingCurriculumStage({ durationMonths, experienceLevel, 
  * Bir duration için curriculum stage boundary'lerini çözer (test/debug için).
  * Invalid input → null.
  */
+/** @returns {{stage1End: number, stage2End?: number, stage3End?: number, maxStage: number}|null} */
 export function resolveCurriculumBoundaries(durationMonths, experienceLevel, totalBoxingExposures) {
   if (!VALID_DURATIONS.has(durationMonths)) return null;
   if (experienceLevel !== EXPERIENCE_LEVELS.BEGINNER) return null;

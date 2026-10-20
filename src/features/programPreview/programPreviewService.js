@@ -24,7 +24,7 @@ const ROLE_COMBINED = WEEKLY_SESSION_ROLES.COMBINED_BOXING_STRENGTH_DAY;
 const KNOWN_BLOCK_TYPES = new Set(Object.values(WORKOUT_BLOCK_TYPES));
 
 function fail(reason, extra = {}) {
-  return { valid: false, reason, ...extra };
+  return { valid: false, reason, viewModel: null, blocksByDay: null, ...extra };
 }
 
 /**
@@ -155,5 +155,5 @@ export async function loadProgramPreview(programId) {
   }
 
   const viewModel = buildProgramPreviewViewModel({ program, version, sortedDays, blocksByDay });
-  return { valid: true, viewModel, blocksByDay };
+  return { valid: true, reason: null, viewModel, blocksByDay };
 }

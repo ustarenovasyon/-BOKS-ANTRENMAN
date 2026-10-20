@@ -12,7 +12,7 @@ import { correctFailedProgram } from '@/features/programCorrection/programCorrec
 import { CORRECTION_REASON_LABELS } from '@/features/programCorrection/programCorrectionConstants';
 
 export default function CorrectionPanel({ programId }) {
-  const [state, setState] = useState({ status: 'idle' });
+  const [state, setState] = useState(/** @type {{status: string, reason?: string, error?: string}} */ ({ status: 'idle' }));
 
   const run = async () => {
     setState({ status: 'running' });

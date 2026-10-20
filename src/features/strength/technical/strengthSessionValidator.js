@@ -113,7 +113,7 @@ export function evaluateStrengthSessionBalance(input = {}) {
   }
 
   // unilateral side coverage requirement (metadata, not hard fail at selection)
-  const hasUnilateral = resolved.some((ex) => STRENGTH_SIDE_SEMANTICS.UNILATERAL_LATERALITIES.includes(ex.laterality));
+  const hasUnilateral = resolved.some((ex) => STRENGTH_SIDE_SEMANTICS.UNILATERAL_LATERALITIES.some((value) => value === ex.laterality));
   if (hasUnilateral) {
     requirements.push(STRENGTH_SIDE_SEMANTICS.BOTH_SIDES_REQUIRED);
   }

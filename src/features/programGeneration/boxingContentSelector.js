@@ -65,7 +65,7 @@ export function resolveWorkingRange(combo) {
  * Per-round combo seçimi. defenseRoundIndex varsa o round defense için ayrılır.
  * focus BOXING_COMPLEXITY ise bir round ceiling'e ulaşmaya çalışır.
  */
-export function selectBoxingRounds({ boxingBudget, effectiveComboCeiling, userBoxingMaxMoves, focus, generationSeed, trainingOrdinal, previousPrimaryIds = [], programUsageCount = {}, generationPolicyVersion = GENERATION_POLICY_VERSIONS.V1, curriculumStage = null, durationMonths = null, experienceLevel = null, boxingExposureOrdinal = null, totalBoxingExposures = null }) {
+export function selectBoxingRounds({ boxingBudget, effectiveComboCeiling, userBoxingMaxMoves, focus, generationSeed, trainingOrdinal, previousPrimaryIds = [], programUsageCount = {}, generationPolicyVersion = /** @type {number} */ (GENERATION_POLICY_VERSIONS.V1), curriculumStage = null, durationMonths = null, experienceLevel = null, boxingExposureOrdinal = null, totalBoxingExposures = null }) {
   const isV1 = generationPolicyVersion === GENERATION_POLICY_VERSIONS.V1;
   const isV2 = generationPolicyVersion === GENERATION_POLICY_VERSIONS.V2;
 

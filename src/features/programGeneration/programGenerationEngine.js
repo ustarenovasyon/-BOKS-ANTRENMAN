@@ -128,6 +128,7 @@ export function generateProgramBlueprint(input = {}) {
   const hasStrength = settings.programMode !== PROGRAM_MODES.BOXING_ONLY;
 
   // Pass 1: per-day budget + progression + defense level.
+  /** @type {Array<{sd: any, role: string, budget: any, progression: any, defenseLevel: string, weekIdx: number, ordinal?: number, defenseEligible?: boolean}>} */
   const dayContext = []; // {sd, role, budget, progression, defenseLevel}
   let defenseExposureCounter = 0;
   for (const [weekIdx, weekDates] of weeks) {

@@ -16,7 +16,7 @@ import { approveProgram } from '@/features/programApproval/programApprovalServic
 import { APPROVAL_REASON_LABELS } from '@/features/programApproval/programApprovalConstants';
 
 export default function ApprovalPanel({ programId }) {
-  const [state, setState] = useState({ status: 'idle' });
+  const [state, setState] = useState(/** @type {{status: string, reason?: string, error?: string}} */ ({ status: 'idle' }));
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const run = async () => {

@@ -61,6 +61,7 @@ export function getEligibleFootworkMoveIdsAtStage(stage) {
     .map((move) => move.id);
 }
 
+/** @param {{footworkMoveId?: string, plannedSeconds?: number}} input */
 export function buildFootworkTechniqueDescriptor({ footworkMoveId, plannedSeconds } = {}) {
   if (!isCanonicalActiveFootworkMove(footworkMoveId)) {
     return { valid: false, reason: 'footwork_move_invalid', descriptor: null };
@@ -75,6 +76,7 @@ export function buildFootworkTechniqueDescriptor({ footworkMoveId, plannedSecond
   };
 }
 
+/** @param {{settings?: Record<string, any>, programDays?: Array<Record<string, any>>, day?: Record<string, any>}} input */
 export function resolveFootworkCurriculumStageForDay({ settings, programDays, day } = {}) {
   if (!settings || !day || !Array.isArray(programDays)) {
     return { valid: false, reason: 'footwork_curriculum_context_missing', stage: null };
@@ -98,6 +100,7 @@ export function resolveFootworkCurriculumStageForDay({ settings, programDays, da
   return { valid: true, reason: null, stage: stageResult.stage };
 }
 
+/** @param {{block?: Record<string, any>, settings?: Record<string, any>, programDays?: Array<Record<string, any>>, day?: Record<string, any>}} input */
 export function validateFootworkTechniqueBlock({ block, settings, programDays, day } = {}) {
   const reasons = [];
   if (!block || block.type !== WORKOUT_BLOCK_TYPES.FOOTWORK_TECHNIQUE) {
@@ -124,6 +127,7 @@ export function validateFootworkTechniqueBlock({ block, settings, programDays, d
   return { valid: reasons.length === 0, reasons, stage: stageResult.stage };
 }
 
+/** @param {{day?: Record<string, any>, dayBlocks?: Array<Record<string, any>>, programDays?: Array<Record<string, any>>, settings?: Record<string, any>, generationPolicyVersion?: number}} input */
 export function validateFootworkTechniqueDay({
   day,
   dayBlocks,

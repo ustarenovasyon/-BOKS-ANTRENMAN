@@ -40,7 +40,7 @@ function FindingRow({ f }) {
 }
 
 export default function AuditPanel({ programId, programStatus }) {
-  const [state, setState] = useState({ status: 'loading' });
+  const [state, setState] = useState(/** @type {{status: string, reason?: string, error?: string, result?: Record<string, any>}} */ ({ status: 'loading' }));
 
   const peek = async () => {
     const existing = await loadExistingAudit(programId);

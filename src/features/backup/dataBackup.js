@@ -33,12 +33,25 @@ export function validateBackupStores(stores) {
     const policy=resolveGenerationPolicyVersion(version);
     if(!policy.resolved||!policy.active)throw new Error('Yedekte desteklenmeyen üretim sürümü var.');
     const days=stores[S.PROGRAM_DAYS].filter(d=>d.programVersionId===version.id),dayIds=new Set(days.map(d=>d.id));
-    const snapshot={program:{...ids[S.PROGRAMS].get(version.programId),currentVersionId:version.id,status:version.status},programVersion:version,programDays:days,workoutBlocks:stores[S.WORKOUT_BLOCKS].filter(b=>dayIds.has(b.programDayId))};
+    const snapshot={program:{...ids[S.PROGRAMS].get(version.programId),currentVersionId:version.id,status:version.status,programMode:version.settingsSnapshot?.programMode,durationMonths:version.settingsSnapshot?.durationMonths},programVersion:version,programDays:days,workoutBlocks:stores[S.WORKOUT_BLOCKS].filter(b=>dayIds.has(b.programDayId))};
     if(computeBlueprintFingerprint(snapshot,version.generationSeed)!==version.blueprintFingerprint)throw new Error('Yedekteki program bütünlüğü bozuk.');
     const audit=auditProgramSnapshot({...snapshot,programVersion:{...version,locked:false}});
     if(audit.findings.some(f=>f.code==='audit_engine_version_incompatible'))throw new Error('Yedekte desteklenmeyen kütüphane sürümü var.');
     // Failed drafts may be backed up without becoming approved/active.
     if(!['review_required','review_failed'].includes(version.status)&&audit.outcome!=='pass')throw new Error('Yedekteki onaylı program denetimden geçemedi.');
+    if(version.previousVersionId) {
+      const previous=ids[S.PROGRAM_VERSIONS].get(version.previousVersionId);
+      if(!previous||previous.programId!==version.programId||previous.versionNumber>=version.versionNumber)throw new Error('Düzenleme sürüm bağlantısı bozuk.');
+    }
+    if(version.carriedResults!==undefined) {
+      if(!version.carriedResults||typeof version.carriedResults!=='object'||Array.isArray(version.carriedResults))throw new Error('Önceki sonuç bağlantıları geçersiz.');
+      const targets=new Set();
+      for(const [dayId,oldId] of Object.entries(version.carriedResults)) {
+        const day=ids[S.PROGRAM_DAYS].get(dayId),old=ids[S.PROGRAM_DAYS].get(oldId),oldVersion=old&&ids[S.PROGRAM_VERSIONS].get(old.programVersionId),progress=ids[S.WORKOUT_PROGRESS].get(`WPR_${oldId}`);
+        if(!dayIds.has(dayId)||!old||oldVersion?.programId!==version.programId||old.programVersionId===version.id||day.plannedDate!==old.plannedDate||!progress||!['completed','partial','skipped'].includes(progress.status)||!ids[S.WORKOUT_HISTORY].has(`WH_${oldId}`)||targets.has(oldId))throw new Error('Önceki antrenman sonucu bağlantısı bozuk.');
+        targets.add(oldId);
+      }
+    }
   }
   for(const day of stores[S.PROGRAM_DAYS])if(!ids[S.PROGRAM_VERSIONS].has(day.programVersionId))throw new Error('Sahipsiz antrenman günü.');
   for(const block of stores[S.WORKOUT_BLOCKS])if(!ids[S.PROGRAM_DAYS].has(block.programDayId))throw new Error('Sahipsiz antrenman bloğu.');

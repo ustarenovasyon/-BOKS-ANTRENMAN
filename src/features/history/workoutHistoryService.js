@@ -1,7 +1,14 @@
-import {workoutHistoryRepository,feedbackRepository} from '@/lib/localData/repositories';
+import {workoutHistoryRepository,feedbackRepository,programRepository,programVersionRepository} from '@/lib/localData/repositories';
+import {setHistoryDeleted} from '@/lib/localData/programManagementRepository';
 import {nowIso} from '@/lib/localData/time';
 export async function loadWorkoutHistory() {
-  return {rows:(await workoutHistoryRepository.list()).sort((a,b)=>(b.completedAt||'').localeCompare(a.completedAt||'')),feedback:await feedbackRepository.list()};
+  return {rows:(await workoutHistoryRepository.list()).sort((a,b)=>(b.completedAt||'').localeCompare(a.completedAt||'')),feedback:await feedbackRepository.list(),programs:await programRepository.list(),versions:await programVersionRepository.list()};
+}
+export async function changeHistoryVisibility(historyId,deleted) {await setHistoryDeleted(historyId,deleted?nowIso():null);}
+export async function deleteWorkoutFeedback(historyId) {
+  const history=await workoutHistoryRepository.getById(historyId);
+  if(!history)throw new Error('Antrenman sonucu bulunamadı.');
+  await feedbackRepository.remove(`FB_${history.programDayId}`);
 }
 export async function saveWorkoutFeedback(historyId,effort,note) {
   const history=await workoutHistoryRepository.getById(historyId);

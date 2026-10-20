@@ -21,3 +21,7 @@ Repository'den gerçek completed/partial/skipped kayıtları, planlanan/yapılan
 Ses/titreşim/tema, JSON export/import, kurtarma noktası ve çift adımlı sıfırlama çalışır. Sıfırlama yerel kurtarma noktasını koruduğunu açıkça belirtir. İçe aktarma atomiktir; geçersiz dosya mevcut veriyi değiştirmez. Production service worker ilk online açılışta shell/assets'i cache eder. Ayrıntı: `28_PART_44_HISTORY_SETTINGS_BACKUP.md`.
 
 390 × 844 Chromium testleri gerçek IndexedDB üzerinde oluşturma/onay/workout/reload/history/backup/migration/offline akışlarını çalıştırır. Hareket medyası, pivot veya fiziksel skor eklenmemiştir.
+
+## PART46 yönetim akışları
+
+Programlarım ve Önizleme düzenle/kopyala/duraklat/devam/arşiv/çöp kutusu sağlar. Oluşturma ekranı edit/copy modunda kaynak version'ın gerçek tercihlerini yükler. Ana Sayfa ve Workout doğru program ID'sini taşır; duruş görünür. History program filtresi, özgün version görüntüsü, not silme ve geri alınabilir kayıt silme içerir. Settings program yönetimine bağlantı sağlar. Detay ve testler: `31_PART_46_PROGRAM_MANAGEMENT.md`.

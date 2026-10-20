@@ -10,10 +10,12 @@ import {currentWorkoutBlock,WORKOUT_STATUS_LABELS,TERMINAL_WORKOUT_STATUSES} fro
 import {formatCivilDate,formatSeconds,BLOCK_TYPE_LABELS} from '@/features/programPreview/previewLabels';
 import {currentStrengthPhase} from '@/features/workout/strengthPlayback';
 import {loadAppPreferences} from '@/features/settings/appPreferences';
+import {LABELS} from '@/features/programCreate/programPreferences';
+import {programTitle} from '@/features/programManagement/programManagementService';
 import {TRAINING_OBJECTIVE_INSTRUCTIONS} from '@/features/boxing/instructions/trainingObjectiveInstructions';
 
 export default function Workout() {
-  const [params]=useSearchParams();const dayId=params.get('day');
+  const [params]=useSearchParams();const dayId=params.get('day'),programId=params.get('program');
   const [context,setContext]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState('');
   const contextRef=useRef(null),queue=useRef(Promise.resolve()),mounted=useRef(true);
   const [confirmStop,setConfirmStop]=useState(false);
@@ -22,9 +24,9 @@ export default function Workout() {
   useEffect(()=>{loadAppPreferences().then(value=>{preferences.current=value;}).catch(()=>{});return()=>{audio.current?.close();};},[]);
   useEffect(()=>{
     let active=true;mounted.current=true;setLoading(true);setError('');
-    loadWorkout(dayId,Date.now()).then(result=>{if(active){contextRef.current=result;setContext(result);setLoading(false);}}).catch(e=>{if(active){setError(e.message);setLoading(false);}});
+    loadWorkout(dayId,Date.now(),programId).then(result=>{if(active){contextRef.current=result;setContext(result);setLoading(false);}}).catch(e=>{if(active){setError(e.message);setLoading(false);}});
     return()=>{active=false;mounted.current=false;};
-  },[dayId]);
+  },[dayId,programId]);
   const execute=useCallback(event=>{
     if(['start','resume'].includes(event)&&preferences.current.sound&&typeof window.AudioContext==='function') {
       audio.current??=new AudioContext();audio.current.resume().catch(()=>{});
@@ -57,6 +59,10 @@ export default function Workout() {
   const strengthPhase=current.block?currentStrengthPhase(current.block,progress.positionMs-current.startMs):null;
   return <div className="space-y-5">
     <PageHeader title={`Antrenman ${day.trainingOrdinal}`} description={formatCivilDate(day.plannedDate)}/>
+    <p className="text-sm font-medium break-words">{programTitle(context.program)}</p>
+    {context.version.settingsSnapshot.boxingStance&&<p className="text-sm">Duruş: {LABELS.boxingStance[context.version.settingsSnapshot.boxingStance]}</p>}
+    {!context.program.deletedAt&&<Link className="block text-sm underline" to={`/program-create?edit=${context.program.id}`}>Programı düzenle</Link>}
+    {context.program.currentVersionId!==context.version.id&&<p className="text-sm text-muted-foreground">Bu sonuç önceki program düzenine aittir; o antrenmanın özgün duruşu ve içeriği gösteriliyor.</p>}
     {day.trainingCycleSnapshot&&<p className="rounded-lg bg-muted p-3 text-sm">{TRAINING_OBJECTIVE_INSTRUCTIONS[day.trainingCycleSnapshot.objective]}</p>}
     {error&&<p role="alert" className="rounded-lg border border-destructive p-3 text-sm text-destructive">{error} <button className="underline" onClick={()=>window.location.reload()}>Yeniden aç</button></p>}
     <div className="rounded-2xl border bg-muted/30 p-5 text-center space-y-2">
@@ -74,7 +80,7 @@ export default function Workout() {
     {['paused','in_progress'].includes(progress.status)&&<Button variant="outline" className="w-full" onClick={()=>execute('skip_block')}>Bu bloğu atla</Button>}
     {progress.status==='awaiting_completion_confirmation'&&<div className="rounded-xl border p-4 space-y-3"><p>Planlanan süre bitti. Antrenmanı yaptığını onayla.</p>{progress.skippedBlockIds.length>0&&<p className="text-sm text-muted-foreground">Atlanan bloklar nedeniyle sonuç kısmen yapıldı olarak kaydedilecek.</p>}<Button className="w-full" onClick={()=>execute('confirm')}>Yaptım, sonucu kaydet</Button></div>}
     {!terminal&&<div className="space-y-2">{!confirmStop?<Button variant="ghost" className="w-full" onClick={()=>setConfirmStop(true)}>Antrenmanı sonlandır</Button>:<div className="rounded-lg border p-3 space-y-2"><p className="text-sm">{progress.actualMs>0?'Yapılan süre kısmen yapıldı olarak kaydedilsin mi?':'Antrenman atlandı olarak kaydedilsin mi?'}</p><Button variant="destructive" className="w-full" onClick={()=>execute(progress.actualMs>0?'finish_partial':'skip_workout')}>Sonlandır ve kaydet</Button><Button variant="ghost" className="w-full" onClick={()=>setConfirmStop(false)}>Vazgeç</Button></div>}</div>}
-    {terminal&&<div className="rounded-xl border p-4 space-y-3"><p>Sonucun kaydedildi.</p><Button asChild className="w-full"><Link to="/workout" onClick={()=>{if(!dayId)window.location.reload();}}>Sıradaki antrenman</Link></Button><Button asChild variant="outline" className="w-full"><Link to="/history">Geçmişi gör</Link></Button></div>}
+    {terminal&&<div className="rounded-xl border p-4 space-y-3"><p>Sonucun kaydedildi.</p><Button asChild className="w-full"><Link to={`/workout?program=${context.program.id}`} onClick={()=>{if(!dayId)window.location.reload();}}>Sıradaki antrenman</Link></Button><Button asChild variant="outline" className="w-full"><Link to="/history">Geçmişi gör</Link></Button></div>}
     <p className="text-xs text-muted-foreground">Uygulama arka plana geçtiğinde duraklar. Yeniden açıldığında kayıtlı noktadan devam edebilirsin.</p>
   </div>;
 }

@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
+import {Link} from 'react-router-dom';
 import PageHeader from '@/components/PageHeader';
 import {Button} from '@/components/ui/button';
 import {createDataBackup,parseDataBackup,restoreDataBackup,restoreRecoveryBackup,resetTrainingData,getRecoveryBackup} from '@/features/backup/dataBackup';
@@ -21,6 +22,6 @@ export default function Settings() {
       {recovery&&<div className="border-t pt-3 space-y-2"><p className="text-xs text-muted-foreground">Son yerel geri dönüş yedeği: {new Date(recovery.createdAt).toLocaleString('tr-TR')}</p><Button variant="outline" className="w-full" disabled={busy} onClick={()=>{if(window.confirm('Yerel veriler son geri dönüş yedeğiyle değiştirilsin mi?'))run(async()=>{await restoreRecoveryBackup();window.location.reload();});}}>Son yerel yedeğe dön</Button></div>}
     </section>
     <section className="rounded-xl border border-destructive/30 p-4 space-y-3"><h2 className="font-medium">Yerel verileri temizle</h2><p className="text-sm text-muted-foreground">Programlar, geçmiş ve ayarlar temizlenir. Son geri dönüş yedeği cihazında tutulur. Onay için SİL yaz.</p><input aria-label="Temizleme onayı" value={resetText} onChange={e=>setResetText(e.target.value)} className="w-full rounded border bg-background p-2"/><Button variant="destructive" className="w-full" disabled={busy||resetText!=='SİL'} onClick={()=>{if(window.confirm('Tüm yerel antrenman verilerini temizlemek istediğinden emin misin?'))run(async()=>{await resetTrainingData();window.location.reload();});}}>Verileri temizle</Button></section>
-    <p className="text-xs text-muted-foreground">Sayaç arka planda duraklar. Üretim tercihleri Program Oluştur ekranından değiştirilir.</p>
+<p className="text-xs text-muted-foreground">Sayaç arka planda duraklar. Mevcut programının gün, süre ve duruşunu Programlarım ekranındaki Düzenle ile değiştirebilirsin.</p><Button asChild variant="outline" className="w-full"><Link to="/programs">Programları yönet</Link></Button>
   </div>;
 }

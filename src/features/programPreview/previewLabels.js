@@ -64,7 +64,7 @@ export const BLOCK_TYPE_LABELS = {
   [WORKOUT_BLOCK_TYPES.COOLDOWN]: 'Soğuma / Toparlanma',
 };
 
-export const PREVIEWABLE_STATUSES = ['review_required', 'review_failed', 'ready_for_approval', 'active'];
+export const PREVIEWABLE_STATUSES = ['review_required', 'review_failed', 'ready_for_approval', 'active', 'paused', 'completed', 'archived'];
 
 /** Tek program-status display source (Programs + Preview ortak). */
 export const PROGRAM_STATUS_LABELS = {

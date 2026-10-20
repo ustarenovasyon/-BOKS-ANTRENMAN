@@ -1,6 +1,10 @@
 # BOX ANTRENMAN — Güncel Proje Durumu
 
-## Son durum — PART 45
+## Son durum — PART 46
+
+Programlarım’da her zaman yeni program, mevcut aktif programı düzenleme, kopyalama, adlandırma, duraklatma/devam, arşiv ve geri alınabilir çöp kutusu var. Duruş değişikliği yarım kalan süreyi korur; eski version ve history değiştirilmez. Birden fazla programın antrenman hedefleri ayrıldı. History kayıt/not silme ve geri alma eklendi. Ayrıntı: `31_PART_46_PROGRAM_MANAGEMENT.md`.
+
+## PART 45 temeli
 
 Uygulama tek kullanıcılı, offline-first ve backend/login bağımsızdır. Yeni program oluşturma UI'sı explicit V2 kullanır. Generator, audit, persistence ve preview birlikte V2 destekler. Legacy missing-version ve explicit V1 programlarının yolu değişmez; `CURRENT_GENERATION_POLICY_VERSION = V1` compatibility default olarak korunur. Null/bilinmeyen version fail-closed kalır.
 
@@ -25,7 +29,7 @@ V2 temel/support 2–3, main en fazla 6, challenge en fazla 7; 8+ üretmez. İzo
 
 ## Kalite durumu
 
-Yerel independence, tüm regression suite, checkJs/typecheck, lint ve production build PASS. 216 self-contained V2 fixture (8 süre × 3 deneyim × 3 mod × 3 zorluk), bağımsız iki üretim/audit deep-equal ve exact FP/AFP PASS. Gerçek Chromium/IndexedDB üzerinde 6 tarayıcı senaryosu PASS; 390px mobil görünüm ve taşma kontrolü dahil. GitHub final CI ve Pages sonucu ayrıca yayın kapısıdır; yerel sonuç yayın sonucu olarak sunulmaz.
+Yerel independence, tüm regression suite, checkJs/typecheck, lint ve production build PASS. 216 self-contained V2 fixture (8 süre × 3 deneyim × 3 mod × 3 zorluk), bağımsız iki üretim/audit deep-equal ve exact FP/AFP PASS. Gerçek Chromium/IndexedDB üzerinde 12 tarayıcı senaryosu PASS (6 temel + 6 PART46 yönetim senaryosu); 390px mobil görünüm ve taşma kontrolü dahil. GitHub final CI ve Pages sonucu ayrıca yayın kapısıdır; yerel sonuç yayın sonucu olarak sunulmaz.
 
 V1 canonical gate değişmedi: 104 seans, `FP_9b61698b / AFP_3194287436`, audit pass, critical 0, warning 0. Historical `FP_9698c40e / AFP_628181959` kayıp original-input nedeniyle historical/unreproducible kalır. Historical 1M/3M/6M78 çiftleri overwrite edilmez.
 

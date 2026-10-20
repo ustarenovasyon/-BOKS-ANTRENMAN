@@ -57,3 +57,7 @@ Her biri ayrı contract olarak korunmalıdır.
 5. Workout progress/history gerçek kayıt akışı
 
 Veri migration'ları eski kaydı silmemeli; destructive reset yalnız kullanıcı açıkça isterse yapılmalıdır.
+
+## PART46 additive metadata
+
+Schema v2 korunur. Program.name/deletedAt/beforeTrashStatus/beforeArchiveStatus yalnız yönetim metadata'sıdır. Yeni program version'larında previousVersionId ve carriedResults (yeni dayId → gerçek terminal sonuç dayId) bulunabilir. History.deletedAt sonuç gövdesini değiştirmeden geri alınabilir silme sağlar. Eski version/day/block/history tutulur; source-of-truth yeniden yazılmaz. Atomik edit repository'si program kimliği ve progress revision kontrolü yapar. Backup bu ilişkileri ayrıca doğrular. Ayrıntı: `31_PART_46_PROGRAM_MANAGEMENT.md`.

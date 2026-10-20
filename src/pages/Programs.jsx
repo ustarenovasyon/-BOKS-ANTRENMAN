@@ -1,92 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useCallback,useEffect,useState} from 'react';
+import {Link} from 'react-router-dom';
 import PageHeader from '@/components/PageHeader';
 import EmptyState from '@/components/EmptyState';
-import { Button } from '@/components/ui/button';
-import { programRepository } from '@/lib/localData/repositories';
-import { LABELS } from '@/features/programCreate/programPreferences';
-import { formatIsoCivilDate, PROGRAM_STATUS_LABELS } from '@/features/programPreview/previewLabels';
+import {Button} from '@/components/ui/button';
+import {programRepository} from '@/lib/localData/repositories';
+import {LABELS} from '@/features/programCreate/programPreferences';
+import {formatIsoCivilDate,PROGRAM_STATUS_LABELS} from '@/features/programPreview/previewLabels';
+import ProgramActions from '@/features/programManagement/ProgramActions';
+import {programTitle} from '@/features/programManagement/programManagementService';
 
 export default function Programs() {
-  const [state, setState] = useState(/** @type {{status: string, programs?: Record<string, any>[]}} */ ({ status: 'loading' }));
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const list = await programRepository.list();
-        if (!active) return;
-        const sorted = [...list].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-        setState({ status: 'ready', programs: sorted });
-      } catch (e) {
-        setState({ status: 'error' });
-      }
-    })();
-    return () => { active = false; };
-  }, []);
-
-  if (state.status === 'loading') {
-    return (
-      <div>
-        <PageHeader title="Programlarım" />
-        <p className="text-sm text-muted-foreground">Yükleniyor...</p>
-      </div>
-    );
-  }
-
-  if (state.status === 'error') {
-    return (
-      <div>
-        <PageHeader title="Programlarım" />
-        <p className="text-sm text-destructive">Programlar okunamadı.</p>
-      </div>
-    );
-  }
-
-  if (state.programs.length === 0) {
-    return (
-      <div>
-        <PageHeader title="Programlarım" />
-        <EmptyState
-          title="Henüz oluşturulmuş program yok."
-          description="Program Oluştur ekranından ilk programını oluşturabilirsin."
-        />
-        <Button onClick={() => navigate('/program-create')} className="w-full mt-4">
-          Program Oluştur
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      <PageHeader title="Programlarım" />
-      {state.programs.map((p) => {
-        const modeLabel = LABELS.programMode[p.programMode] || p.programMode;
-        const durationLabel = LABELS.durationMonths[p.durationMonths] || `${p.durationMonths} Ay`;
-        const statusLabel = PROGRAM_STATUS_LABELS[p.status] || p.status;
-        return (
-          <div key={p.id} className="rounded-lg border border-border p-3 space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-medium text-foreground">{modeLabel}</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{statusLabel}</span>
-            </div>
-            <div className="text-xs text-muted-foreground space-y-0.5">
-              <p>{durationLabel}</p>
-              {p.createdAt && <p>Oluşturulma: {formatIsoCivilDate(p.createdAt)}</p>}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => navigate(`/program-preview/${p.id}`)}
-            >
-              Önizle
-            </Button>
-          </div>
-        );
-      })}
-    </div>
-  );
+  const [programs,setPrograms]=useState(null),[error,setError]=useState(''),[filter,setFilter]=useState('all'),[search,setSearch]=useState('');
+  const load=useCallback(async()=>{try{const list=await programRepository.list();setPrograms([...list].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')));setError('');}catch{setError('Programlar okunamadı.');}},[]);
+  useEffect(()=>{load();},[load]);
+  const visible=programs?.filter(p=>(filter==='trash'?!!p.deletedAt:!p.deletedAt&&(filter==='all'||p.status===filter))&&programTitle(p).toLocaleLowerCase('tr').includes(search.toLocaleLowerCase('tr')))??[];
+  return <div className="space-y-4"><PageHeader title="Programlarım" description="Birden fazla program oluşturabilir, mevcut programlarını düzenleyebilirsin."/>
+    <Button asChild className="w-full"><Link to="/program-create">Yeni program oluştur</Link></Button>
+    <label className="block text-sm">Program ara<input className="mt-1 w-full rounded border bg-background p-2" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Program adı"/></label>
+    <label className="block text-sm">Program listesi<select aria-label="Program listesi" className="mt-1 w-full rounded border bg-background p-2" value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">Tüm programlar</option><option value="active">Aktif</option><option value="paused">Duraklatılmış</option><option value="archived">Arşiv</option><option value="trash">Çöp kutusu</option></select></label>
+    {error&&<p role="alert" className="text-destructive">{error}</p>}{!programs&&!error&&<p>Yükleniyor…</p>}
+    {programs&&!visible.length&&<EmptyState title="Bu listede program yok." description="Yeni program oluşturabilir veya liste filtresini değiştirebilirsin."/>}
+    {visible.map(program=><article key={program.id} aria-label={programTitle(program)} className="rounded-xl border p-4 space-y-3"><div className="flex justify-between gap-2"><h2 className="font-medium break-words min-w-0">{programTitle(program)}</h2><span className="text-xs shrink-0">{program.deletedAt?'Çöp kutusunda':PROGRAM_STATUS_LABELS[program.status]||program.status}</span></div><p className="text-sm text-muted-foreground">{LABELS.programMode[program.programMode]} · {program.durationMonths} ay</p>{program.createdAt&&<p className="text-xs text-muted-foreground">Oluşturulma: {formatIsoCivilDate(program.createdAt)}</p>}
+      {!program.deletedAt&&<Button asChild variant="outline" className="w-full"><Link to={`/program-preview/${program.id}`}>Önizle</Link></Button>}
+      <ProgramActions program={program} onChanged={load}/>
+    </article>)}
+  </div>;
 }

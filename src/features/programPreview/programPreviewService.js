@@ -16,6 +16,8 @@ import { PREVIEWABLE_STATUSES } from './previewLabels';
 import { validateFootworkTechniqueDay } from '@/features/programGeneration/footworkTechniqueBlock';
 import { validateFootworkPrescriptionDay } from '@/features/programGeneration/footworkPrescription';
 import { buildProgramPreviewViewModel } from './previewViewModel';
+import {buildEngineVersions} from '@/features/programGeneration/engineVersionSnapshot';
+import {auditProgramSnapshotV2} from '@/features/programAudit/programAuditV2';
 
 const ROLE_BOXING = WEEKLY_SESSION_ROLES.BOXING_ONLY_DAY;
 const ROLE_STRENGTH = WEEKLY_SESSION_ROLES.STRENGTH_ONLY_DAY;
@@ -57,6 +59,8 @@ export async function loadProgramPreview(programId) {
       generationPolicyVersion: version.generationPolicyVersion ?? null,
     });
   }
+  const engines=version.engineVersions||{},known=buildEngineVersions();
+  if(![1,2,3].includes(engines.boxingMoveLibraryVersion)||![1,2].includes(engines.dbSchemaVersion)||Object.keys(known).some(key=>!['boxingMoveLibraryVersion','dbSchemaVersion'].includes(key)&&engines[key]!==known[key]))return fail('PREVIEW_DATA_INTEGRITY_FAILED');
 
   // currentVersionId exact — guess YOK.
   if (version.programId !== program.id) return fail('PREVIEW_DATA_INTEGRITY_FAILED');
@@ -153,6 +157,7 @@ export async function loadProgramPreview(programId) {
   if (computed !== version.blueprintFingerprint) {
     return fail('PREVIEW_FINGERPRINT_MISMATCH', { computed, expected: version.blueprintFingerprint });
   }
+  if(policy.version===2&&auditProgramSnapshotV2(blueprint).outcome!=='pass')return fail('PREVIEW_DATA_INTEGRITY_FAILED');
 
   const viewModel = buildProgramPreviewViewModel({ program, version, sortedDays, blocksByDay });
   return { valid: true, reason: null, viewModel, blocksByDay };

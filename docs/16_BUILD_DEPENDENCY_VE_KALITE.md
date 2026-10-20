@@ -1,43 +1,24 @@
-# Build, Dependency ve Kalite Notları
+# Build, Dependency ve Kalite
 
-## Runtime dependency sadeleştirmesi
+## Tekrarlanabilir kapılar
 
-Base44 ve kullanılmayan boilerplate paketleri kaldırıldı. Current app entry tarafından kullanılan ana runtime paketleri:
+```bash
+npm ci
+npm run verify:independent
+npm run test:regression
+npm run typecheck
+npm run lint
+npm run build
+npx playwright install --with-deps chromium
+npm run test:browser
+```
 
-- react / react-dom
-- react-router-dom
-- lucide-react
-- Radix dialog/label/slot/toast
-- class-variance-authority
-- clsx
-- tailwind-merge
+PART 45 yerel tam zinciri PASS. Eski dependency indirme/typecheck engelleri kapanmıştır. JavaScript/JSDoc `checkJs=true` korunur; tip kontrolünü kapatarak yeşil sonuç alınmaz.
 
-## Scriptler
+Regression tüm önceki PART'ları, canonical V1 lock'u, 216 V2 input/FP/AFP fixture'ını, bağımsız tekrarları, fail-closed ve yeniden hash edilmiş semantik bozulma kontrollerini içerir. Browser suite 6 gerçek Chromium/IndexedDB senaryosudur: timer/restore/explicit confirmation, skipped, history/backup, DB migration, offline production ve 24 aylık V2 UI.
 
-- `npm run dev`
-- `npm run build`
-- `npm run lint`
-- `npm run typecheck`
-- `npm run preview`
-- `npm run verify:independent`
+Vite build local offline shell/hashed asset listesi üretir. `GITHUB_ACTIONS=true` production için `/-BOKS-ANTRENMAN/` base kullanır; dev server root kalır. Browser suite hem dev gerçek servisleri hem production preview'ı test eder. Özel yerel Chromium kurulumunda `PLAYWRIGHT_CHROMIUM_EXECUTABLE` desteklenir; CI normal Playwright Chromium kurar.
 
-## Bu paket hazırlanırken yapılan statik doğrulama
+`.github/workflows/ci.yml` ve `deploy-pages.yml` aynı zorunlu kapıları çalıştırır. Deploy build ayrıca `404.html` SPA fallback üretir. Final yayın sonucunda exact CI/Pages run'ları kontrol edilir; yerel doğrulama ile yayın doğrulaması birbirine karıştırılmaz.
 
-- Base44 runtime/package/config taraması: PASS
-- 98 `.js` dosyasında `node --check`: PASS
-- 133 JS/JSX/TS/TSX dosyada TypeScript transpile syntax kontrolü: PASS
-- Tüm local import yolları çözümleniyor: PASS
-- Tüm external source importları `package.json` içinde mevcut: PASS
-- package-lock Base44 dependency taraması: PASS
-
-## Ortam notu
-
-Bu çalışma ortamında npm dependency indirme işlemi zaman aşımına uğradığı için tam `npm ci + npm run build` sonucu burada tamamlanamadı. Bu bir source-code build hatası olarak yorumlanmamalıdır; ilk GitHub push öncesi gerçek CI/local ortamda `npm ci`, lint ve build zorunlu çalıştırılmalıdır.
-
-## Type hygiene
-
-`checkJs=true` kullanılan mevcut JS/JSDoc yapısında feature katmanında tip borcu bulunması olasıdır. Bu borç functional refactor ile karıştırılmadan ayrı bir kalite PART'ında azaltılmalıdır.
-
-## Öneri
-
-İlk GitHub commit'ten hemen sonra CI ekle ve build'i repository gate haline getir. Böylece bundan sonraki PART'larda paket her zaman tekrar üretilebilir kalır.
+Base44/runtime/auth/backend/AI dependency eklenmemiştir. Playwright yalnız dev dependency'dir. İlk bundle yaklaşık 554 kB (gzip yaklaşık 163 kB); Vite chunk-size uyarısı build hatası değildir. İleride route splitting yapılabilir.

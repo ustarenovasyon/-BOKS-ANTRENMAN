@@ -469,7 +469,7 @@ export const MIN_INTERSET_REST_SECONDS = 15;
 // --- Generation policy versioning (PART 20) ---
 // Bir programın hangi curriculum/progression kurallarıyla üretildiğini belirtir.
 // engineVersions'dan AYRI semantik kavramdır (implementation version vs policy version).
-// V2 henüz aktif değildir — CURRENT_GENERATION_POLICY_VERSION = V1.
+// PART 45: explicit V2 aktif; legacy/default compatibility için CURRENT = V1.
 export const GENERATION_POLICY_VERSIONS = Object.freeze({
   V1: 1,
   V2: 2,

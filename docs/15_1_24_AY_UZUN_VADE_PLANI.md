@@ -1,57 +1,11 @@
-# 1–24 Ay Uzun Vadeli Eğitim Planı
+# 1–24 Ay Eğitim Politikası — Uygulanan Karar
 
-## Hedef süreler
+V2 süre ailesi: `1, 3, 6, 9, 12, 15, 18, 24`. UI, validation, takvim, curriculum, progression, selectors, audit, preview ve 216 fixture birlikte uygulanmıştır. V1'in 1/3/6 davranışı korunur.
 
-`1, 3, 6, 9, 12, 15, 18, 24 ay`
+Daha uzun süre daha uzun combo anlamına gelmez. Foundational/support 2–3, main en fazla 6, challenge en fazla 7 yumruk içerir. Stage 5/6 yeni movement açmaz; mesafe, ritim, savunma sonrası cevap ve kontrollü tekrar görevleri bağlamı değiştirir.
 
-## Ana prensip
+Beginner mevcut 1/3/6 sınırları değişmez. Uzun beginner timeline stage 2/3'ü yaklaşık ay 2/4'e, stage 4'ü ay 9'a taşır; ay 9 sonrası stage 5, 24 ayda ay 18 sonrası stage 6. Intermediate stage 2, experienced stage 3'ten başlar; bunlar kullanıcı beyanıdır. Kesin exposure sınırlarının tek kaynağı `longTermTimelinePolicy.js` ve curriculum resolver'dır. Takvim gününden veya round sayısından stage uydurulmaz.
 
-Daha uzun süre = daha uzun combo değildir. Aynı kısa combo ileri seviyede farklı footwork, defense, timing ve counter bağlamıyla kullanılabilir.
+9+ ayda her dördüncü hafta recovery: work cap 60 sn, combo cap 3, kuvvet tier 1/minimum uygun hareket sayısı. Toplam seans süresi dinlenme/teknik tekrar alanıyla korunur. Otomatik kg veya fiziksel beceri puanı yoktur. Stage-local izole footwork 60 sn'yi boks bütçesinden kullanır. Rotation/pivot DEFER kalır.
 
-## Önerilen curriculum yaklaşımı
-
-### 1 ay
-Fundamentals. Jab/Cross, basic stance movement, kısa kontrollü tekrar.
-
-### 3 ay
-Basic combinations + Catch + lateral footwork + ilk defense entegrasyonu.
-
-### 6 ay
-Slip, body transitions, uppercut, düzenli defense/footwork entegrasyonu.
-
-### 9 ay
-Stage4 stabilizasyonu; mesafe giriş/çıkış, defense sonrası cevap, ritim varyasyonu.
-
-### 12 ay
-Stage5 başlangıcı; timing/rhythm objective, daha kontrollü counter zincirleri, teknik yoğunluğu artırma.
-
-### 15 ay
-Uzun vadeli varyasyon; short-combo advanced context, fatigue altında kontrollü tekrar, deload dönemleri.
-
-### 18 ay
-Gelişmiş defense + footwork kombinasyonu; angle model eklendiyse pivot/angle uygulamaları.
-
-### 24 ay
-Stage6 performance. Sürdürülebilir curriculum rotation, tekrar kontrolü, teknik blokların dengeli yeniden kullanımı.
-
-## Uygulama gereksinimleri
-
-Her yeni duration için:
-
-- architecture enum
-- form label/validation
-- calendar
-- progression phase counts
-- curriculum boundaries
-- attack length policy
-- role policy
-- defense policy
-- weekly balance
-- audit expectations
-- fixture regression
-
-birlikte güncellenmelidir.
-
-## Deload
-
-Uzun programlarda yalnız sürekli yoğunluk artışı yapılmamalıdır. Deload/recovery phase ayrı progression kararına bağlanmalıdır.
+Kararlar: `24_PART_38_LONG_TERM_ARCHITECTURE.md`, `25_PART_39_41_LONG_DURATION_SUPPORT.md`, `29_PART_45_V2_ACTIVATION.md`.

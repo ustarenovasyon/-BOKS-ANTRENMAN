@@ -18,9 +18,11 @@ import {loadAppPreferences,applyTheme} from '@/features/settings/appPreferences'
  */
 export function useAppInit() {
   const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [warning,setWarning]=useState('');
 
   const run = useCallback(async () => {
     setStatus('loading');
+    setWarning('');
     try {
       await settingsRepository.ensureInitialized();
       await appMetaRepository.ensureInitialized();
@@ -31,7 +33,7 @@ export function useAppInit() {
       await ensureDefenseCounterLibrary();
       await ensureStrengthTemplateLibrary();
       applyTheme((await loadAppPreferences()).theme);
-      await ensureDailyBackup();
+      try{await ensureDailyBackup();}catch{setWarning('Otomatik yerel yedek alınamadı. Ayarlar’dan JSON yedeğini indir.');}
       setStatus('ready');
     } catch (e) {
       console.error('App init failed:', e);
@@ -47,5 +49,5 @@ export function useAppInit() {
     run();
   }, [run]);
 
-  return { status, retry };
+  return { status, retry, warning };
 }

@@ -18,7 +18,7 @@ import ProgramPreview from '@/pages/ProgramPreview';
  * Yalnızca yerel DB hazırlanır; hata olursa kontrollü ekran gösterilir.
  */
 const AppInitGate = ({ children }) => {
-  const { status, retry } = useAppInit();
+  const { status, retry, warning } = useAppInit();
 
   if (status === 'loading') {
     return (
@@ -43,7 +43,7 @@ const AppInitGate = ({ children }) => {
     );
   }
 
-  return children;
+  return <>{warning&&<p role="alert" className="mx-auto max-w-md p-3 text-sm text-destructive">{warning}</p>}{children}</>;
 };
 
 const LocalApp = () => (

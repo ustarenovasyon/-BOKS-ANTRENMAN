@@ -44,6 +44,7 @@ function shouldScheduleIsolatedFootwork({ stageLocalOrdinal, newlyUnlockedCount 
  * - Isolated block 60 sn; mevcut boxing budget'tan düşer.
  * - Kalan interval en az 180 sn olmalı, aksi halde fail-closed.
  */
+/** @param {{generationPolicyVersion?: number, durationMonths?: number, experienceLevel?: string, boxingExposureOrdinal?: number, totalBoxingExposures?: number, boxingSeconds?: number}} input */
 export function planV2FootworkTechniqueSession({
   generationPolicyVersion,
   durationMonths,

@@ -12,7 +12,7 @@ import { minimumSessionMinutesForMode } from '@/features/sessionBudget/sessionDu
 import { nowIso } from '@/lib/localData/time';
 
 export const PROGRAM_MODE_VALUES = Object.values(PROGRAM_MODES);
-export const DURATION_VALUES = [1, 3, 6];
+export const DURATION_VALUES = Object.values(PROGRAM_DURATION_MONTHS);
 export const EXPERIENCE_VALUES = Object.values(EXPERIENCE_LEVELS);
 export const DIFFICULTY_VALUES = Object.values(DIFFICULTY_LEVELS);
 export const STANCE_VALUES = Object.values(BOXING_STANCES);
@@ -28,6 +28,11 @@ export const LABELS = {
     [PROGRAM_DURATION_MONTHS.ONE]: '1 Ay',
     [PROGRAM_DURATION_MONTHS.THREE]: '3 Ay',
     [PROGRAM_DURATION_MONTHS.SIX]: '6 Ay',
+    [PROGRAM_DURATION_MONTHS.NINE]: '9 Ay',
+    [PROGRAM_DURATION_MONTHS.TWELVE]: '12 Ay',
+    [PROGRAM_DURATION_MONTHS.FIFTEEN]: '15 Ay',
+    [PROGRAM_DURATION_MONTHS.EIGHTEEN]: '18 Ay',
+    [PROGRAM_DURATION_MONTHS.TWENTY_FOUR]: '24 Ay',
   },
   weekdays: {
     MONDAY: 'Pazartesi',

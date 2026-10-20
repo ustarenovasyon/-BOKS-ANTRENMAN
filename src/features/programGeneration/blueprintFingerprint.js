@@ -53,7 +53,18 @@ export function getBlueprintFingerprintSignature(blueprint, seed) {
   return { sig, seed, startDate: programVersion.programStartDate, endDate: programVersion.endDateExclusive, total: programVersion.totalPlannedTrainingSessions, daySig, blockSig, daysOrder: days.map((d) => d.trainingOrdinal), blocksOrder: blocks.map((b) => `${b.programDayId}:${b.orderIndex}:${b.type}`) };
 }
 
+export function stableObjectString(value) {
+  if(value === undefined)return 'undefined';
+  if(value === null || typeof value !== 'object')return JSON.stringify(value);
+  if(Array.isArray(value))return '['+value.map(stableObjectString).join(',')+']';
+  return '{'+Object.keys(value).sort().map(key=>JSON.stringify(key)+':'+stableObjectString(value[key])).join(',')+'}';
+}
 export function computeBlueprintFingerprint(blueprint, seed) {
+  if(blueprint.programVersion.generationPolicyVersion===2) {
+    const {programVersion:v,programDays,workoutBlocks}=blueprint;
+    const signature={seed,policy:2,settings:v.settingsSnapshot,engineVersions:v.engineVersions,start:v.programStartDate,end:v.endDateExclusive,total:v.totalPlannedTrainingSessions,days:canonicalDays(programDays),blocks:canonicalBlocks(programDays,workoutBlocks)};
+    return `FP_${stableHash(stableObjectString(signature)).toString(16)}`;
+  }
   const { sig } = getBlueprintFingerprintSignature(blueprint, seed);
   return `FP_${stableHash(sig).toString(16)}`;
 }

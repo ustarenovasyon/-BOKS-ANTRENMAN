@@ -22,7 +22,8 @@ export default function WeekdayPicker({ selected, onChange, expectedCount }) {
               key={day}
               type="button"
               onClick={() => toggle(day)}
-              className={`px-3 py-2 rounded-md text-sm border transition-colors ${
+              aria-pressed={active}
+              className={`min-h-11 px-3 py-2 rounded-md text-sm border transition-colors ${
                 active
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-foreground border-border'

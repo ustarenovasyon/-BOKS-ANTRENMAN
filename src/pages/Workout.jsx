@@ -10,6 +10,7 @@ import {currentWorkoutBlock,WORKOUT_STATUS_LABELS,TERMINAL_WORKOUT_STATUSES} fro
 import {formatCivilDate,formatSeconds,BLOCK_TYPE_LABELS} from '@/features/programPreview/previewLabels';
 import {currentStrengthPhase} from '@/features/workout/strengthPlayback';
 import {loadAppPreferences} from '@/features/settings/appPreferences';
+import {TRAINING_OBJECTIVE_INSTRUCTIONS} from '@/features/boxing/instructions/trainingObjectiveInstructions';
 
 export default function Workout() {
   const [params]=useSearchParams();const dayId=params.get('day');
@@ -56,6 +57,7 @@ export default function Workout() {
   const strengthPhase=current.block?currentStrengthPhase(current.block,progress.positionMs-current.startMs):null;
   return <div className="space-y-5">
     <PageHeader title={`Antrenman ${day.trainingOrdinal}`} description={formatCivilDate(day.plannedDate)}/>
+    {day.trainingCycleSnapshot&&<p className="rounded-lg bg-muted p-3 text-sm">{TRAINING_OBJECTIVE_INSTRUCTIONS[day.trainingCycleSnapshot.objective]}</p>}
     {error&&<p role="alert" className="rounded-lg border border-destructive p-3 text-sm text-destructive">{error} <button className="underline" onClick={()=>window.location.reload()}>Yeniden aç</button></p>}
     <div className="rounded-2xl border bg-muted/30 p-5 text-center space-y-2">
       <p className="text-sm font-medium">{WORKOUT_STATUS_LABELS[progress.status]}</p>

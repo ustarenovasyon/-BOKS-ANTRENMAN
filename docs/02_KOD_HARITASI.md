@@ -9,13 +9,13 @@
 
 ## Sayfalar
 
-- `Home.jsx`: giriş ekranı
+- `Home.jsx`: gerçek aktif program ve sıradaki antrenman
 - `ProgramCreate.jsx`: kullanıcı tercihleri + generation başlatma
 - `ProgramPreview.jsx`: persisted program preview/audit/correction/approval
 - `Programs.jsx`: yerel program listesi
-- `Workout.jsx`: henüz placeholder
-- `History.jsx`: henüz placeholder
-- `Settings.jsx`: henüz placeholder
+- `Workout.jsx`: kalıcı timer, work/rest, teknik talimat ve kullanıcı completion onayı
+- `History.jsx`: gerçek sonuçlar, filtre ve öz beyan feedback
+- `Settings.jsx`: ses/titreşim/tema, JSON backup/import/kurtarma ve sıfırlama
 
 ## Configuration
 
@@ -65,3 +65,14 @@
 ## Yerel veri
 
 `src/lib/localData/` uygulamadaki tek kalıcı storage katmanıdır. UI doğrudan IndexedDB kullanmamalıdır.
+
+## PART 43–45 ekleri
+
+- `features/workout/`: pure timer reducer ve approved-program loader
+- `lib/localData/workoutRepository.js`: atomik revision-checked progress/history
+- `features/backup/`: doğrulamalı JSON backup ve kurtarma
+- `programGeneration/programGenerationV2.js`, `v2ProgramPolicy.js`: V2 orchestration/context
+- `programAudit/programAuditV2.js`: bağımsız V2 semantic audit
+- `tests/fixtures/v2/program-matrix.json`: 216 self-contained exact fixture
+- `tests/browser/`: gerçek IndexedDB/production offline Playwright testleri
+- `vite.config.js`: production offline shell/asset generation

@@ -1,39 +1,26 @@
 # V1 / V2 Sürümleme ve Güvenlik
 
-## Current
+## PART 45 resolver sözleşmesi
 
-- `GENERATION_POLICY_VERSIONS.V1 = 1`
-- `GENERATION_POLICY_VERSIONS.V2 = 2`
-- `CURRENT_GENERATION_POLICY_VERSION = V1`
+| Girdi | Sonuç |
+| --- | --- |
+| Version field eksik/undefined | Legacy V1, aktif |
+| Explicit 1 | V1, aktif |
+| Explicit 2 | V2, aktif |
+| Null veya bilinmeyen | Fail-closed |
 
-## Resolver davranışı
+`CURRENT_GENERATION_POLICY_VERSION = V1` geriye uyumluluk default'udur. Yeni program UI'sı explicit V2 ister. V1 yalnız 1/3/6 ay; V2 1/3/6/9/12/15/18/24 ay destekler.
 
-- generationPolicyVersion field yoksa: legacy V1
-- explicit V1: aktif
-- explicit V2: tanımlı ama inactive
-- null/unknown: fail-closed
+## Ortak aktivasyon
 
-## Audit
+Generator, audit, blueprint validator, persistence ve preview birlikte V2 destekler. Preview ve persistence V2 semantik audit'i geçmeden programı kabul etmez. Başka policy etiketiyle yeniden imzalanmış V1 fixture V2 program sayılmaz.
 
-Audit V2'yi production destekli saymaz; unsupported generation policy critical finding üretir. Bu özellik bilinçli safety lock'tur.
+V2 fingerprint settings/engine sürümlerini, takvim/gün snapshot'larını ve tüm block içeriklerini deterministically imzalar. Audit generator'ı çağırmadan domain sözleşmelerini doğrular; yeniden hash edilmiş semantik bozulmalar da reddedilir. V1 signature ve audit summary değişmez; canonical `FP_9b61698b / AFP_3194287436` korunur.
 
-## Preview
+## Library compatibility
 
-V2 persisted program preview de fail-closed kalmalıdır. V2 gerçek production activation PART'ına kadar bu kilit açılmamalıdır.
+Movement library current=3. Legacy V1 1/2/3 desteklenir; unknown/null reddedilir. Diğer engine sürümleri merkezi engine snapshot ile karşılaştırılır. Bilinmeyen sürüm UI'da kullanılabilir kabul edilmez. DB v1→v2 migration eski veriyi silmez; gerçek IndexedDB migration testi vardır.
 
-## Movement library compatibility
+## İzolasyon
 
-Current movement library version: 3. Legacy V1 programları için supported movement versions 1, 2, 3 olarak tutulmalıdır; unknown/null fail etmelidir.
-
-## V1 isolation checklist
-
-V2 feature eklerken:
-
-- V1 attack pool değişmemeli
-- V1 defense selector değişmemeli
-- V1 generated block semantics değişmemeli
-- legacy audit bozulmamalı
-- CURRENT V1 kalmalı
-- V2 supplemental içerik V1'e sızmamalı
-
-V2 aktive edilmeden önce generator + audit + preview + regression fixture birlikte geçirilmelidir.
+V1 attack pool/defense selector/block shape ve FP/AFP değişmez. V2 Catch/footwork metadata V1'e sızmaz. Footwork attack moveIds veya punch moveCount'a eklenmez. 216 V2 fixture ve tüm V1 regression birlikte CI kapısıdır. Ayrıntı: `29_PART_45_V2_ACTIVATION.md`.

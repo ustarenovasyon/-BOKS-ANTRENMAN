@@ -31,12 +31,15 @@ import { fitStrengthPrescription } from './strengthPrescriptionFitter';
 import { buildDayBlocks } from './workoutBlockBuilder';
 import { validateFullProgramBlueprint } from './programBlueprintValidator';
 
+import {buildEngineVersions} from './engineVersionSnapshot';
+import {resolveGenerationPolicyVersion} from './generationPolicyResolver';
+import {generateProgramBlueprintV2} from './programGenerationV2';
 const RC = PROGRAM_GENERATION_REASON_CODES;
 
 function validateInput(input) {
   const reasons = [];
   if (!Object.values(PROGRAM_MODES).includes(input.programMode)) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
-  if (![1, 3, 6].includes(input.durationMonths)) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
+  if (!(input.generationPolicyVersion === 2 ? Object.values(PROGRAM_DURATION_MONTHS) : [1, 3, 6]).includes(input.durationMonths)) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
   if (!Object.values(EXPERIENCE_LEVELS).includes(input.experienceLevel)) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
   if (!Object.values(DIFFICULTY_LEVELS).includes(input.difficulty)) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
   if (!Array.isArray(input.selectedWeekdays) || input.selectedWeekdays.length === 0) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
@@ -56,7 +59,7 @@ function validateInput(input) {
   if (input.programMode !== PROGRAM_MODES.STRENGTH_ONLY) {
     if (![4, 6, 8, 10].includes(input.boxingMaxMoves)) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
   }
-  if (!input.generationLocalDate || !/^\d{4}-\d{2}-\d{2}$/.test(input.generationLocalDate)) reasons.push(RC.PROGRAM_INVALID_GENERATION_DATE);
+  if (!input.generationLocalDate || !/^\d{4}-\d{2}-\d{2}$/.test(input.generationLocalDate) || Number.isNaN(Date.parse(input.generationLocalDate)) || new Date(input.generationLocalDate).toISOString().slice(0,10)!==input.generationLocalDate) reasons.push(RC.PROGRAM_INVALID_GENERATION_DATE);
   if (!input.generationSeed || !input.generationRequestId) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
   if (!Number.isInteger(input.sessionDurationMinutes) || input.sessionDurationMinutes < 10 || input.sessionDurationMinutes > 120) reasons.push(RC.PROGRAM_INVALID_SETTINGS);
   return { valid: reasons.length === 0, reasons };
@@ -79,34 +82,20 @@ function buildSettingsSnapshot(input) {
   };
 }
 
-function buildEngineVersions() {
-  return {
-    dbSchemaVersion: LOCAL_DB.VERSION,
-    boxingMoveLibraryVersion: BOXING_MOVE_LIBRARY_VERSION,
-    strengthExerciseLibraryVersion: STRENGTH_EXERCISE_LIBRARY_VERSION,
-    boxingTechnicalConstitutionVersion: BOXING_TECHNICAL_CONSTITUTION_VERSION,
-    boxingTransitionMatrixVersion: BOXING_TRANSITION_MATRIX_VERSION,
-    boxingCombinationLibraryVersion: BOXING_COMBINATION_LIBRARY_VERSION,
-    boxingDefenseCounterLibraryVersion: BOXING_DEFENSE_COUNTER_LIBRARY_VERSION,
-    strengthTechnicalConstitutionVersion: STRENGTH_TECHNICAL_CONSTITUTION_VERSION,
-    strengthTemplateLibraryVersion: STRENGTH_TEMPLATE_LIBRARY_VERSION,
-    sessionTimeBudgetEngineVersion: SESSION_TIME_BUDGET_ENGINE_VERSION,
-    programProgressionEngineVersion: PROGRAM_PROGRESSION_ENGINE_VERSION,
-    weeklyBalancingEngineVersion: WEEKLY_BALANCING_ENGINE_VERSION,
-    strengthPrescriptionFitterVersion: STRENGTH_PRESCRIPTION_FITTER_VERSION,
-    fullProgramGeneratorVersion: FULL_PROGRAM_GENERATOR_VERSION,
-  };
-}
+
 
 /**
  * Pure blueprint generation. No persistence, no Date.now().
  */
 export function generateProgramBlueprint(input = {}) {
+  const policy=resolveGenerationPolicyVersion({generationPolicyVersion:input.generationPolicyVersion});
+  if(!policy.resolved||!policy.active)return {valid:false,reasons:[RC.PROGRAM_INVALID_SETTINGS],warnings:[],blueprint:null};
   const v = validateInput(input);
   if (!v.valid) return { valid: false, reasons: v.reasons, warnings: [], blueprint: null };
 
   const settings = buildSettingsSnapshot(input);
   const engineVersions = buildEngineVersions();
+  if(policy.version===2)return generateProgramBlueprintV2(input,settings,engineVersions);
   const selectedWeekdayIndices = settings.selectedWeekdays.map((w) => WEEKDAY_INDEX[w]);
   const programStartDate = resolveProgramStartDate(input.generationLocalDate, selectedWeekdayIndices);
   const endDateExclusive = addCalendarMonthsClamped(programStartDate, settings.durationMonths);

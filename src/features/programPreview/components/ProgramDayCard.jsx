@@ -14,6 +14,7 @@ import {
   ROLE_LABELS, PHASE_LABELS, FOCUS_LABELS, formatCivilDate, formatSeconds,
 } from '../previewLabels';
 import { LABELS } from '@/features/programCreate/programPreferences';
+import {TRAINING_OBJECTIVE_INSTRUCTIONS} from '@/features/boxing/instructions/trainingObjectiveInstructions';
 
 const WD_LABELS = LABELS.weekdays;
 
@@ -51,6 +52,7 @@ export default function ProgramDayCard({ day, blocks }) {
       </button>
       {open && (
         <div className="border-t border-border px-3 py-2 space-y-1">
+          {day.trainingCycleSnapshot&&<p className="rounded bg-muted p-2 text-xs">{TRAINING_OBJECTIVE_INSTRUCTIONS[day.trainingCycleSnapshot.objective]} {day.trainingCycleSnapshot.effortCue}</p>}
           {blocks.map((b) => (
             <WorkoutBlockPreview key={b.id} block={b} />
           ))}

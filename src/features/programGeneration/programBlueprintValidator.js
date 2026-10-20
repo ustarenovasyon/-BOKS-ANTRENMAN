@@ -6,6 +6,9 @@
  * --------------------------------------------------------------
  */
 import { LOCAL_DB, WEEKLY_SESSION_ROLES, WORKOUT_BLOCK_TYPES, PROGRAM_GENERATION_REASON_CODES } from '@/config/architecture';
+import { PROGRAM_DURATION_MONTHS } from '@/config/architecture';
+import { BOXING_V2_FOUNDATIONAL_COMBINATIONS } from '@/features/boxing/curriculum/boxingV2FoundationalCombinations';
+import { getV2DefenseEligibleRules } from '@/features/boxing/curriculum/boxingV2DefenseCurriculumEligibility';
 import { resolveGenerationPolicyVersion } from './generationPolicyResolver';
 import { validateFootworkTechniqueDay } from './footworkTechniqueBlock';
 import { validateFootworkPrescriptionDay } from './footworkPrescription';
@@ -19,6 +22,8 @@ import { MIN_INTERSET_REST_SECONDS } from './programGenerationConstants';
 const RC = PROGRAM_GENERATION_REASON_CODES;
 const SLIP_IDS = new Set([BOXING_MOVE_IDS.SLIP_LEAD, BOXING_MOVE_IDS.SLIP_REAR]);
 const COMBO_BY_ID = new Map(BOXING_COMBINATIONS.map((c) => [c.id, c]));
+const V2_COMBO_BY_ID = new Map([...BOXING_COMBINATIONS,...BOXING_V2_FOUNDATIONAL_COMBINATIONS].map(c=>[c.id,c]));
+const V2_DEF_BY_ID = new Map(getV2DefenseEligibleRules(6).map(r=>[r.id,r]));
 const DEF_BY_ID = new Map(DEFENSE_COUNTER_RULES.map((r) => [r.id, r]));
 const TEMPLATE_BY_ID = new Map(STRENGTH_TEMPLATES.map((t) => [t.id, t]));
 const FORBIDDEN_KG_KEYS = ['kg', 'weight', 'recommendedKg', 'defaultKg', 'workingWeight', 'loadKg', 'autoWeight', 'recommendedLoad', 'percentage1rm', 'suggestedWeight'];
@@ -32,10 +37,10 @@ export function validateFullProgramBlueprint(blueprint) {
   const { program, programVersion, programDays, workoutBlocks } = blueprint;
   const settings = programVersion.settingsSnapshot;
   const policy = resolveGenerationPolicyVersion(programVersion);
-  if (!policy.resolved) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
+  if (!policy.resolved || !policy.active) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
 
   // Program-level
-  if (![1, 3, 6].includes(settings.durationMonths)) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
+  if (!(policy.version === 2 ? Object.values(PROGRAM_DURATION_MONTHS) : [1,3,6]).includes(settings.durationMonths)) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
   if (!programVersion.programStartDate || !programVersion.endDateExclusive) reasons.push(RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED);
   const total = programVersion.totalPlannedTrainingSessions;
   if (!Number.isInteger(total) || total < 1) reasons.push(RC.PROGRAM_NO_SCHEDULED_DAYS);
@@ -104,7 +109,7 @@ export function validateFullProgramBlueprint(blueprint) {
     // boxing blocks
     for (const b of dayBlocks) {
       if (b.type === WORKOUT_BLOCK_TYPES.BOXING_ATTACK_WORK) {
-        const combo = COMBO_BY_ID.get(b.combinationId);
+        const combo = (policy.version===2?V2_COMBO_BY_ID:COMBO_BY_ID).get(b.combinationId);
         if (!combo) reasons.push(RC.PROGRAM_BOXING_VALIDATION_FAILED);
         else {
           if (b.moveCount > (day.balancedCapsSnapshot?.boxingComboCeiling || 99)) reasons.push(RC.PROGRAM_BOXING_VALIDATION_FAILED);
@@ -116,7 +121,7 @@ export function validateFullProgramBlueprint(blueprint) {
         }
       }
       if (b.type === WORKOUT_BLOCK_TYPES.BOXING_DEFENSE_WORK) {
-        if (!DEF_BY_ID.has(b.defenseRuleId)) reasons.push(RC.PROGRAM_DEFENSE_VALIDATION_FAILED);
+        if (!(policy.version===2?V2_DEF_BY_ID:DEF_BY_ID).has(b.defenseRuleId)) reasons.push(RC.PROGRAM_DEFENSE_VALIDATION_FAILED);
       }
       if (b.type === WORKOUT_BLOCK_TYPES.STRENGTH_EXERCISE) {
         const tmpl = TEMPLATE_BY_ID.get(b.templateId);

@@ -9,12 +9,11 @@
  *   missing field (undefined)      → V1 (legacy)
  *   null                           → fail-closed (explicit but unknown)
  *   explicit V1                    → V1 (active)
- *   explicit V2                    → V2 (defined but NOT active — fail-closed)
+ *   explicit V2                    → V2 (active since PART 45)
  *   unknown                        → fail-closed
  *
- * V2 production generation henüz aktif değildir. Bu resolver yalnızca
- * version'u çözer ve aktif/pasif durumunu belirler. V2 audit/generation
- * path ileride ilgili PART'ta açılır.
+ * Generator, audit ve preview V2 path'leri PART 45'te birlikte açıldı.
+ * Eksik version için legacy V1 varsayılanı değişmez.
  * --------------------------------------------------------------
  */
 import { GENERATION_POLICY_VERSIONS, CURRENT_GENERATION_POLICY_VERSION } from '@/config/architecture';
@@ -51,9 +50,9 @@ export function resolveGenerationPolicyVersion(programVersion) {
     return { resolved: true, version: V1, active: true, legacy: false };
   }
 
-  // Explicit V2 — defined but not yet active in PART 20
+  // Explicit V2 — jointly activated in PART 45
   if (raw === V2) {
-    return { resolved: true, version: V2, active: false, legacy: false };
+    return { resolved: true, version: V2, active: true, legacy: false };
   }
 
   // Unknown — fail-closed
@@ -68,8 +67,8 @@ export function resolveGenerationPolicyVersion(programVersion) {
 }
 
 /**
- * Aktif production generation policy version'ını döndürür.
- * PART 20: V1 (V2 henüz aktif değil).
+ * Legacy/default generation policy version'ını döndürür.
+ * V1 compatibility default korunur; yeni program UI'sı explicit V2 ister.
  */
 export function getActiveGenerationPolicyVersion() {
   return CURRENT_GENERATION_POLICY_VERSION;

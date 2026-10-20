@@ -1,62 +1,23 @@
-# UI Tamamlama Planı
+# Workout, History ve Settings
 
-## Mevcut durum
+Üç ekran production akışına bağlıdır; placeholder veya demo veri kullanmaz.
 
-### Hazır
-- Program oluşturma formu
-- Program listesi
-- Program preview
-- Audit/correction/approval bileşenleri
-- App shell / bottom navigation
-
-### Placeholder
-- Workout
-- History
-- Settings
-
-## Workout player hedefi
-
-Workout ekranı en az şu state machine'i desteklemelidir:
+## Workout
 
 `upcoming → in_progress ↔ paused → awaiting_completion_confirmation → completed`
 
-Ayrıca `partial` ve `skipped` davranışı açıkça tanımlanmalıdır.
+Partial/skipped ayrı terminal sonuçlardır. Süre dolması otomatik completed değildir. Blok atlayan seans partial olur. Onay tekrarı aynı güne ikinci history kaydı eklemez. Yalnız onaylı/locked ve fingerprint doğrulanmış program açılır.
 
-Süre bitti diye otomatik completed yapılmamalıdır; kullanıcı onayı gerekir.
+Boks attack/defense/footwork ayrı, work/rest görünür. Kombinasyon tek tek yumruk zamanlamasına zorlanmaz. Kuvvet set aralıkları persisted toplam bütçeyi böler. Teknik cue/guard/balance talimattır; fiziksel ölçüm yoktur.
 
-## Boxing round UI
-
-- Round numarası
-- Attack combo
-- Defense instruction varsa ayrı gösterim
-- Footwork prescription varsa ayrı görsel/tekst katmanı
-- Work/rest timer
-- Pause/resume
-- Sonraki round
-
-Footwork punch gibi cadence içine zorlanmamalıdır.
+Arka plana geçince durur; reload son checkpoint'i paused olarak açar. Kapalı geçen zaman yapılmış süreye eklenmez. Stale tab yazımı revision kontrolünde reddedilir. Abrupt kapanmada son yarım saniyelik tick kaybolabilir. Ayrıntı: `27_PART_43_WORKOUT_PLAYER.md`.
 
 ## History
 
-`workout_history` store'dan:
+Repository'den gerçek completed/partial/skipped kayıtları, planlanan/yapılan süre, tarih ve program adı gösterilir. Tarih/durum filtrelenebilir. Not ve efor kullanıcının öz beyanıdır.
 
-- tarih
-- program
-- tamamlanma durumu
-- planlanan / yapılan süre
-- skip/partial
-- kullanıcı feedback
+## Settings ve çevrimdışı
 
-gösterilmelidir.
+Ses/titreşim/tema, JSON export/import, kurtarma noktası ve çift adımlı sıfırlama çalışır. Sıfırlama yerel kurtarma noktasını koruduğunu açıkça belirtir. İçe aktarma atomiktir; geçersiz dosya mevcut veriyi değiştirmez. Production service worker ilk online açılışta shell/assets'i cache eder. Ayrıntı: `28_PART_44_HISTORY_SETTINGS_BACKUP.md`.
 
-## Settings
-
-Önerilen ilk ayarlar:
-
-- Data export/import
-- Local data reset (çift onay)
-- Ses/titreşim tercihleri
-- Timer preferences
-- UI theme gerekiyorsa
-
-Program generation ayarları Training Profile'da kalmalıdır; generic app settings ile karıştırılmamalıdır.
+390 × 844 Chromium testleri gerçek IndexedDB üzerinde oluşturma/onay/workout/reload/history/backup/migration/offline akışlarını çalıştırır. Hareket medyası, pivot veya fiziksel skor eklenmemiştir.

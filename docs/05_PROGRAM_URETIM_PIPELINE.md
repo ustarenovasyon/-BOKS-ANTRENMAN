@@ -101,3 +101,7 @@ Audit fingerprint `checkSummary` JSON'unu da içerdiğinden V1 path'te unconditi
 ## Current duration gate
 
 Generator `durationMonths` için yalnız `[1,3,6]` kabul eder. 9+ ay desteği eklenirken bu satırı değiştirmek tek başına yeterli değildir.
+
+## PART45 güncellemesi — aktif V2
+
+Yukarıdaki future bölümleri PART33 tarihçesidir. V2 artık `programGenerationV2.js` ve merkezi `v2ProgramPolicy.js` ile uygulanır. 60 sn izole footwork mevcut boks bütçesinden ayrılır; kalan interval süresi korunur. Stage-local introduction/repetition ve before/after prescription aktiftir. Gün/block/engine/settings tam V2 fingerprint ile imzalanır. Audit/preview/persistence birlikte doğrular. V1 yalnız 1/3/6, explicit V2 tüm sekiz süreyi destekler. Ayrıntı: `29_PART_45_V2_ACTIVATION.md`.

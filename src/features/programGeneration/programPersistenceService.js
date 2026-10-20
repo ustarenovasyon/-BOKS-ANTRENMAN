@@ -10,6 +10,9 @@
 import { localDb } from '@/lib/localData/localDb';
 import { LOCAL_DB, PROGRAM_GENERATION_REASON_CODES } from '@/config/architecture';
 import { nowIso } from '@/lib/localData/time';
+import {validateFullProgramBlueprint} from './programBlueprintValidator';
+import {computeBlueprintFingerprint} from './blueprintFingerprint';
+import {auditProgramSnapshotV2} from '@/features/programAudit/programAuditV2';
 
 const RC = PROGRAM_GENERATION_REASON_CODES;
 const STORES = [LOCAL_DB.STORES.PROGRAMS, LOCAL_DB.STORES.PROGRAM_VERSIONS, LOCAL_DB.STORES.PROGRAM_DAYS, LOCAL_DB.STORES.WORKOUT_BLOCKS];
@@ -31,6 +34,7 @@ export async function persistProgramBlueprint(blueprint) {
     return { valid: false, persisted: false, reasons: [RC.PROGRAM_PERSISTENCE_FAILED] };
   }
   const { program, programVersion } = blueprint;
+  if(!validateFullProgramBlueprint(blueprint).valid||computeBlueprintFingerprint(blueprint,programVersion.generationSeed)!==programVersion.blueprintFingerprint||(programVersion.generationPolicyVersion===2&&auditProgramSnapshotV2(blueprint).outcome!=='pass'))return {valid:false,persisted:false,reasons:[RC.PROGRAM_BLUEPRINT_VALIDATION_FAILED]};
 
   // Idempotency: mevcut program var mı?
   const existing = await localDb.get(LOCAL_DB.STORES.PROGRAMS, program.id);

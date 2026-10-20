@@ -35,6 +35,12 @@ npm run preview
 
 Tarayıcı testleri gerçek IndexedDB ve üretim motorunu kullanır. CI ve Pages aynı kapıları yayın öncesinde çalıştırır. Test matrisi: 216 V2 kombinasyonu; her biri iki bağımsız üretim/audit ve exact FP/AFP kontrolü. V1 canonical gate: `FP_9b61698b / AFP_3194287436` (104 seans).
 
+## Android APK
+
+Android7 ve üstü için bağımsız `com.ustarenovasyon.boxantrenman` uygulaması vardır. Uygulama dosyaları APK içine gömülür; ilk açılış dahil internet veya Chrome gerektirmez. Webdeki kayıtlarını aktarmak için web Ayarlar → JSON yedeğini indir; APK Ayarlar → JSON yedeği seç → doğrulanmış yedeği geri yükle adımlarını kullan. Uygulamayı kaldırmak yerel APK verilerini siler; önce JSON yedeği al.
+
+Derleme: Java17, Gradle8.9 ve AndroidSDK35/build-tools35.0.0 ile `npm ci`, `npm run build:android`, `gradle -p android assembleRelease`. Unsigned çıktıyı özel kalıcı anahtarla imzala. Gelecek güncellemeler aynı anahtar/applicationId ve daha yüksek versionCode kullanır. CI çevrimdışı API35 native UI testi uygular. Ayrıntı: [PART47](docs/32_PART_47_ANDROID.md).
+
 ## Çevrimdışı çalışma ve veri
 
 Production ilk başarılı çevrimiçi açılıştan sonra uygulama dosyalarını service worker ile önbelleğe alır. Sonraki açılışlar çevrimdışı çalışır. Geliştirme sunucusu service worker kullanmaz. Sekme arka plana gidince sayaç durur; yeniden açılışta son kayıtlı noktadan duraklatılmış olarak devam edilir. Süre dolması kendiliğinden tamamlandı kaydı oluşturmaz.
